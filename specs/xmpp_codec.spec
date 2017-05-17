@@ -4040,7 +4040,9 @@
         module = 'memo_xep_topic',
         result = {mod_topic,'$rtype', '$tid'},
         attrs = [#attr{name = <<"rtype">>,required= false},
-                #attr{name= <<"tid">>,required=false}] }).
+                #attr{name= <<"tid">>,required=false},
+                #attr{name= <<"tuser">>,required=false},
+                #attr{name= <<"code">>,required=false}] }).
 
 -spec dec_tzo(_) -> {integer(), integer()}.
 dec_tzo(Val) ->
