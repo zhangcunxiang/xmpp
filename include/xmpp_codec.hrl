@@ -333,6 +333,10 @@
 -record(addresses, {list = [] :: [#address{}]}).
 -type addresses() :: #addresses{}.
 
+-record(mod_topic, {rtype = <<>> :: binary(),
+                    tid = <<>> :: binary()}).
+-type mod_topic() :: #mod_topic{}.
+
 -record('see-other-host', {host :: binary() | inet:ip_address() | {binary() | inet:ip_address(),non_neg_integer()}}).
 -type 'see-other-host'() :: #'see-other-host'{}.
 
@@ -993,6 +997,7 @@
                         address() |
                         sasl_success() |
                         addresses() |
+                        mod_topic() |
                         muc_subscriptions() |
                         disco_items() |
                         compress() |

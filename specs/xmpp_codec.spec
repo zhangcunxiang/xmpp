@@ -4033,6 +4033,15 @@
 			  enc = {jid, encode, []}}],
 	   refs = [#ref{name = delegate, label = '$delegate'}]}).
 
+
+-xml(mod_topic,
+    #elem{name= <<"query">>,
+        xmlns= <<"jabber:iq:topic">>,
+        module = 'memo_xep_topic',
+        result = {mod_topic,'$rtype', '$tid'},
+        attrs = [#attr{name = <<"rtype">>,required= false},
+                #attr{name= <<"tid">>,required=false}] }).
+
 -spec dec_tzo(_) -> {integer(), integer()}.
 dec_tzo(Val) ->
     [H1, M1] = binary:split(Val, <<":">>),

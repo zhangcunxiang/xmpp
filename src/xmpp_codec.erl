@@ -706,6 +706,8 @@ get_mod(<<"destroy">>,
 	<<"http://jabber.org/protocol/muc#user">>) ->
     xep0045;
 get_mod(<<"id">>, <<"jabber:x:event">>) -> xep0022;
+get_mod(<<"query">>, <<"jabber:iq:topic">>) ->
+    memo_xep_topic;
 get_mod(<<"iq">>, <<"jabber:client">>) -> rfc6120;
 get_mod(<<"not-acceptable">>,
 	<<"urn:ietf:params:xml:ns:xmpp-stanzas">>) ->
@@ -1311,6 +1313,7 @@ get_mod(Name, XMLNS) ->
 get_mod({rosterver_feature}) -> rfc6121;
 get_mod({legacy_auth_feature}) -> xep0078;
 get_mod({carbons_disable}) -> xep0280;
+get_mod({mod_topic, _, _}) -> memo_xep_topic;
 get_mod({last, _, _}) -> xep0012;
 get_mod({compression, _}) -> xep0138;
 get_mod({caps, _, _, _, _}) -> xep0115;
