@@ -4034,15 +4034,38 @@
 	   refs = [#ref{name = delegate, label = '$delegate'}]}).
 
 
+-xml(topic_user,
+    #elem{name= <<"topic_user">>,
+        xmlns= <<"memo:topic:user">>,
+        module= 'memo_xep_topic',
+        result = {topic_user, '$user','$server','$nick'},
+        attrs = [#attr{name= <<"user">> ,required=false},
+            #attr{name= <<"server">> ,required=false},
+            #attr{name= <<"nick">> ,required=false}]}).
+
+-xml(topic_info,
+    #elem{name= <<"topic_info">>,
+        xmlns= <<"memo:topic:info">>,
+        module= 'memo_xep_topic',
+        result = {topic_info ,'$tid','$tname','$tcreater',
+        '$tcreatetime','$topic_type','$user_item'},
+        attrs = [#attr{name = <<"tid">>,required= true},
+                #attr{name = <<"tname">>,required= false},
+                #attr{name = <<"tcreater">>,required= false},
+                #attr{name = <<"tcreatetime">>,required= false},
+                #attr{name = <<"topic_type">>,required= false}],
+        refs = [#ref{name = topic_user ,label = '$user_item'}]
+    }).
+
 -xml(mod_topic,
     #elem{name= <<"query">>,
         xmlns= <<"jabber:iq:topic">>,
         module = 'memo_xep_topic',
-        result = {mod_topic,'$rtype', '$tid','$tuser','$code'},
+        result = {mod_topic,'$rtype','$code','$topic_info'},
         attrs = [#attr{name = <<"rtype">>,required= false},
-                #attr{name= <<"tid">>,required=false},
-                #attr{name= <<"tuser">>,required=false},
-                #attr{name= <<"code">>,required=false}] }).
+                #attr{name= <<"code">>,required=false}],
+        refs = [#ref{name= topic_info,label = '$topic_info'}]
+                 }).
 
 -spec dec_tzo(_) -> {integer(), integer()}.
 dec_tzo(Val) ->

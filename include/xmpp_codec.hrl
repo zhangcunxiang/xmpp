@@ -316,6 +316,11 @@
 -record(sm_r, {xmlns = <<>> :: binary()}).
 -type sm_r() :: #sm_r{}.
 
+-record(topic_user, {user = <<>> :: binary(),
+                     server = <<>> :: binary(),
+                     nick = <<>> :: binary()}).
+-type topic_user() :: #topic_user{}.
+
 -record(muc_actor, {jid :: undefined | jid:jid(),
                     nick = <<>> :: binary()}).
 -type muc_actor() :: #muc_actor{}.
@@ -332,10 +337,6 @@
 
 -record(addresses, {list = [] :: [#address{}]}).
 -type addresses() :: #addresses{}.
-
--record(mod_topic, {rtype = <<>> :: binary(),
-                    tid = <<>> :: binary()}).
--type mod_topic() :: #mod_topic{}.
 
 -record('see-other-host', {host :: binary() | inet:ip_address() | {binary() | inet:ip_address(),non_neg_integer()}}).
 -type 'see-other-host'() :: #'see-other-host'{}.
@@ -410,6 +411,19 @@
                           subid = <<>> :: binary(),
                           expiry :: undefined | erlang:timestamp()}).
 -type ps_subscription() :: #ps_subscription{}.
+
+-record(topic_info, {tid = <<>> :: binary(),
+                     tname = <<>> :: binary(),
+                     tcreater = <<>> :: binary(),
+                     tcreatetime = <<>> :: binary(),
+                     topic_type = <<>> :: binary(),
+                     user_item = [] :: [#topic_user{}]}).
+-type topic_info() :: #topic_info{}.
+
+-record(mod_topic, {rtype = <<>> :: binary(),
+                    code = <<>> :: binary(),
+                    topic_info = [] :: [#topic_info{}]}).
+-type mod_topic() :: #mod_topic{}.
 
 -record(bob_data, {cid = <<>> :: binary(),
                    'max-age' :: 'undefined' | non_neg_integer(),
@@ -963,13 +977,6 @@
                         xdata_option() |
                         version() |
                         sm_a() |
-                        stanza_id() |
-                        starttls_proceed() |
-                        forwarded() |
-                        client_id() |
-                        sm_resumed() |
-                        xevent() |
-                        privacy_list() |
                         carbons_sent() |
                         mam_archived() |
                         p1_rebind() |
@@ -982,9 +989,6 @@
                         block_list() |
                         delegated() |
                         rsm_set() |
-                        'see-other-host'() |
-                        hint() |
-                        stream_start() |
                         text() |
                         vcard_org() |
                         shim() |
@@ -997,8 +1001,8 @@
                         address() |
                         sasl_success() |
                         addresses() |
-                        mod_topic() |
                         muc_subscriptions() |
+                        mod_topic() |
                         disco_items() |
                         compress() |
                         bytestreams() |
@@ -1010,6 +1014,7 @@
                         delay() |
                         thumbnail() |
                         vcard_tel() |
+                        topic_info() |
                         vcard_geo() |
                         vcard_photo() |
                         pubsub_owner() |
@@ -1091,14 +1096,15 @@
                         csi() |
                         delegation_query() |
                         mam_query() |
-                        bookmark_url() |
                         vcard_email() |
+                        bookmark_url() |
                         vcard_label() |
                         vcard_logo() |
                         disco_info() |
                         feature_register() |
                         register() |
                         sm_r() |
+                        topic_user() |
                         stat_error() |
                         stanza_error() |
                         stream_error() |
@@ -1127,4 +1133,14 @@
                         ps_affiliation() |
                         mam_fin() |
                         bob_data() |
-                        media().
+                        media() |
+                        stanza_id() |
+                        starttls_proceed() |
+                        forwarded() |
+                        client_id() |
+                        sm_resumed() |
+                        xevent() |
+                        privacy_list() |
+                        'see-other-host'() |
+                        hint() |
+                        stream_start().

@@ -939,6 +939,8 @@ get_mod(<<"db:verify">>, <<"jabber:server">>) ->
 get_mod(<<"url">>, <<"jabber:x:oob">>) -> xep0066;
 get_mod(<<"delegated">>, <<"urn:xmpp:delegation:1">>) ->
     xep0355;
+get_mod(<<"topic_info">>, <<"memo:topic:info">>) ->
+    memo_xep_topic;
 get_mod(<<"presence">>,
 	<<"jabber:component:accept">>) ->
     rfc6120;
@@ -1069,6 +1071,8 @@ get_mod(<<"ORGUNIT">>, <<"vcard-temp">>) -> xep0054;
 get_mod(<<"UID">>, <<"vcard-temp">>) -> xep0054;
 get_mod(<<"required">>, <<"jabber:x:data">>) -> xep0004;
 get_mod(<<"result">>, <<"urn:xmpp:mam:0">>) -> xep0313;
+get_mod(<<"topic_user">>, <<"memo:topic:user">>) ->
+    memo_xep_topic;
 get_mod(<<"TEL">>, <<"vcard-temp">>) -> xep0054;
 get_mod(<<"prefs">>, <<"urn:xmpp:mam:tmp">>) -> xep0313;
 get_mod(<<"captcha">>, <<"urn:xmpp:captcha">>) ->
@@ -1313,17 +1317,9 @@ get_mod(Name, XMLNS) ->
 get_mod({rosterver_feature}) -> rfc6121;
 get_mod({legacy_auth_feature}) -> xep0078;
 get_mod({carbons_disable}) -> xep0280;
-get_mod({mod_topic, _, _}) -> memo_xep_topic;
 get_mod({last, _, _}) -> xep0012;
 get_mod({compression, _}) -> xep0138;
-get_mod({caps, _, _, _, _}) -> xep0115;
-get_mod({xdata, _, _, _, _, _, _}) -> xep0004;
-get_mod({ps_options, _, _, _, _}) -> xep0060;
-get_mod({muc_admin, _}) -> xep0045;
 get_mod({mam_prefs, _, _, _, _}) -> xep0313;
-get_mod({search, _, _, _, _, _, _, _}) -> xep0055;
-get_mod({expire, _, _}) -> xep0023;
-get_mod({privilege, _, _}) -> xep0356;
 get_mod({stanza_error, _, _, _, _, _, _}) -> rfc6120;
 get_mod({muc_user, _, _, _, _, _, _}) -> xep0045;
 get_mod({bytestreams, _, _, _, _, _, _}) -> xep0065;
@@ -1348,12 +1344,14 @@ get_mod({carbons_received, _}) -> xep0280;
 get_mod({carbons_sent, _}) -> xep0280;
 get_mod({hint, _}) -> xep0334;
 get_mod({client_id, _}) -> xep0359;
+get_mod({topic_user, _, _, _}) -> memo_xep_topic;
 get_mod({disco_items, _, _, _}) -> xep0030;
 get_mod({private, _}) -> xep0049;
 get_mod({sasl_challenge, _}) -> rfc6120;
 get_mod({compress_failure, _}) -> xep0138;
 get_mod({db_feature, _}) -> xep0220;
 get_mod({handshake, _}) -> xep0114;
+get_mod({mod_topic, _, _, _}) -> memo_xep_topic;
 get_mod({message, _, _, _, _, _, _, _, _, _, _}) ->
     rfc6120;
 get_mod({presence, _, _, _, _, _, _, _, _, _, _}) ->
@@ -1402,6 +1400,8 @@ get_mod({muc, _, _}) -> xep0045;
 get_mod({carbons_enable}) -> xep0280;
 get_mod({carbons_private}) -> xep0280;
 get_mod({mix_leave}) -> xep0369;
+get_mod({topic_info, _, _, _, _, _, _}) ->
+    memo_xep_topic;
 get_mod({privacy_list, _, _}) -> xep0016;
 get_mod({text, _, _}) -> rfc6120;
 get_mod({shim, _}) -> xep0131;
@@ -1498,4 +1498,11 @@ get_mod({starttls_failure}) -> rfc6120;
 get_mod({bob_data, _, _, _, _}) -> xep0231;
 get_mod({bind, _, _}) -> rfc6120;
 get_mod({rsm_first, _, _}) -> xep0059;
+get_mod({caps, _, _, _, _}) -> xep0115;
+get_mod({xdata, _, _, _, _, _, _}) -> xep0004;
+get_mod({ps_options, _, _, _, _}) -> xep0060;
+get_mod({muc_admin, _}) -> xep0045;
+get_mod({search, _, _, _, _, _, _, _}) -> xep0055;
+get_mod({expire, _, _}) -> xep0023;
+get_mod({privilege, _, _}) -> xep0356;
 get_mod(Record) -> xmpp_codec_external:lookup(Record).
