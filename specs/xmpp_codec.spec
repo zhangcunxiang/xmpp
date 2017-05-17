@@ -4038,7 +4038,7 @@
     #elem{name= <<"query">>,
         xmlns= <<"jabber:iq:topic">>,
         module = 'memo_xep_topic',
-        result = {mod_topic,'$rtype', '$tid'},
+        result = {mod_topic,'$rtype', '$tid','$tuser','$code'},
         attrs = [#attr{name = <<"rtype">>,required= false},
                 #attr{name= <<"tid">>,required=false},
                 #attr{name= <<"tuser">>,required=false},
