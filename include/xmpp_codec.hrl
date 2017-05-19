@@ -177,6 +177,12 @@
                     height :: 'undefined' | non_neg_integer()}).
 -type thumbnail() :: #thumbnail{}.
 
+-record(topic_user_item, {user = <<>> :: binary(),
+                          server = <<>> :: binary(),
+                          nick = <<>> :: binary(),
+                          addtime = <<>> :: binary()}).
+-type topic_user_item() :: #topic_user_item{}.
+
 -record(privilege_perm, {access :: 'message' | 'presence' | 'roster',
                          type :: 'both' | 'get' | 'managed_entity' | 'none' | 'outgoing' | 'roster' | 'set'}).
 -type privilege_perm() :: #privilege_perm{}.
@@ -185,6 +191,15 @@
                       from :: undefined | jid:jid(),
                       to :: undefined | jid:jid()}).
 -type muc_decline() :: #muc_decline{}.
+
+-record(auth_info, {type = groupauth :: 'groupauth' | 'sgroupauth',
+                    data = <<>> :: binary()}).
+-type auth_info() :: #auth_info{}.
+
+-record(receipt_info, {type = server :: 'read' | 'received' | 'server',
+                       msgid = <<>> :: binary(),
+                       data = <<>> :: binary()}).
+-type receipt_info() :: #receipt_info{}.
 
 -record(upload_slot_0, {get :: binary(),
                         put :: binary(),
@@ -316,11 +331,6 @@
 -record(sm_r, {xmlns = <<>> :: binary()}).
 -type sm_r() :: #sm_r{}.
 
--record(topic_user, {user = <<>> :: binary(),
-                     server = <<>> :: binary(),
-                     nick = <<>> :: binary()}).
--type topic_user() :: #topic_user{}.
-
 -record(muc_actor, {jid :: undefined | jid:jid(),
                     nick = <<>> :: binary()}).
 -type muc_actor() :: #muc_actor{}.
@@ -412,17 +422,31 @@
                           expiry :: undefined | erlang:timestamp()}).
 -type ps_subscription() :: #ps_subscription{}.
 
--record(topic_info, {tid = <<>> :: binary(),
-                     tname = <<>> :: binary(),
-                     tcreater = <<>> :: binary(),
-                     tcreatetime = <<>> :: binary(),
-                     topic_type = <<>> :: binary(),
-                     user_item = [] :: [#topic_user{}]}).
--type topic_info() :: #topic_info{}.
+-record(chat_info, {type = oto :: 'group' | 'groupchat' | 'oto' | 'topic' | 'topicchat',
+                    content_type = <<>> :: binary(),
+                    target_id = <<>> :: binary(),
+                    data = <<>> :: binary()}).
+-type chat_info() :: #chat_info{}.
+
+-record(memo_info, {memo_type = chat :: 'auth' | 'chat' | 'receipt',
+                    chat_info :: 'undefined' | #chat_info{},
+                    auth_info :: 'undefined' | #auth_info{},
+                    receipt_info :: 'undefined' | #receipt_info{}}).
+-type memo_info() :: #memo_info{}.
+
+-record(query_topic_info, {tid = <<>> :: binary(),
+                           tname = <<>> :: binary(),
+                           tcreater :: undefined | jid:jid(),
+                           tcreate_time = <<>> :: binary(),
+                           topic_type = <<>> :: binary(),
+                           user_item = [] :: [#topic_user_item{}],
+                           tmaxnum = <<>> :: binary()}).
+-type query_topic_info() :: #query_topic_info{}.
 
 -record(mod_topic, {rtype = <<>> :: binary(),
                     code = <<>> :: binary(),
-                    topic_info = [] :: [#topic_info{}]}).
+                    tuser = <<>> :: binary(),
+                    topic_info :: 'undefined' | #query_topic_info{}}).
 -type mod_topic() :: #mod_topic{}.
 
 -record(bob_data, {cid = <<>> :: binary(),
@@ -1014,7 +1038,11 @@
                         delay() |
                         thumbnail() |
                         vcard_tel() |
-                        topic_info() |
+                        receipt_info() |
+                        chat_info() |
+                        query_topic_info() |
+                        auth_info() |
+                        memo_info() |
                         vcard_geo() |
                         vcard_photo() |
                         pubsub_owner() |
@@ -1072,6 +1100,7 @@
                         adhoc_command() |
                         sm_failed() |
                         ping() |
+                        topic_user_item() |
                         privilege_perm() |
                         privacy_item() |
                         disco_item() |
@@ -1104,7 +1133,6 @@
                         feature_register() |
                         register() |
                         sm_r() |
-                        topic_user() |
                         stat_error() |
                         stanza_error() |
                         stream_error() |

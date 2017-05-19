@@ -4034,38 +4034,95 @@
 	   refs = [#ref{name = delegate, label = '$delegate'}]}).
 
 
--xml(topic_user,
-    #elem{name= <<"topic_user">>,
-        xmlns= <<"memo:topic:user">>,
+-xml(topic_user_item,
+    #elem{name= <<"topic_user_item">>,
+        xmlns= <<"jabber:iq:topic">>,
         module= 'memo_xep_topic',
-        result = {topic_user, '$user','$server','$nick'},
+        result = {topic_user_item,'$user','$server','$nick','$addtime'},
         attrs = [#attr{name= <<"user">> ,required=false},
             #attr{name= <<"server">> ,required=false},
-            #attr{name= <<"nick">> ,required=false}]}).
+            #attr{name= <<"nick">> ,required=false},
+            #attr{name= <<"addtime">> ,required=false}]}).
 
--xml(topic_info,
-    #elem{name= <<"topic_info">>,
-        xmlns= <<"memo:topic:info">>,
+-xml(query_topic_info,
+    #elem{name= <<"query_topic_info">>,
+        xmlns= <<"jabber:iq:topic">>,
         module= 'memo_xep_topic',
-        result = {topic_info ,'$tid','$tname','$tcreater',
-        '$tcreatetime','$topic_type','$user_item'},
+        result = {query_topic_info ,'$tid','$tname','$tcreater',
+        '$tcreate_time','$topic_type','$user_item','$tmaxnum'},
         attrs = [#attr{name = <<"tid">>,required= true},
                 #attr{name = <<"tname">>,required= false},
-                #attr{name = <<"tcreater">>,required= false},
-                #attr{name = <<"tcreatetime">>,required= false},
-                #attr{name = <<"topic_type">>,required= false}],
-        refs = [#ref{name = topic_user ,label = '$user_item'}]
+                #attr{name = <<"tcreater">>,required= false,
+                dec = {jid, decode, []},
+                enc = {jid, encode, []}},
+                #attr{name = <<"tcreate_time">>,required= false},
+                #attr{name = <<"topic_type">>,required= false},
+                #attr{name = <<"tmaxnum">>,required= false}],
+        refs = [#ref{name = topic_user_item ,label = '$user_item'}]
     }).
 
 -xml(mod_topic,
     #elem{name= <<"query">>,
         xmlns= <<"jabber:iq:topic">>,
         module = 'memo_xep_topic',
-        result = {mod_topic,'$rtype','$code','$topic_info'},
+        result = {mod_topic,'$rtype','$code','$tuser','$topic_info'},
         attrs = [#attr{name = <<"rtype">>,required= false},
-                #attr{name= <<"code">>,required=false}],
-        refs = [#ref{name= topic_info,label = '$topic_info'}]
+                #attr{name= <<"code">>,required=false},
+                #attr{name = <<"tuser">>,required = false }],
+        refs = [#ref{name= query_topic_info,min = 0, max = 1,label = '$topic_info'}]
                  }).
+
+-xml(chat_info,
+    #elem{name = <<"chat_info">>,
+        xmlns = <<"jabber:memo:chat">>,
+        module = 'memo_xep_message',
+        result = { chat_info,'$type','$content_type','$target_id','$data'},
+        attrs = [ #attr{name = <<"type">>, default= oto,
+                                  enc = {enc_enum, []},
+                                  dec = {dec_enum, [[oto,topic,topicchat,group,groupchat]]} },
+                 #attr{name = <<"target_id">>,required = false},
+                #attr{name = <<"content_type">> ,required = false}],
+        cdata = #cdata{label = '$data', default = <<"">>}
+        }).
+
+-xml(auth_info,
+    #elem{name= <<"auth_info">>,
+        xmlns = <<"jabber:memo:auth">>,
+        module = 'memo_xep_message',
+        result = { auth_info, '$type','$data'},
+        attrs = [ #attr{name = <<"type">>, default = groupauth,
+                        enc = {enc_enum, []},
+                        dec = {dec_enum, [[groupauth,sgroupauth]]} }],
+        cdata = #cdata{label = '$data', default = <<"">>}
+         }).
+
+-xml(receipt_info,
+    #elem{name = <<"receipt_info">>,
+        xmlns= <<"jabber:memo:receipt">>,
+        module = 'memo_xep_message',
+        result = {receipt_info, '$type','$msgid','$data'},
+        attrs = [ #attr{name = <<"type">>, default = server,
+                       enc = {enc_enum, []},
+                       dec = {dec_enum, [[server,received,read ]] } },
+                 #attr{name = <<"msgid">>,required = false}],
+        cdata = #cdata{label = '$data', default = <<"">>}
+        }).
+
+-xml(memo_info,
+    #elem{name = <<"memo_info">>,
+        xmlns= <<"jabber:message:memo">>,
+        module = 'memo_xep_message',
+        result = {memo_info,'$memo_type','$chat_info','$auth_info','$receipt_info'},
+        attrs = [ #attr{name = <<"memo_type">>,default= chat ,
+                            enc = {enc_enum, []},
+                            dec = {dec_enum, [[chat,auth,receipt ]] }}],
+        refs = [#ref{name = chat_info ,max=1,min =0,label = '$chat_info'},
+            #ref{name = auth_info ,max = 1,min = 0, label = '$auth_info'},
+            #ref{name = receipt_info ,max = 1,min = 0, label = '$receipt_info'}
+        ]
+        }).
+
+
 
 -spec dec_tzo(_) -> {integer(), integer()}.
 dec_tzo(Val) ->
