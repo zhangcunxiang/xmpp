@@ -4072,45 +4072,133 @@
         refs = [#ref{name= query_topic_info,min = 0, max = 1,label = '$topic_info'}]
                  }).
 
+
+-xml(group_user_item,
+     #elem{name = <<"group_user_item">>,
+        xmlns= <<"jabber:memo:group">>,
+        module = 'memo_xep_group',
+        result = {group_user_item,'$user','$server','$nick','$role'},
+        attrs = [#attr{name = <<"user">>,required= false},
+                #attr{name = <<"server">>,required = false},
+                #attr{name = <<"nick">>,required = false},
+                #attr{name = <<"role">> ,required = false}]
+        }).
+
+-xml(query_group_info,
+    #elem{name = <<"query_group_info">>,
+        xmlns= <<"jabber:memo:group">>,
+        module = 'memo_xep_group',
+        result = {query_group_info, '$otype','$targetuser','$gid','$gname','$group_type','$maxuser','$gcreater','$user_items'},
+        attrs = [#attr{name = <<"otype">>,required = false},
+                #attr{name = <<"targetuser">> ,required = false},
+                #attr{name = <<"gid">> ,required = false},
+                #attr{name = <<"gname">> ,required = false},
+                #attr{name = <<"group_type">> ,required = false},
+                #attr{name = <<"maxuser">> ,required = false},
+                #attr{name = <<"gcreater">> ,required = false,
+                dec = {jid, decode, []},
+                enc = {jid, encode, []}}],
+        refs = [ #ref{name = group_user_item ,label = '$user_items'}]
+        }).
+
+
+
+-xml(memo_group,
+    #elem{name = <<"query">>,
+        xmlns= <<"jabber:memo:group">>,
+        module = 'memo_xep_group',
+        result = { memo_group, '$rtype','$group_info','$group_type'},
+        attrs = [#attr{name = <<"rtype">>,required = false},
+        #attr{name = <<"group_type">>,required = false}],
+        refs = [ #ref{name = query_group_info, min = 0, max = 1,label = '$group_info'}]
+        }).
+
+
+
+-xml(group_item,
+    #elem{name= <<"group_item">>,
+        xmlns= <<"jabber:memo:group:relation">>,
+        module = 'memo_xep_group_relation',
+        result = {group_item, '$gid','$gname','$group_type','$gcreater','$role','$photo','$maxuser'},
+        attrs = [#attr{name = <<"gid">> ,required = false},
+                 #attr{name = <<"gname">> ,required = false},
+                 #attr{name = <<"group_type">> ,required = false},
+                 #attr{name = <<"maxuser">> ,required = false},
+                 #attr{name = <<"role">> ,required = false},
+                 #attr{name = <<"photo">> ,required = false},
+                 #attr{name = <<"gcreater">> ,required = false,
+                                 dec = {jid, decode, []},
+                                 enc = {jid, encode, []}}]
+                                 }).
+
+-xml(group_relation_request,
+    #elem{ name= <<"request_info">>,
+        xmlns= <<"jabber:memo:group:relation">>,
+        module = 'memo_xep_group_relation',
+        result = { request_info, '$sub_type','$ask_msg',
+                '$join_user','$invite_user','$out_user','$invited_user'},
+        attrs = [ #attr{name = <<"sub_type">>,required = false},
+                #attr{name = <<"ask_msg">>,required = false},
+                #attr{name = <<"join_user">>,required = false},
+                #attr{name = <<"invite_user">>,required = false},
+                #attr{name = <<"out_user">>,required = false},
+                #attr{name = <<"invited_user">>,required = false}]
+        }).
+
+
+-xml(memo_group_relation,
+    #elem{name = <<"query">>,
+        xmlns= <<"jabber:memo:group:relation">>,
+        module = 'memo_xep_group_relation',
+        result = { memo_group_relation, '$rtype','$gid','$request_info','$group_items'},
+        attrs = [#attr{name = <<"rtype">>,required = false},
+                #attr{name = <<"gid">>,required = false}],
+        refs = [ #ref{name = group_item,label = '$group_items'},
+        #ref{name = group_relation_request,min = 0, max = 1,label = '$request_info'}]
+        }).
+
+
+
+
 -xml(chat_info,
     #elem{name = <<"chat_info">>,
-        xmlns = <<"jabber:memo:chat">>,
+        xmlns = <<"jabber:memo:message">>,
         module = 'memo_xep_message',
-        result = { chat_info,'$type','$content_type','$target_id','$data'},
+        result = { chat_info,'$type','$content_type','$target_id'},
         attrs = [ #attr{name = <<"type">>, default= oto,
                                   enc = {enc_enum, []},
                                   dec = {dec_enum, [[oto,topic,topicchat,group,groupchat]]} },
                  #attr{name = <<"target_id">>,required = false},
-                #attr{name = <<"content_type">> ,required = false}],
-        cdata = #cdata{label = '$data', default = <<"">>}
+                #attr{name = <<"content_type">> ,required = false}]
         }).
 
 -xml(auth_info,
     #elem{name= <<"auth_info">>,
-        xmlns = <<"jabber:memo:auth">>,
+        xmlns = <<"jabber:memo:message">>,
         module = 'memo_xep_message',
-        result = { auth_info, '$type','$data'},
+        result = { auth_info, '$type','$sub_type','$auth_msg','$nick'},
         attrs = [ #attr{name = <<"type">>, default = groupauth,
                         enc = {enc_enum, []},
-                        dec = {dec_enum, [[groupauth,sgroupauth]]} }],
-        cdata = #cdata{label = '$data', default = <<"">>}
+                        dec = {dec_enum, [[groupauth,sgroupauth]]} },
+                  #attr{name= <<"sub_type">>,required = false},
+                  #attr{name = <<"auth_msg">>,required = false},
+                  #attr{name = <<"nick">>,required = false}]
          }).
 
 -xml(receipt_info,
     #elem{name = <<"receipt_info">>,
-        xmlns= <<"jabber:memo:receipt">>,
+        xmlns= <<"jabber:memo:message">>,
         module = 'memo_xep_message',
-        result = {receipt_info, '$type','$msgid','$data'},
+        result = {receipt_info, '$type','$msgid'},
         attrs = [ #attr{name = <<"type">>, default = server,
                        enc = {enc_enum, []},
                        dec = {dec_enum, [[server,received,read ]] } },
-                 #attr{name = <<"msgid">>,required = false}],
-        cdata = #cdata{label = '$data', default = <<"">>}
+                 #attr{name = <<"msgid">>,required = false}]
         }).
 
 -xml(memo_info,
     #elem{name = <<"memo_info">>,
-        xmlns= <<"jabber:message:memo">>,
+        xmlns= <<"jabber:memo:message">>,
         module = 'memo_xep_message',
         result = {memo_info,'$memo_type','$chat_info','$auth_info','$receipt_info'},
         attrs = [ #attr{name = <<"memo_type">>,default= chat ,
