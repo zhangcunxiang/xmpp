@@ -4210,6 +4210,94 @@
         ]
         }).
 
+-xml(search_user_item,
+    #elem{name = <<"user_item">>,
+        xmlns= <<"jabber:memo:search">>,
+        module = 'memo_xep_search',
+        result = {search_user_item,'$jid','$nick','$photo'},
+        attrs = [ #attr{name = <<"jid">>,required=false ,
+                              dec = {jid, decode, []},
+                              enc = {jid, encode, []} },
+                  #attr{name = <<"nick">>,required= false},
+                  #attr{name = <<"photo">>,required =false}]
+                  }).
+
+-xml(search_group_item,
+    #elem{name = <<"group_item">>,
+        xmlns= <<"jabber:memo:search">>,
+        module = 'memo_xep_search',
+        result = {search_group_item,'$gid','$gname','$gphoto','$gtype'},
+        attrs = [ #attr{name = <<"gid">>,required=false},
+                  #attr{name = <<"gname">>,required= false},
+                  #attr{name = <<"gphoto">>,required =false},
+                  #attr{name = <<"gtype">>,required =false}]
+                  }).
+
+-xml(search_account,
+    #elem{name = <<"account">>,
+        xmlns= <<"jabber:memo:search">>,
+        module = 'memo_xep_search',
+        result = '$cdata',
+        cdata = #cdata{required = true, label = '$cdata'}
+        }).
+
+
+-xml(memo_search,
+    #elem{name = <<"query">>,
+        xmlns= <<"jabber:memo:search">>,
+        module = 'memo_xep_search',
+        result = {memo_search,'$rtype','$keywords','$user_items','$group_items','$search_account'},
+        attrs = [ #attr{name = <<"rtype">>,required=false},
+        #attr{name = <<"keywords">>,required=false}],
+        refs = [#ref{name = search_user_item,label= '$user_items'},
+            #ref{name = search_group_item,label= '$group_items'},
+            #ref{name = search_account,max=1,min=0,label = '$search_account'}]
+            }).
+
+-xml(group_vcard_BINVAL,
+     #elem{name = <<"BINVAL">>,
+           xmlns = <<"group-vcard-temp">>,
+	   module = 'memo_group_vcard',
+           cdata = #cdata{dec = {base64, decode, []},
+                          enc = {base64, encode, []}},
+           result = '$cdata'}).
+
+-xml(group_vcard_GROUP_NAME,
+     #elem{name = <<"GROUP_NAME">>,
+           xmlns = <<"group-vcard-temp">>,
+	   module = 'memo_group_vcard',
+           cdata = #cdata{required = true, label = '$cdata'},
+           result = '$cdata'}).
+
+-xml(group_vcard_TYPE,
+     #elem{name = <<"TYPE">>,
+           xmlns = <<"group-vcard-temp">>,
+	   module = 'memo_group_vcard',
+           cdata = #cdata{required = true, label = '$cdata'},
+           result = '$cdata'}).
+
+-xml(group_vcard_PHOTO,
+    #elem{name = <<"PHOTO">>,
+        xmlns= <<"group-vcard-temp">>,
+        module = 'memo-group-vcard',
+        result = {group_vcard_photo,'$type','$photo'},
+        refs = [ #ref{name = group_vcard_BINVAL, label='$photo',max=1,min=0},
+                #ref{name = group_vcard_TYPE,label ='$type',max=1,min=0}]
+                }).
+
+
+
+
+-xml(memo_group_vcard,
+    #elem{name = <<"query">>,
+        xmlns= <<"group-vcard-temp">>,
+        module = 'memo_group_vcard',
+        result = {memo_group_vcard,'$gid','$photo_version','$group_name','$photo'},
+        attrs = [#attr{name = <<"gid">>,required= false},
+            #attr{name= <<"photo_version">>,required = false}],
+        refs = [ #ref{name = group_vcard_GROUP_NAME, label='$group_name',min=0,max=1},
+            #ref{name = group_vcard_PHOTO,label = '$photo',min=0,max=1}]
+            }).
 
 
 -spec dec_tzo(_) -> {integer(), integer()}.

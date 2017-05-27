@@ -337,6 +337,12 @@
                        ver :: 'undefined' | binary()}).
 -type roster_query() :: #roster_query{}.
 
+-record(search_group_item, {gid = <<>> :: binary(),
+                            gname = <<>> :: binary(),
+                            gphoto = <<>> :: binary(),
+                            gtype = <<>> :: binary()}).
+-type search_group_item() :: #search_group_item{}.
+
 -record(group_item, {gid = <<>> :: binary(),
                      gname = <<>> :: binary(),
                      group_type = <<>> :: binary(),
@@ -407,6 +413,10 @@
                       resource :: 'undefined' | binary()}).
 -type legacy_auth() :: #legacy_auth{}.
 
+-record(group_vcard_photo, {type :: 'undefined' | binary(),
+                            photo :: 'undefined' | binary()}).
+-type group_vcard_photo() :: #group_vcard_photo{}.
+
 -record(ps_subscribe, {node = <<>> :: binary(),
                        jid :: jid:jid()}).
 -type ps_subscribe() :: #ps_subscribe{}.
@@ -425,6 +435,18 @@
                      name = <<>> :: binary(),
                      node = <<>> :: binary()}).
 -type disco_item() :: #disco_item{}.
+
+-record(search_user_item, {jid :: undefined | jid:jid(),
+                           nick = <<>> :: binary(),
+                           photo = <<>> :: binary()}).
+-type search_user_item() :: #search_user_item{}.
+
+-record(memo_search, {rtype = <<>> :: binary(),
+                      keywords = <<>> :: binary(),
+                      user_items = [] :: [#search_user_item{}],
+                      group_items = [] :: [#search_group_item{}],
+                      search_account :: 'undefined' | binary()}).
+-type memo_search() :: #memo_search{}.
 
 -record(unblock, {items = [] :: [jid:jid()]}).
 -type unblock() :: #unblock{}.
@@ -632,6 +654,12 @@
 
 -record(rosterver_feature, {}).
 -type rosterver_feature() :: #rosterver_feature{}.
+
+-record(memo_group_vcard, {gid = <<>> :: binary(),
+                           photo_version = <<>> :: binary(),
+                           group_name :: 'undefined' | binary(),
+                           photo :: 'undefined' | #group_vcard_photo{}}).
+-type memo_group_vcard() :: #memo_group_vcard{}.
 
 -record(muc_invite, {reason = <<>> :: binary(),
                      from :: undefined | jid:jid(),
@@ -1059,12 +1087,8 @@
                         rsm_set() |
                         text() |
                         vcard_org() |
+                        search_group_item() |
                         group_item() |
-                        shim() |
-                        search_item() |
-                        group_user_item() |
-                        offline_item() |
-                        muc_item() |
                         feature_sm() |
                         roster_item() |
                         vcard_temp() |
@@ -1146,6 +1170,7 @@
                         stat() |
                         upload_request() |
                         xdata_field() |
+                        memo_group_vcard() |
                         adhoc_command() |
                         sm_failed() |
                         ping() |
@@ -1153,6 +1178,7 @@
                         privilege_perm() |
                         privacy_item() |
                         disco_item() |
+                        search_user_item() |
                         ps_item() |
                         upload_slot_0() |
                         upload_request_0() |
@@ -1177,8 +1203,9 @@
                         vcard_email() |
                         bookmark_url() |
                         vcard_label() |
-                        vcard_logo() |
+                        group_vcard_photo() |
                         disco_info() |
+                        vcard_logo() |
                         feature_register() |
                         register() |
                         sm_r() |
@@ -1202,6 +1229,7 @@
                         muc_unsubscribe() |
                         ps_unsubscribe() |
                         chatstate() |
+                        memo_search() |
                         sasl_auth() |
                         p1_push() |
                         oob_x() |
@@ -1221,4 +1249,9 @@
                         privacy_list() |
                         'see-other-host'() |
                         hint() |
-                        stream_start().
+                        stream_start() |
+                        shim() |
+                        search_item() |
+                        group_user_item() |
+                        offline_item() |
+                        muc_item().

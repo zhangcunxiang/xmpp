@@ -268,6 +268,10 @@ get_mod(<<"password">>, <<"jabber:iq:auth">>) ->
 get_mod(<<"TZ">>, <<"vcard-temp">>) -> xep0054;
 get_mod(<<"request">>, <<"urn:xmpp:http:upload">>) ->
     xep0363;
+get_mod(<<"group_item">>, <<"jabber:memo:search">>) ->
+    memo_xep_search;
+get_mod(<<"query">>, <<"jabber:memo:search">>) ->
+    memo_xep_search;
 get_mod(<<"nick">>, <<"storage:bookmarks">>) -> xep0048;
 get_mod(<<"iq">>, <<"jabber:component:accept">>) ->
     rfc6120;
@@ -311,6 +315,8 @@ get_mod(<<"request_info">>,
 get_mod(<<"query">>, <<"jabber:iq:roster">>) -> rfc6121;
 get_mod(<<"digest">>, <<"jabber:iq:auth">>) -> xep0078;
 get_mod(<<"NUMBER">>, <<"vcard-temp">>) -> xep0054;
+get_mod(<<"PHOTO">>, <<"group-vcard-temp">>) ->
+    'memo-group-vcard';
 get_mod(<<"gone">>,
 	<<"urn:ietf:params:xml:ns:xmpp-stanzas">>) ->
     rfc6120;
@@ -432,6 +438,8 @@ get_mod(<<"delay">>, <<"urn:xmpp:delay">>) -> xep0203;
 get_mod(<<"first">>, <<"jabber:iq:search">>) -> xep0055;
 get_mod(<<"request">>, <<"urn:xmpp:http:upload:0">>) ->
     xep0363;
+get_mod(<<"BINVAL">>, <<"group-vcard-temp">>) ->
+    memo_group_vcard;
 get_mod(<<"conflict">>,
 	<<"urn:ietf:params:xml:ns:xmpp-stanzas">>) ->
     rfc6120;
@@ -447,6 +455,8 @@ get_mod(<<"query">>, <<"urn:xmpp:delegation:1">>) ->
 get_mod(<<"invalid-options">>,
 	<<"http://jabber.org/protocol/pubsub#errors">>) ->
     xep0060;
+get_mod(<<"query">>, <<"group-vcard-temp">>) ->
+    memo_group_vcard;
 get_mod(<<"event">>, <<"urn:xmpp:mucsub:0">>) ->
     p1_mucsub;
 get_mod(<<"query">>, <<"jabber:iq:search">>) -> xep0055;
@@ -628,36 +638,17 @@ get_mod(<<"status">>, <<"jabber:component:accept">>) ->
 get_mod(<<"query">>, <<"jabber:iq:register">>) ->
     xep0077;
 get_mod(<<"CLASS">>, <<"vcard-temp">>) -> xep0054;
-get_mod(<<"storage">>, <<"storage:bookmarks">>) ->
-    xep0048;
-get_mod(<<"LINE">>, <<"vcard-temp">>) -> xep0054;
-get_mod(<<"PRODID">>, <<"vcard-temp">>) -> xep0054;
-get_mod(<<"publish-options">>,
-	<<"http://jabber.org/protocol/pubsub">>) ->
-    xep0060;
 get_mod(<<"purge">>,
 	<<"http://jabber.org/protocol/pubsub#event">>) ->
     xep0060;
 get_mod(<<"header">>,
 	<<"http://jabber.org/protocol/shim">>) ->
     xep0131;
-get_mod(<<"reason">>,
-	<<"http://jabber.org/protocol/muc#admin">>) ->
-    xep0045;
 get_mod(<<"failed">>, <<"urn:xmpp:sm:3">>) -> xep0198;
 get_mod(<<"x">>, <<"jabber:x:expire">>) -> xep0023;
-get_mod(<<"policy-violation">>,
-	<<"urn:ietf:params:xml:ns:xmpp-stanzas">>) ->
-    rfc6120;
-get_mod(<<"mechanism">>,
-	<<"urn:ietf:params:xml:ns:xmpp-sasl">>) ->
-    rfc6120;
 get_mod(<<"not-well-formed">>,
 	<<"urn:ietf:params:xml:ns:xmpp-streams">>) ->
     rfc6120;
-get_mod(<<"default">>,
-	<<"http://jabber.org/protocol/pubsub">>) ->
-    xep0060;
 get_mod(<<"content-type">>,
 	<<"eu:siacs:conversations:http:upload">>) ->
     xep0363;
@@ -987,6 +978,8 @@ get_mod(<<"fetch">>,
 get_mod(<<"state">>, <<"jabber:iq:register">>) ->
     xep0077;
 get_mod(<<"utc">>, <<"urn:xmpp:time">>) -> xep0202;
+get_mod(<<"TYPE">>, <<"group-vcard-temp">>) ->
+    memo_group_vcard;
 get_mod(<<"DOM">>, <<"vcard-temp">>) -> xep0054;
 get_mod(<<"default">>,
 	<<"http://jabber.org/protocol/pubsub#owner">>) ->
@@ -1196,6 +1189,8 @@ get_mod(<<"invalid-payload">>,
 	<<"http://jabber.org/protocol/pubsub#errors">>) ->
     xep0060;
 get_mod(<<"last">>, <<"jabber:iq:search">>) -> xep0055;
+get_mod(<<"GROUP_NAME">>, <<"group-vcard-temp">>) ->
+    memo_group_vcard;
 get_mod(<<"query">>, <<"jabber:iq:last">>) -> xep0012;
 get_mod(<<"show">>, <<"jabber:server">>) -> rfc6120;
 get_mod(<<"configure">>,
@@ -1338,12 +1333,37 @@ get_mod(<<"no-permanent-store">>,
     xep0334;
 get_mod(<<"filename">>, <<"urn:xmpp:http:upload">>) ->
     xep0363;
+get_mod(<<"storage">>, <<"storage:bookmarks">>) ->
+    xep0048;
+get_mod(<<"LINE">>, <<"vcard-temp">>) -> xep0054;
+get_mod(<<"PRODID">>, <<"vcard-temp">>) -> xep0054;
+get_mod(<<"publish-options">>,
+	<<"http://jabber.org/protocol/pubsub">>) ->
+    xep0060;
+get_mod(<<"reason">>,
+	<<"http://jabber.org/protocol/muc#admin">>) ->
+    xep0045;
+get_mod(<<"policy-violation">>,
+	<<"urn:ietf:params:xml:ns:xmpp-stanzas">>) ->
+    rfc6120;
+get_mod(<<"mechanism">>,
+	<<"urn:ietf:params:xml:ns:xmpp-sasl">>) ->
+    rfc6120;
+get_mod(<<"default">>,
+	<<"http://jabber.org/protocol/pubsub">>) ->
+    xep0060;
+get_mod(<<"user_item">>, <<"jabber:memo:search">>) ->
+    memo_xep_search;
+get_mod(<<"account">>, <<"jabber:memo:search">>) ->
+    memo_xep_search;
 get_mod(Name, XMLNS) ->
     xmpp_codec_external:lookup(Name, XMLNS).
 
 get_mod({rosterver_feature}) -> rfc6121;
 get_mod({legacy_auth_feature}) -> xep0078;
 get_mod({carbons_disable}) -> xep0280;
+get_mod({memo_search, _, _, _, _, _}) ->
+    memo_xep_search;
 get_mod({last, _, _}) -> xep0012;
 get_mod({compression, _}) -> xep0138;
 get_mod({mam_prefs, _, _, _, _}) -> xep0313;
@@ -1354,7 +1374,6 @@ get_mod({bytestreams, _, _, _, _, _, _}) -> xep0065;
 get_mod({sasl_auth, _, _}) -> rfc6120;
 get_mod({vcard_logo, _, _, _}) -> xep0054;
 get_mod({ps_item, _, _, _, _, _}) -> xep0060;
-get_mod({ps_event, _, _, _, _, _, _}) -> xep0060;
 get_mod({p1_ack}) -> p1_stream;
 get_mod({mam_fin, _, _, _, _, _}) -> xep0313;
 get_mod({memo_group, _, _, _}) -> memo_xep_group;
@@ -1402,6 +1421,8 @@ get_mod({db_result, _, _, _, _, _}) -> xep0220;
 get_mod({group_user_item, _, _, _, _}) ->
     memo_xep_group;
 get_mod({receipt_info, _, _}) -> memo_xep_message;
+get_mod({search_group_item, _, _, _, _}) ->
+    memo_xep_search;
 get_mod({bookmark_conference, _, _, _, _, _}) ->
     xep0048;
 get_mod({feature_register}) -> xep0077;
@@ -1462,6 +1483,9 @@ get_mod({pubsub_owner, _, _, _, _, _, _}) -> xep0060;
 get_mod({mam_result, _, _, _, _}) -> xep0313;
 get_mod({sm_failed, _, _, _, _}) -> xep0198;
 get_mod({upload_request, _, _, _, _}) -> xep0363;
+get_mod({search_user_item, _, _, _}) -> memo_xep_search;
+get_mod({memo_group_vcard, _, _, _, _}) ->
+    memo_group_vcard;
 get_mod({version, _, _, _}) -> xep0092;
 get_mod({vcard_org, _, _}) -> xep0054;
 get_mod({ps_items, _, _, _, _, _, _}) -> xep0060;
@@ -1517,6 +1541,8 @@ get_mod({delegation, _, _}) -> xep0355;
 get_mod({sm_enabled, _, _, _, _, _}) -> xep0198;
 get_mod({topic_user_item, _, _, _, _}) ->
     memo_xep_topic;
+get_mod({group_vcard_photo, _, _}) ->
+    'memo-group-vcard';
 get_mod({vcard_email, _, _, _, _, _, _}) -> xep0054;
 get_mod({ps_affiliation, _, _, _, _}) -> xep0060;
 get_mod({feature_csi, _}) -> xep0352;
@@ -1548,4 +1574,5 @@ get_mod({expire, _, _}) -> xep0023;
 get_mod({privilege, _, _}) -> xep0356;
 get_mod({stanza_error, _, _, _, _, _, _}) -> rfc6120;
 get_mod({muc_invite, _, _, _, _}) -> xep0045;
+get_mod({ps_event, _, _, _, _, _, _}) -> xep0060;
 get_mod(Record) -> xmpp_codec_external:lookup(Record).
