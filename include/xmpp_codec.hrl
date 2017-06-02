@@ -206,7 +206,7 @@
                     nick = <<>> :: binary()}).
 -type auth_info() :: #auth_info{}.
 
--record(receipt_info, {type = server :: 'read' | 'received' | 'server',
+-record(receipt_info, {type :: 'read' | 'received' | 'server',
                        msgid = <<>> :: binary()}).
 -type receipt_info() :: #receipt_info{}.
 
@@ -240,6 +240,11 @@
                         jid :: undefined | jid:jid(),
                         events = [] :: [binary()]}).
 -type muc_subscribe() :: #muc_subscribe{}.
+
+-record(memo_check_account, {account = <<>> :: binary(),
+                             server = <<>> :: binary(),
+                             exist = <<>> :: binary()}).
+-type memo_check_account() :: #memo_check_account{}.
 
 -record(stanza_id, {by :: jid:jid(),
                     id = <<>> :: binary()}).
@@ -358,6 +363,11 @@
                               group_items = [] :: [#group_item{}]}).
 -type memo_group_relation() :: #memo_group_relation{}.
 
+-record(memo_invite_info, {beinviteds = <<>> :: binary(),
+                           invite_num = <<>> :: binary(),
+                           success_num = <<>> :: binary()}).
+-type memo_invite_info() :: #memo_invite_info{}.
+
 -record(sm_r, {xmlns = <<>> :: binary()}).
 -type sm_r() :: #sm_r{}.
 
@@ -377,6 +387,11 @@
 
 -record(addresses, {list = [] :: [#address{}]}).
 -type addresses() :: #addresses{}.
+
+-record(memo_change_pass, {account = <<>> :: binary(),
+                           newpass = <<>> :: binary(),
+                           vcode = <<>> :: binary()}).
+-type memo_change_pass() :: #memo_change_pass{}.
 
 -record('see-other-host', {host :: binary() | inet:ip_address() | {binary() | inet:ip_address(),non_neg_integer()}}).
 -type 'see-other-host'() :: #'see-other-host'{}.
@@ -468,12 +483,13 @@
                           expiry :: undefined | erlang:timestamp()}).
 -type ps_subscription() :: #ps_subscription{}.
 
--record(chat_info, {type = oto :: 'group' | 'groupchat' | 'oto' | 'topic' | 'topicchat',
+-record(chat_info, {type :: 'group' | 'oto' | 'topic',
+                    dispatched = <<>> :: binary(),
                     content_type = <<>> :: binary(),
                     target_id = <<>> :: binary()}).
 -type chat_info() :: #chat_info{}.
 
--record(memo_info, {memo_type = chat :: 'auth' | 'chat' | 'receipt',
+-record(memo_info, {memo_type :: 'auth' | 'chat' | 'receipt',
                     chat_info :: 'undefined' | #chat_info{},
                     auth_info :: 'undefined' | #auth_info{},
                     receipt_info :: 'undefined' | #receipt_info{}}).
@@ -1096,6 +1112,7 @@
                         address() |
                         sasl_success() |
                         addresses() |
+                        memo_change_pass() |
                         muc_subscriptions() |
                         mod_topic() |
                         disco_items() |
@@ -1206,6 +1223,7 @@
                         group_vcard_photo() |
                         disco_info() |
                         vcard_logo() |
+                        memo_invite_info() |
                         feature_register() |
                         register() |
                         sm_r() |
@@ -1240,6 +1258,7 @@
                         mam_fin() |
                         bob_data() |
                         media() |
+                        memo_check_account() |
                         stanza_id() |
                         starttls_proceed() |
                         forwarded() |

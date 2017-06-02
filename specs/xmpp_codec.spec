@@ -4164,10 +4164,12 @@
     #elem{name = <<"chat_info">>,
         xmlns = <<"jabber:memo:message">>,
         module = 'memo_xep_message',
-        result = { chat_info,'$type','$content_type','$target_id'},
-        attrs = [ #attr{name = <<"type">>, default= oto,
+        result = { chat_info,'$type','$dispatched','$content_type','$target_id'},
+        attrs = [ #attr{name = <<"type">>,
+                            required=true,
                                   enc = {enc_enum, []},
-                                  dec = {dec_enum, [[oto,topic,topicchat,group,groupchat]]} },
+                                  dec = {dec_enum, [[oto,topic,group]]} },
+                  #attr{name = <<"dispatched">> ,required = false},
                  #attr{name = <<"target_id">>,required = false},
                 #attr{name = <<"content_type">> ,required = false}]
         }).
@@ -4190,9 +4192,10 @@
         xmlns= <<"jabber:memo:message">>,
         module = 'memo_xep_message',
         result = {receipt_info, '$type','$msgid'},
-        attrs = [ #attr{name = <<"type">>, default = server,
+        attrs = [ #attr{name = <<"type">>,
+                        required = true,
                        enc = {enc_enum, []},
-                       dec = {dec_enum, [[server,received,read ]] } },
+                       dec = {dec_enum, [[server,received,read]] } },
                  #attr{name = <<"msgid">>,required = false}]
         }).
 
@@ -4201,9 +4204,10 @@
         xmlns= <<"jabber:memo:message">>,
         module = 'memo_xep_message',
         result = {memo_info,'$memo_type','$chat_info','$auth_info','$receipt_info'},
-        attrs = [ #attr{name = <<"memo_type">>,default= chat ,
+        attrs = [ #attr{name = <<"memo_type">>,
+                            required = true,
                             enc = {enc_enum, []},
-                            dec = {dec_enum, [[chat,auth,receipt ]] }}],
+                            dec = {dec_enum, [[chat,auth,receipt]] }}],
         refs = [#ref{name = chat_info ,max=1,min =0,label = '$chat_info'},
             #ref{name = auth_info ,max = 1,min = 0, label = '$auth_info'},
             #ref{name = receipt_info ,max = 1,min = 0, label = '$receipt_info'}
@@ -4279,7 +4283,7 @@
 -xml(group_vcard_PHOTO,
     #elem{name = <<"PHOTO">>,
         xmlns= <<"group-vcard-temp">>,
-        module = 'memo-group-vcard',
+        module = 'memo_group_vcard',
         result = {group_vcard_photo,'$type','$photo'},
         refs = [ #ref{name = group_vcard_BINVAL, label='$photo',max=1,min=0},
                 #ref{name = group_vcard_TYPE,label ='$type',max=1,min=0}]
@@ -4297,6 +4301,37 @@
             #attr{name= <<"photo_version">>,required = false}],
         refs = [ #ref{name = group_vcard_GROUP_NAME, label='$group_name',min=0,max=1},
             #ref{name = group_vcard_PHOTO,label = '$photo',min=0,max=1}]
+            }).
+
+
+-xml(memo_check_account,
+    #elem{name = <<"query">>,
+        xmlns= <<"memo:check:account">>,
+        module = 'memo_check_account',
+        result = {memo_check_account,'$account','$server','$exist'},
+        attrs = [#attr{name = <<"account">>,required= false},
+                #attr{name = <<"server">>,required= false},
+                #attr{name = <<"exist">>,required= false}]
+                }).
+
+-xml(memo_change_pass,
+    #elem{name = <<"query">>,
+        xmlns= <<"memo:change:pass">>,
+        module= 'memo_change_pass',
+        result = {memo_change_pass,'$account','$newpass','$vcode'},
+        attrs = [#attr{name = <<"account">>,required= false},
+            #attr{name = <<"newpass">>,required= false},
+            #attr{name = <<"vcode">>,required= false}]
+            }).
+
+-xml(memo_invite_info,
+    #elem{name= <<"query">>,
+        xmlns= <<"memo:invite:info">>,
+        module= 'memo_invite_info',
+        result = {memo_invite_info,'$beinviteds','$invite_num','$success_num'},
+        attrs = [#attr{name = <<"beinviteds">>,required= false},
+            #attr{name = <<"invite_num">>,required= false},
+            #attr{name = <<"success_num">>,required= false} ]
             }).
 
 
