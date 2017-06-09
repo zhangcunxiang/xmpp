@@ -200,14 +200,24 @@
                       to :: undefined | jid:jid()}).
 -type muc_decline() :: #muc_decline{}.
 
--record(auth_info, {type = groupauth :: 'groupauth' | 'sgroupauth',
+-record(auth_info, {type :: 'groupauth' | 'sgroupauth' | 'topicauth',
                     sub_type = <<>> :: binary(),
+                    info_id = <<>> :: binary(),
+                    info_name = <<>> :: binary(),
                     auth_msg = <<>> :: binary(),
+                    otype = <<>> :: binary(),
+                    need_resend = <<>> :: binary(),
+                    operate_user = <<>> :: binary(),
+                    target_user = <<>> :: binary(),
                     nick = <<>> :: binary()}).
 -type auth_info() :: #auth_info{}.
 
 -record(receipt_info, {type :: 'read' | 'received' | 'server',
-                       msgid = <<>> :: binary()}).
+                       msgid = <<>> :: binary(),
+                       topic_name = <<>> :: binary(),
+                       topic_id = <<>> :: binary(),
+                       max_user = <<>> :: binary(),
+                       now_user = <<>> :: binary()}).
 -type receipt_info() :: #receipt_info{}.
 
 -record(upload_slot_0, {get :: binary(),
@@ -486,7 +496,10 @@
 -record(chat_info, {type :: 'group' | 'oto' | 'topic',
                     dispatched = <<>> :: binary(),
                     content_type = <<>> :: binary(),
-                    target_id = <<>> :: binary()}).
+                    target_id = <<>> :: binary(),
+                    target_name = <<>> :: binary(),
+                    max_user = <<>> :: binary(),
+                    now_user = <<>> :: binary()}).
 -type chat_info() :: #chat_info{}.
 
 -record(memo_info, {memo_type :: 'auth' | 'chat' | 'receipt',

@@ -1430,7 +1430,6 @@ get_mod({xevent, _, _, _, _, _}) -> xep0022;
 get_mod({db_result, _, _, _, _, _}) -> xep0220;
 get_mod({group_user_item, _, _, _, _}) ->
     memo_xep_group;
-get_mod({receipt_info, _, _}) -> memo_xep_message;
 get_mod({search_group_item, _, _, _, _}) ->
     memo_xep_search;
 get_mod({bookmark_conference, _, _, _, _, _}) ->
@@ -1464,6 +1463,8 @@ get_mod({carbons_private}) -> xep0280;
 get_mod({mix_leave}) -> xep0369;
 get_mod({request_info, _, _, _, _, _, _}) ->
     memo_xep_group_relation;
+get_mod({receipt_info, _, _, _, _, _, _}) ->
+    memo_xep_message;
 get_mod({privacy_list, _, _}) -> xep0016;
 get_mod({text, _, _}) -> rfc6120;
 get_mod({shim, _}) -> xep0131;
@@ -1500,6 +1501,8 @@ get_mod({version, _, _, _}) -> xep0092;
 get_mod({vcard_org, _, _}) -> xep0054;
 get_mod({ps_items, _, _, _, _, _, _}) -> xep0060;
 get_mod({muc_subscribe, _, _, _, _}) -> p1_mucsub;
+get_mod({auth_info, _, _, _, _, _, _, _, _, _, _}) ->
+    memo_xep_message;
 get_mod({roster_item, _, _, _, _, _}) -> rfc6121;
 get_mod({vcard_tel, _, _, _, _, _, _, _, _, _, _, _, _,
 	 _, _}) ->
@@ -1536,6 +1539,8 @@ get_mod({muc_unsubscribe, _}) -> p1_mucsub;
 get_mod({sic, _, _, _}) -> xep0279;
 get_mod({query_topic_info, _, _, _, _, _, _, _}) ->
     memo_xep_topic;
+get_mod({chat_info, _, _, _, _, _, _, _}) ->
+    memo_xep_message;
 get_mod({sm_resumed, _, _, _}) -> xep0198;
 get_mod({offline_item, _, _}) -> xep0013;
 get_mod({db_verify, _, _, _, _, _, _}) -> xep0220;
@@ -1559,8 +1564,6 @@ get_mod({feature_csi, _}) -> xep0352;
 get_mod({memo_group_relation, _, _, _, _}) ->
     memo_xep_group_relation;
 get_mod({rsm_set, _, _, _, _, _, _, _}) -> xep0059;
-get_mod({chat_info, _, _, _, _}) -> memo_xep_message;
-get_mod({auth_info, _, _, _, _}) -> memo_xep_message;
 get_mod({memo_info, _, _, _, _}) -> memo_xep_message;
 get_mod({unblock, _}) -> xep0191;
 get_mod({stat_error, _, _}) -> xep0039;

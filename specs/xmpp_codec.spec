@@ -4164,39 +4164,54 @@
     #elem{name = <<"chat_info">>,
         xmlns = <<"jabber:memo:message">>,
         module = 'memo_xep_message',
-        result = { chat_info,'$type','$dispatched','$content_type','$target_id'},
+        result = { chat_info,'$type','$dispatched','$content_type','$target_id',
+        '$target_name','$max_user','$now_user'},
         attrs = [ #attr{name = <<"type">>,
                             required=true,
                                   enc = {enc_enum, []},
                                   dec = {dec_enum, [[oto,topic,group]]} },
                   #attr{name = <<"dispatched">> ,required = false},
                  #attr{name = <<"target_id">>,required = false},
-                #attr{name = <<"content_type">> ,required = false}]
+                #attr{name = <<"content_type">> ,required = false},
+                #attr{name = <<"target_name">> ,required = false},
+                #attr{name = <<"max_user">> ,required = false},
+                #attr{name = <<"now_user">> ,required = false}]
         }).
 
 -xml(auth_info,
     #elem{name= <<"auth_info">>,
         xmlns = <<"jabber:memo:message">>,
         module = 'memo_xep_message',
-        result = { auth_info, '$type','$sub_type','$auth_msg','$nick'},
-        attrs = [ #attr{name = <<"type">>, default = groupauth,
+        result = { auth_info, '$type','$sub_type','$info_id','$info_name','$auth_msg',
+        '$otype','$need_resend','$operate_user','$target_user','$nick'},
+        attrs = [ #attr{name = <<"type">>, required=true,
                         enc = {enc_enum, []},
-                        dec = {dec_enum, [[groupauth,sgroupauth]]} },
+                        dec = {dec_enum, [[groupauth,sgroupauth,topicauth]]} },
                   #attr{name= <<"sub_type">>,required = false},
+                  #attr{name= <<"info_id">>,required = false},
+                  #attr{name= <<"info_name">>,required = false},
                   #attr{name = <<"auth_msg">>,required = false},
-                  #attr{name = <<"nick">>,required = false}]
+                  #attr{name = <<"otype">>,required = false},
+                  #attr{name = <<"need_resend">>,required = false},
+                  #attr{name = <<"operate_user">>,required = false},
+                  #attr{name = <<"target_user">>,required = false},
+                  #attr{name = <<"nick">>,required = true }]
          }).
 
 -xml(receipt_info,
     #elem{name = <<"receipt_info">>,
         xmlns= <<"jabber:memo:message">>,
         module = 'memo_xep_message',
-        result = {receipt_info, '$type','$msgid'},
+        result = {receipt_info, '$type','$msgid','$topic_name','$topic_id','$max_user','$now_user'},
         attrs = [ #attr{name = <<"type">>,
                         required = true,
                        enc = {enc_enum, []},
                        dec = {dec_enum, [[server,received,read]] } },
-                 #attr{name = <<"msgid">>,required = false}]
+                 #attr{name = <<"msgid">>,required = false},
+                 #attr{name = <<"topic_name">>,required = false},
+                 #attr{name = <<"topic_id">>,required = false},
+                 #attr{name = <<"max_user">>,required = false},
+                 #attr{name = <<"now_user">>,required = false}]
         }).
 
 -xml(memo_info,
