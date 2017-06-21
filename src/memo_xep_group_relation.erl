@@ -1,5 +1,5 @@
 %% Created automatically by XML generator (fxml_gen.erl)
-%% Source: memo_codec.spec
+%% Source: xmpp_codec.spec
 
 -module(memo_xep_group_relation).
 
@@ -18,9 +18,9 @@ do_decode(<<"group_item">>,
     decode_group_item(<<"jabber:memo:group:relation">>,
 		      Opts, El);
 do_decode(Name, <<>>, _, _) ->
-    erlang:error({memo_codec, {missing_tag_xmlns, Name}});
+    erlang:error({xmpp_codec, {missing_tag_xmlns, Name}});
 do_decode(Name, XMLNS, _, _) ->
-    erlang:error({memo_codec, {unknown_tag, Name, XMLNS}}).
+    erlang:error({xmpp_codec, {unknown_tag, Name, XMLNS}}).
 
 tags() ->
     [{<<"query">>, <<"jabber:memo:group:relation">>},
@@ -85,7 +85,7 @@ decode_memo_group_relation_els(__TopXMLNS, __Opts,
 			       [{xmlel, <<"group_item">>, _attrs, _} = _el
 				| _els],
 			       Group_items, Request_info) ->
-    case memo_codec:get_attr(<<"xmlns">>, _attrs,
+    case xmpp_codec:get_attr(<<"xmlns">>, _attrs,
 			     __TopXMLNS)
 	of
       <<"jabber:memo:group:relation">> ->
@@ -102,7 +102,7 @@ decode_memo_group_relation_els(__TopXMLNS, __Opts,
 			       [{xmlel, <<"request_info">>, _attrs, _} = _el
 				| _els],
 			       Group_items, Request_info) ->
-    case memo_codec:get_attr(<<"xmlns">>, _attrs,
+    case xmpp_codec:get_attr(<<"xmlns">>, _attrs,
 			     __TopXMLNS)
 	of
       <<"jabber:memo:group:relation">> ->
@@ -142,7 +142,7 @@ encode_memo_group_relation({memo_group_relation, Rtype,
 			    Gid, Request_info, Group_items},
 			   __TopXMLNS) ->
     __NewTopXMLNS =
-	memo_codec:choose_top_xmlns(<<"jabber:memo:group:relation">>,
+	xmpp_codec:choose_top_xmlns(<<"jabber:memo:group:relation">>,
 				    [], __TopXMLNS),
     _els =
 	lists:reverse('encode_memo_group_relation_$group_items'(Group_items,
@@ -152,7 +152,7 @@ encode_memo_group_relation({memo_group_relation, Rtype,
 													   []))),
     _attrs = encode_memo_group_relation_attr_gid(Gid,
 						 encode_memo_group_relation_attr_rtype(Rtype,
-										       memo_codec:enc_xmlns_attrs(__NewTopXMLNS,
+										       xmpp_codec:enc_xmlns_attrs(__NewTopXMLNS,
 														  __TopXMLNS))),
     {xmlel, <<"query">>, _attrs, _els}.
 
@@ -277,7 +277,7 @@ encode_group_relation_request({request_info, Sub_type,
 			       Invited_user},
 			      __TopXMLNS) ->
     __NewTopXMLNS =
-	memo_codec:choose_top_xmlns(<<"jabber:memo:group:relation">>,
+	xmpp_codec:choose_top_xmlns(<<"jabber:memo:group:relation">>,
 				    [], __TopXMLNS),
     _els = [],
     _attrs =
@@ -287,7 +287,7 @@ encode_group_relation_request({request_info, Sub_type,
 																		   encode_group_relation_request_attr_join_user(Join_user,
 																								encode_group_relation_request_attr_ask_msg(Ask_msg,
 																													   encode_group_relation_request_attr_sub_type(Sub_type,
-																																		       memo_codec:enc_xmlns_attrs(__NewTopXMLNS,
+																																		       xmpp_codec:enc_xmlns_attrs(__NewTopXMLNS,
 																																						  __TopXMLNS))))))),
     {xmlel, <<"request_info">>, _attrs, _els}.
 
@@ -439,7 +439,7 @@ encode_group_item({group_item, Gid, Gname, Group_type,
 		   Gcreater, Role, Photo, Maxuser},
 		  __TopXMLNS) ->
     __NewTopXMLNS =
-	memo_codec:choose_top_xmlns(<<"jabber:memo:group:relation">>,
+	xmpp_codec:choose_top_xmlns(<<"jabber:memo:group:relation">>,
 				    [], __TopXMLNS),
     _els = [],
     _attrs = encode_group_item_attr_gcreater(Gcreater,
@@ -449,7 +449,7 @@ encode_group_item({group_item, Gid, Gname, Group_type,
 																     encode_group_item_attr_group_type(Group_type,
 																				       encode_group_item_attr_gname(Gname,
 																								    encode_group_item_attr_gid(Gid,
-																											       memo_codec:enc_xmlns_attrs(__NewTopXMLNS,
+																											       xmpp_codec:enc_xmlns_attrs(__NewTopXMLNS,
 																															  __TopXMLNS)))))))),
     {xmlel, <<"group_item">>, _attrs, _els}.
 
@@ -510,7 +510,7 @@ decode_group_item_attr_gcreater(__TopXMLNS,
 decode_group_item_attr_gcreater(__TopXMLNS, _val) ->
     case catch jid:decode(_val) of
       {'EXIT', _} ->
-	  erlang:error({memo_codec,
+	  erlang:error({xmpp_codec,
 			{bad_attr_value, <<"gcreater">>, <<"group_item">>,
 			 __TopXMLNS}});
       _res -> _res

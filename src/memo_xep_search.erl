@@ -1,5 +1,5 @@
 %% Created automatically by XML generator (fxml_gen.erl)
-%% Source: memo_codec.spec
+%% Source: xmpp_codec.spec
 
 -module(memo_xep_search).
 
@@ -21,9 +21,9 @@ do_decode(<<"user_item">>, <<"jabber:memo:search">>, El,
     decode_search_user_item(<<"jabber:memo:search">>, Opts,
 			    El);
 do_decode(Name, <<>>, _, _) ->
-    erlang:error({memo_codec, {missing_tag_xmlns, Name}});
+    erlang:error({xmpp_codec, {missing_tag_xmlns, Name}});
 do_decode(Name, XMLNS, _, _) ->
-    erlang:error({memo_codec, {unknown_tag, Name, XMLNS}}).
+    erlang:error({xmpp_codec, {unknown_tag, Name, XMLNS}}).
 
 tags() ->
     [{<<"query">>, <<"jabber:memo:search">>},
@@ -83,7 +83,7 @@ decode_memo_search_els(__TopXMLNS, __Opts, [],
 decode_memo_search_els(__TopXMLNS, __Opts,
 		       [{xmlel, <<"user_item">>, _attrs, _} = _el | _els],
 		       Group_items, User_items, Search_account) ->
-    case memo_codec:get_attr(<<"xmlns">>, _attrs,
+    case xmpp_codec:get_attr(<<"xmlns">>, _attrs,
 			     __TopXMLNS)
 	of
       <<"jabber:memo:search">> ->
@@ -100,7 +100,7 @@ decode_memo_search_els(__TopXMLNS, __Opts,
 decode_memo_search_els(__TopXMLNS, __Opts,
 		       [{xmlel, <<"group_item">>, _attrs, _} = _el | _els],
 		       Group_items, User_items, Search_account) ->
-    case memo_codec:get_attr(<<"xmlns">>, _attrs,
+    case xmpp_codec:get_attr(<<"xmlns">>, _attrs,
 			     __TopXMLNS)
 	of
       <<"jabber:memo:search">> ->
@@ -116,7 +116,7 @@ decode_memo_search_els(__TopXMLNS, __Opts,
 decode_memo_search_els(__TopXMLNS, __Opts,
 		       [{xmlel, <<"account">>, _attrs, _} = _el | _els],
 		       Group_items, User_items, Search_account) ->
-    case memo_codec:get_attr(<<"xmlns">>, _attrs,
+    case xmpp_codec:get_attr(<<"xmlns">>, _attrs,
 			     __TopXMLNS)
 	of
       <<"jabber:memo:search">> ->
@@ -154,7 +154,7 @@ encode_memo_search({memo_search, Rtype, Keywords,
 		    User_items, Group_items, Search_account},
 		   __TopXMLNS) ->
     __NewTopXMLNS =
-	memo_codec:choose_top_xmlns(<<"jabber:memo:search">>,
+	xmpp_codec:choose_top_xmlns(<<"jabber:memo:search">>,
 				    [], __TopXMLNS),
     _els =
 	lists:reverse('encode_memo_search_$group_items'(Group_items,
@@ -166,7 +166,7 @@ encode_memo_search({memo_search, Rtype, Keywords,
 															      [])))),
     _attrs = encode_memo_search_attr_keywords(Keywords,
 					      encode_memo_search_attr_rtype(Rtype,
-									    memo_codec:enc_xmlns_attrs(__NewTopXMLNS,
+									    xmpp_codec:enc_xmlns_attrs(__NewTopXMLNS,
 												       __TopXMLNS))),
     {xmlel, <<"query">>, _attrs, _els}.
 
@@ -236,15 +236,15 @@ decode_search_account_els(__TopXMLNS, __Opts,
 
 encode_search_account(Cdata, __TopXMLNS) ->
     __NewTopXMLNS =
-	memo_codec:choose_top_xmlns(<<"jabber:memo:search">>,
+	xmpp_codec:choose_top_xmlns(<<"jabber:memo:search">>,
 				    [], __TopXMLNS),
     _els = encode_search_account_cdata(Cdata, []),
-    _attrs = memo_codec:enc_xmlns_attrs(__NewTopXMLNS,
+    _attrs = xmpp_codec:enc_xmlns_attrs(__NewTopXMLNS,
 					__TopXMLNS),
     {xmlel, <<"account">>, _attrs, _els}.
 
 decode_search_account_cdata(__TopXMLNS, <<>>) ->
-    erlang:error({memo_codec,
+    erlang:error({xmpp_codec,
 		  {missing_cdata, <<>>, <<"account">>, __TopXMLNS}});
 decode_search_account_cdata(__TopXMLNS, _val) -> _val.
 
@@ -295,14 +295,14 @@ encode_search_group_item({search_group_item, Gid, Gname,
 			  Gphoto, Gtype},
 			 __TopXMLNS) ->
     __NewTopXMLNS =
-	memo_codec:choose_top_xmlns(<<"jabber:memo:search">>,
+	xmpp_codec:choose_top_xmlns(<<"jabber:memo:search">>,
 				    [], __TopXMLNS),
     _els = [],
     _attrs = encode_search_group_item_attr_gtype(Gtype,
 						 encode_search_group_item_attr_gphoto(Gphoto,
 										      encode_search_group_item_attr_gname(Gname,
 															  encode_search_group_item_attr_gid(Gid,
-																			    memo_codec:enc_xmlns_attrs(__NewTopXMLNS,
+																			    xmpp_codec:enc_xmlns_attrs(__NewTopXMLNS,
 																						       __TopXMLNS))))),
     {xmlel, <<"group_item">>, _attrs, _els}.
 
@@ -384,13 +384,13 @@ encode_search_user_item({search_user_item, Jid, Nick,
 			 Photo},
 			__TopXMLNS) ->
     __NewTopXMLNS =
-	memo_codec:choose_top_xmlns(<<"jabber:memo:search">>,
+	xmpp_codec:choose_top_xmlns(<<"jabber:memo:search">>,
 				    [], __TopXMLNS),
     _els = [],
     _attrs = encode_search_user_item_attr_photo(Photo,
 						encode_search_user_item_attr_nick(Nick,
 										  encode_search_user_item_attr_jid(Jid,
-														   memo_codec:enc_xmlns_attrs(__NewTopXMLNS,
+														   xmpp_codec:enc_xmlns_attrs(__NewTopXMLNS,
 																	      __TopXMLNS)))),
     {xmlel, <<"user_item">>, _attrs, _els}.
 
@@ -400,7 +400,7 @@ decode_search_user_item_attr_jid(__TopXMLNS,
 decode_search_user_item_attr_jid(__TopXMLNS, _val) ->
     case catch jid:decode(_val) of
       {'EXIT', _} ->
-	  erlang:error({memo_codec,
+	  erlang:error({xmpp_codec,
 			{bad_attr_value, <<"jid">>, <<"user_item">>,
 			 __TopXMLNS}});
       _res -> _res

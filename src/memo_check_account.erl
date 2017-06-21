@@ -1,5 +1,5 @@
 %% Created automatically by XML generator (fxml_gen.erl)
-%% Source: memo_codec.spec
+%% Source: xmpp_codec.spec
 
 -module(memo_check_account).
 
@@ -10,9 +10,9 @@ do_decode(<<"query">>, <<"memo:check:account">>, El,
     decode_memo_check_account(<<"memo:check:account">>,
 			      Opts, El);
 do_decode(Name, <<>>, _, _) ->
-    erlang:error({memo_codec, {missing_tag_xmlns, Name}});
+    erlang:error({xmpp_codec, {missing_tag_xmlns, Name}});
 do_decode(Name, XMLNS, _, _) ->
-    erlang:error({memo_codec, {unknown_tag, Name, XMLNS}}).
+    erlang:error({xmpp_codec, {unknown_tag, Name, XMLNS}}).
 
 tags() -> [{<<"query">>, <<"memo:check:account">>}].
 
@@ -70,13 +70,13 @@ encode_memo_check_account({memo_check_account, Account,
 			   Server, Exist},
 			  __TopXMLNS) ->
     __NewTopXMLNS =
-	memo_codec:choose_top_xmlns(<<"memo:check:account">>,
+	xmpp_codec:choose_top_xmlns(<<"memo:check:account">>,
 				    [], __TopXMLNS),
     _els = [],
     _attrs = encode_memo_check_account_attr_exist(Exist,
 						  encode_memo_check_account_attr_server(Server,
 											encode_memo_check_account_attr_account(Account,
-															       memo_codec:enc_xmlns_attrs(__NewTopXMLNS,
+															       xmpp_codec:enc_xmlns_attrs(__NewTopXMLNS,
 																			  __TopXMLNS)))),
     {xmlel, <<"query">>, _attrs, _els}.
 

@@ -1,5 +1,5 @@
 %% Created automatically by XML generator (fxml_gen.erl)
-%% Source: memo_codec.spec
+%% Source: xmpp_codec.spec
 
 -module(memo_invite_info).
 
@@ -10,9 +10,9 @@ do_decode(<<"query">>, <<"memo:invite:info">>, El,
     decode_memo_invite_info(<<"memo:invite:info">>, Opts,
 			    El);
 do_decode(Name, <<>>, _, _) ->
-    erlang:error({memo_codec, {missing_tag_xmlns, Name}});
+    erlang:error({xmpp_codec, {missing_tag_xmlns, Name}});
 do_decode(Name, XMLNS, _, _) ->
-    erlang:error({memo_codec, {unknown_tag, Name, XMLNS}}).
+    erlang:error({xmpp_codec, {unknown_tag, Name, XMLNS}}).
 
 tags() -> [{<<"query">>, <<"memo:invite:info">>}].
 
@@ -70,14 +70,14 @@ encode_memo_invite_info({memo_invite_info, Beinviteds,
 			 Invite_num, Success_num},
 			__TopXMLNS) ->
     __NewTopXMLNS =
-	memo_codec:choose_top_xmlns(<<"memo:invite:info">>, [],
+	xmpp_codec:choose_top_xmlns(<<"memo:invite:info">>, [],
 				    __TopXMLNS),
     _els = [],
     _attrs =
 	encode_memo_invite_info_attr_success_num(Success_num,
 						 encode_memo_invite_info_attr_invite_num(Invite_num,
 											 encode_memo_invite_info_attr_beinviteds(Beinviteds,
-																 memo_codec:enc_xmlns_attrs(__NewTopXMLNS,
+																 xmpp_codec:enc_xmlns_attrs(__NewTopXMLNS,
 																			    __TopXMLNS)))),
     {xmlel, <<"query">>, _attrs, _els}.
 

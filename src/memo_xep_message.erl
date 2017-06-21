@@ -1,5 +1,5 @@
 %% Created automatically by XML generator (fxml_gen.erl)
-%% Source: memo_codec.spec
+%% Source: xmpp_codec.spec
 
 -module(memo_xep_message).
 
@@ -19,9 +19,9 @@ do_decode(<<"chat_info">>, <<"jabber:memo:message">>,
 	  El, Opts) ->
     decode_chat_info(<<"jabber:memo:message">>, Opts, El);
 do_decode(Name, <<>>, _, _) ->
-    erlang:error({memo_codec, {missing_tag_xmlns, Name}});
+    erlang:error({xmpp_codec, {missing_tag_xmlns, Name}});
 do_decode(Name, XMLNS, _, _) ->
-    erlang:error({memo_codec, {unknown_tag, Name, XMLNS}}).
+    erlang:error({xmpp_codec, {unknown_tag, Name, XMLNS}}).
 
 tags() ->
     [{<<"memo_info">>, <<"jabber:memo:message">>},
@@ -102,7 +102,7 @@ decode_memo_info_els(__TopXMLNS, __Opts, [],
 decode_memo_info_els(__TopXMLNS, __Opts,
 		     [{xmlel, <<"chat_info">>, _attrs, _} = _el | _els],
 		     Receipt_info, Auth_info, Chat_info) ->
-    case memo_codec:get_attr(<<"xmlns">>, _attrs,
+    case xmpp_codec:get_attr(<<"xmlns">>, _attrs,
 			     __TopXMLNS)
 	of
       <<"jabber:memo:message">> ->
@@ -117,7 +117,7 @@ decode_memo_info_els(__TopXMLNS, __Opts,
 decode_memo_info_els(__TopXMLNS, __Opts,
 		     [{xmlel, <<"auth_info">>, _attrs, _} = _el | _els],
 		     Receipt_info, Auth_info, Chat_info) ->
-    case memo_codec:get_attr(<<"xmlns">>, _attrs,
+    case xmpp_codec:get_attr(<<"xmlns">>, _attrs,
 			     __TopXMLNS)
 	of
       <<"jabber:memo:message">> ->
@@ -133,7 +133,7 @@ decode_memo_info_els(__TopXMLNS, __Opts,
 decode_memo_info_els(__TopXMLNS, __Opts,
 		     [{xmlel, <<"receipt_info">>, _attrs, _} = _el | _els],
 		     Receipt_info, Auth_info, Chat_info) ->
-    case memo_codec:get_attr(<<"xmlns">>, _attrs,
+    case xmpp_codec:get_attr(<<"xmlns">>, _attrs,
 			     __TopXMLNS)
 	of
       <<"jabber:memo:message">> ->
@@ -163,7 +163,7 @@ encode_memo_info({memo_info, Memo_type, Chat_info,
 		  Auth_info, Receipt_info},
 		 __TopXMLNS) ->
     __NewTopXMLNS =
-	memo_codec:choose_top_xmlns(<<"jabber:memo:message">>,
+	xmpp_codec:choose_top_xmlns(<<"jabber:memo:message">>,
 				    [], __TopXMLNS),
     _els =
 	lists:reverse('encode_memo_info_$receipt_info'(Receipt_info,
@@ -174,7 +174,7 @@ encode_memo_info({memo_info, Memo_type, Chat_info,
 														   __NewTopXMLNS,
 														   [])))),
     _attrs = encode_memo_info_attr_memo_type(Memo_type,
-					     memo_codec:enc_xmlns_attrs(__NewTopXMLNS,
+					     xmpp_codec:enc_xmlns_attrs(__NewTopXMLNS,
 									__TopXMLNS)),
     {xmlel, <<"memo_info">>, _attrs, _els}.
 
@@ -201,13 +201,13 @@ encode_memo_info({memo_info, Memo_type, Chat_info,
 
 decode_memo_info_attr_memo_type(__TopXMLNS,
 				undefined) ->
-    erlang:error({memo_codec,
+    erlang:error({xmpp_codec,
 		  {missing_attr, <<"memo_type">>, <<"memo_info">>,
 		   __TopXMLNS}});
 decode_memo_info_attr_memo_type(__TopXMLNS, _val) ->
     case catch dec_enum(_val, [chat, auth, receipt]) of
       {'EXIT', _} ->
-	  erlang:error({memo_codec,
+	  erlang:error({xmpp_codec,
 			{bad_attr_value, <<"memo_type">>, <<"memo_info">>,
 			 __TopXMLNS}});
       _res -> _res
@@ -276,7 +276,7 @@ encode_receipt_info({receipt_info, Type, Msgid,
 		     Topic_name, Topic_id, Max_user, Now_user},
 		    __TopXMLNS) ->
     __NewTopXMLNS =
-	memo_codec:choose_top_xmlns(<<"jabber:memo:message">>,
+	xmpp_codec:choose_top_xmlns(<<"jabber:memo:message">>,
 				    [], __TopXMLNS),
     _els = [],
     _attrs = encode_receipt_info_attr_now_user(Now_user,
@@ -285,18 +285,18 @@ encode_receipt_info({receipt_info, Type, Msgid,
 														   encode_receipt_info_attr_topic_name(Topic_name,
 																		       encode_receipt_info_attr_msgid(Msgid,
 																						      encode_receipt_info_attr_type(Type,
-																										    memo_codec:enc_xmlns_attrs(__NewTopXMLNS,
+																										    xmpp_codec:enc_xmlns_attrs(__NewTopXMLNS,
 																													       __TopXMLNS))))))),
     {xmlel, <<"receipt_info">>, _attrs, _els}.
 
 decode_receipt_info_attr_type(__TopXMLNS, undefined) ->
-    erlang:error({memo_codec,
+    erlang:error({xmpp_codec,
 		  {missing_attr, <<"type">>, <<"receipt_info">>,
 		   __TopXMLNS}});
 decode_receipt_info_attr_type(__TopXMLNS, _val) ->
     case catch dec_enum(_val, [server, received, read]) of
       {'EXIT', _} ->
-	  erlang:error({memo_codec,
+	  erlang:error({xmpp_codec,
 			{bad_attr_value, <<"type">>, <<"receipt_info">>,
 			 __TopXMLNS}});
       _res -> _res
@@ -464,7 +464,7 @@ encode_auth_info({auth_info, Type, Sub_type, Info_id,
 		  Target_user, Nick},
 		 __TopXMLNS) ->
     __NewTopXMLNS =
-	memo_codec:choose_top_xmlns(<<"jabber:memo:message">>,
+	xmpp_codec:choose_top_xmlns(<<"jabber:memo:message">>,
 				    [], __TopXMLNS),
     _els = [],
     _attrs = encode_auth_info_attr_nick(Nick,
@@ -477,12 +477,12 @@ encode_auth_info({auth_info, Type, Sub_type, Info_id,
 																													  encode_auth_info_attr_info_id(Info_id,
 																																	encode_auth_info_attr_sub_type(Sub_type,
 																																				       encode_auth_info_attr_type(Type,
-																																								  memo_codec:enc_xmlns_attrs(__NewTopXMLNS,
+																																								  xmpp_codec:enc_xmlns_attrs(__NewTopXMLNS,
 																																											     __TopXMLNS))))))))))),
     {xmlel, <<"auth_info">>, _attrs, _els}.
 
 decode_auth_info_attr_type(__TopXMLNS, undefined) ->
-    erlang:error({memo_codec,
+    erlang:error({xmpp_codec,
 		  {missing_attr, <<"type">>, <<"auth_info">>,
 		   __TopXMLNS}});
 decode_auth_info_attr_type(__TopXMLNS, _val) ->
@@ -490,7 +490,7 @@ decode_auth_info_attr_type(__TopXMLNS, _val) ->
 			[groupauth, sgroupauth, topicauth])
 	of
       {'EXIT', _} ->
-	  erlang:error({memo_codec,
+	  erlang:error({xmpp_codec,
 			{bad_attr_value, <<"type">>, <<"auth_info">>,
 			 __TopXMLNS}});
       _res -> _res
@@ -574,7 +574,7 @@ encode_auth_info_attr_target_user(_val, _acc) ->
     [{<<"target_user">>, _val} | _acc].
 
 decode_auth_info_attr_nick(__TopXMLNS, undefined) ->
-    erlang:error({memo_codec,
+    erlang:error({xmpp_codec,
 		  {missing_attr, <<"nick">>, <<"auth_info">>,
 		   __TopXMLNS}});
 decode_auth_info_attr_nick(__TopXMLNS, _val) -> _val.
@@ -666,7 +666,7 @@ encode_chat_info({chat_info, Type, Dispatched,
 		  Now_user},
 		 __TopXMLNS) ->
     __NewTopXMLNS =
-	memo_codec:choose_top_xmlns(<<"jabber:memo:message">>,
+	xmpp_codec:choose_top_xmlns(<<"jabber:memo:message">>,
 				    [], __TopXMLNS),
     _els = [],
     _attrs = encode_chat_info_attr_now_user(Now_user,
@@ -676,18 +676,18 @@ encode_chat_info({chat_info, Type, Dispatched,
 																		encode_chat_info_attr_target_id(Target_id,
 																						encode_chat_info_attr_dispatched(Dispatched,
 																										 encode_chat_info_attr_type(Type,
-																													    memo_codec:enc_xmlns_attrs(__NewTopXMLNS,
+																													    xmpp_codec:enc_xmlns_attrs(__NewTopXMLNS,
 																																       __TopXMLNS)))))))),
     {xmlel, <<"chat_info">>, _attrs, _els}.
 
 decode_chat_info_attr_type(__TopXMLNS, undefined) ->
-    erlang:error({memo_codec,
+    erlang:error({xmpp_codec,
 		  {missing_attr, <<"type">>, <<"chat_info">>,
 		   __TopXMLNS}});
 decode_chat_info_attr_type(__TopXMLNS, _val) ->
     case catch dec_enum(_val, [oto, topic, group]) of
       {'EXIT', _} ->
-	  erlang:error({memo_codec,
+	  erlang:error({xmpp_codec,
 			{bad_attr_value, <<"type">>, <<"chat_info">>,
 			 __TopXMLNS}});
       _res -> _res

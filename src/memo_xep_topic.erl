@@ -1,5 +1,5 @@
 %% Created automatically by XML generator (fxml_gen.erl)
-%% Source: memo_codec.spec
+%% Source: xmpp_codec.spec
 
 -module(memo_xep_topic).
 
@@ -16,9 +16,9 @@ do_decode(<<"topic_user_item">>, <<"jabber:iq:topic">>,
 	  El, Opts) ->
     decode_topic_user_item(<<"jabber:iq:topic">>, Opts, El);
 do_decode(Name, <<>>, _, _) ->
-    erlang:error({memo_codec, {missing_tag_xmlns, Name}});
+    erlang:error({xmpp_codec, {missing_tag_xmlns, Name}});
 do_decode(Name, XMLNS, _, _) ->
-    erlang:error({memo_codec, {unknown_tag, Name, XMLNS}}).
+    erlang:error({xmpp_codec, {unknown_tag, Name, XMLNS}}).
 
 tags() ->
     [{<<"query">>, <<"jabber:iq:topic">>},
@@ -76,7 +76,7 @@ decode_mod_topic_els(__TopXMLNS, __Opts,
 		     [{xmlel, <<"query_topic_info">>, _attrs, _} = _el
 		      | _els],
 		     Topic_info) ->
-    case memo_codec:get_attr(<<"xmlns">>, _attrs,
+    case xmpp_codec:get_attr(<<"xmlns">>, _attrs,
 			     __TopXMLNS)
 	of
       <<"jabber:iq:topic">> ->
@@ -118,7 +118,7 @@ encode_mod_topic({mod_topic, Rtype, Code, Tuser,
 		  Topic_info},
 		 __TopXMLNS) ->
     __NewTopXMLNS =
-	memo_codec:choose_top_xmlns(<<"jabber:iq:topic">>, [],
+	xmpp_codec:choose_top_xmlns(<<"jabber:iq:topic">>, [],
 				    __TopXMLNS),
     _els =
 	lists:reverse('encode_mod_topic_$topic_info'(Topic_info,
@@ -126,7 +126,7 @@ encode_mod_topic({mod_topic, Rtype, Code, Tuser,
     _attrs = encode_mod_topic_attr_tuser(Tuser,
 					 encode_mod_topic_attr_code(Code,
 								    encode_mod_topic_attr_rtype(Rtype,
-												memo_codec:enc_xmlns_attrs(__NewTopXMLNS,
+												xmpp_codec:enc_xmlns_attrs(__NewTopXMLNS,
 															   __TopXMLNS)))),
     {xmlel, <<"query">>, _attrs, _els}.
 
@@ -181,7 +181,7 @@ decode_query_topic_info_els(__TopXMLNS, __Opts,
 			    [{xmlel, <<"topic_user_item">>, _attrs, _} = _el
 			     | _els],
 			    User_item) ->
-    case memo_codec:get_attr(<<"xmlns">>, _attrs,
+    case xmpp_codec:get_attr(<<"xmlns">>, _attrs,
 			     __TopXMLNS)
 	of
       <<"jabber:iq:topic">> ->
@@ -257,7 +257,7 @@ encode_query_topic_info({query_topic_info, Tid, Tname,
 			 Tmaxnum},
 			__TopXMLNS) ->
     __NewTopXMLNS =
-	memo_codec:choose_top_xmlns(<<"jabber:iq:topic">>, [],
+	xmpp_codec:choose_top_xmlns(<<"jabber:iq:topic">>, [],
 				    __TopXMLNS),
     _els =
 	lists:reverse('encode_query_topic_info_$user_item'(User_item,
@@ -268,7 +268,7 @@ encode_query_topic_info({query_topic_info, Tid, Tname,
 																    encode_query_topic_info_attr_tcreater(Tcreater,
 																					  encode_query_topic_info_attr_tname(Tname,
 																									     encode_query_topic_info_attr_tid(Tid,
-																													      memo_codec:enc_xmlns_attrs(__NewTopXMLNS,
+																													      xmpp_codec:enc_xmlns_attrs(__NewTopXMLNS,
 																																	 __TopXMLNS))))))),
     {xmlel, <<"query_topic_info">>, _attrs, _els}.
 
@@ -284,7 +284,7 @@ encode_query_topic_info({query_topic_info, Tid, Tname,
 
 decode_query_topic_info_attr_tid(__TopXMLNS,
 				 undefined) ->
-    erlang:error({memo_codec,
+    erlang:error({xmpp_codec,
 		  {missing_attr, <<"tid">>, <<"query_topic_info">>,
 		   __TopXMLNS}});
 decode_query_topic_info_attr_tid(__TopXMLNS, _val) ->
@@ -310,7 +310,7 @@ decode_query_topic_info_attr_tcreater(__TopXMLNS,
 				      _val) ->
     case catch jid:decode(_val) of
       {'EXIT', _} ->
-	  erlang:error({memo_codec,
+	  erlang:error({xmpp_codec,
 			{bad_attr_value, <<"tcreater">>, <<"query_topic_info">>,
 			 __TopXMLNS}});
       _res -> _res
@@ -402,14 +402,14 @@ encode_topic_user_item({topic_user_item, User, Server,
 			Nick, Addtime},
 		       __TopXMLNS) ->
     __NewTopXMLNS =
-	memo_codec:choose_top_xmlns(<<"jabber:iq:topic">>, [],
+	xmpp_codec:choose_top_xmlns(<<"jabber:iq:topic">>, [],
 				    __TopXMLNS),
     _els = [],
     _attrs = encode_topic_user_item_attr_addtime(Addtime,
 						 encode_topic_user_item_attr_nick(Nick,
 										  encode_topic_user_item_attr_server(Server,
 														     encode_topic_user_item_attr_user(User,
-																		      memo_codec:enc_xmlns_attrs(__NewTopXMLNS,
+																		      xmpp_codec:enc_xmlns_attrs(__NewTopXMLNS,
 																						 __TopXMLNS))))),
     {xmlel, <<"topic_user_item">>, _attrs, _els}.
 
