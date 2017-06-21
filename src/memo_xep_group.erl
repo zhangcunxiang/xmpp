@@ -1,5 +1,5 @@
 %% Created automatically by XML generator (fxml_gen.erl)
-%% Source: xmpp_codec.spec
+%% Source: memo_codec.spec
 
 -module(memo_xep_group).
 
@@ -17,9 +17,9 @@ do_decode(<<"group_user_item">>,
     decode_group_user_item(<<"jabber:memo:group">>, Opts,
 			   El);
 do_decode(Name, <<>>, _, _) ->
-    erlang:error({xmpp_codec, {missing_tag_xmlns, Name}});
+    erlang:error({memo_codec, {missing_tag_xmlns, Name}});
 do_decode(Name, XMLNS, _, _) ->
-    erlang:error({xmpp_codec, {unknown_tag, Name, XMLNS}}).
+    erlang:error({memo_codec, {unknown_tag, Name, XMLNS}}).
 
 tags() ->
     [{<<"query">>, <<"jabber:memo:group">>},
@@ -78,7 +78,7 @@ decode_memo_group_els(__TopXMLNS, __Opts,
 		      [{xmlel, <<"query_group_info">>, _attrs, _} = _el
 		       | _els],
 		      Group_info) ->
-    case xmpp_codec:get_attr(<<"xmlns">>, _attrs,
+    case memo_codec:get_attr(<<"xmlns">>, _attrs,
 			     __TopXMLNS)
 	of
       <<"jabber:memo:group">> ->
@@ -117,14 +117,14 @@ encode_memo_group({memo_group, Rtype, Group_info,
 		   Group_type},
 		  __TopXMLNS) ->
     __NewTopXMLNS =
-	xmpp_codec:choose_top_xmlns(<<"jabber:memo:group">>, [],
+	memo_codec:choose_top_xmlns(<<"jabber:memo:group">>, [],
 				    __TopXMLNS),
     _els =
 	lists:reverse('encode_memo_group_$group_info'(Group_info,
 						      __NewTopXMLNS, [])),
     _attrs = encode_memo_group_attr_group_type(Group_type,
 					       encode_memo_group_attr_rtype(Rtype,
-									    xmpp_codec:enc_xmlns_attrs(__NewTopXMLNS,
+									    memo_codec:enc_xmlns_attrs(__NewTopXMLNS,
 												       __TopXMLNS))),
     {xmlel, <<"query">>, _attrs, _els}.
 
@@ -174,7 +174,7 @@ decode_query_group_info_els(__TopXMLNS, __Opts,
 			    [{xmlel, <<"group_user_item">>, _attrs, _} = _el
 			     | _els],
 			    User_items) ->
-    case xmpp_codec:get_attr(<<"xmlns">>, _attrs,
+    case memo_codec:get_attr(<<"xmlns">>, _attrs,
 			     __TopXMLNS)
 	of
       <<"jabber:memo:group">> ->
@@ -264,7 +264,7 @@ encode_query_group_info({query_group_info, Otype,
 			 User_items},
 			__TopXMLNS) ->
     __NewTopXMLNS =
-	xmpp_codec:choose_top_xmlns(<<"jabber:memo:group">>, [],
+	memo_codec:choose_top_xmlns(<<"jabber:memo:group">>, [],
 				    __TopXMLNS),
     _els =
 	lists:reverse('encode_query_group_info_$user_items'(User_items,
@@ -276,7 +276,7 @@ encode_query_group_info({query_group_info, Otype,
 																				   encode_query_group_info_attr_gid(Gid,
 																								    encode_query_group_info_attr_targetuser(Targetuser,
 																													    encode_query_group_info_attr_otype(Otype,
-																																	       xmpp_codec:enc_xmlns_attrs(__NewTopXMLNS,
+																																	       memo_codec:enc_xmlns_attrs(__NewTopXMLNS,
 																																					  __TopXMLNS)))))))),
     {xmlel, <<"query_group_info">>, _attrs, _els}.
 
@@ -364,7 +364,7 @@ decode_query_group_info_attr_gcreater(__TopXMLNS,
 				      _val) ->
     case catch jid:decode(_val) of
       {'EXIT', _} ->
-	  erlang:error({xmpp_codec,
+	  erlang:error({memo_codec,
 			{bad_attr_value, <<"gcreater">>, <<"query_group_info">>,
 			 __TopXMLNS}});
       _res -> _res
@@ -419,14 +419,14 @@ encode_group_user_item({group_user_item, User, Server,
 			Nick, Role},
 		       __TopXMLNS) ->
     __NewTopXMLNS =
-	xmpp_codec:choose_top_xmlns(<<"jabber:memo:group">>, [],
+	memo_codec:choose_top_xmlns(<<"jabber:memo:group">>, [],
 				    __TopXMLNS),
     _els = [],
     _attrs = encode_group_user_item_attr_role(Role,
 					      encode_group_user_item_attr_nick(Nick,
 									       encode_group_user_item_attr_server(Server,
 														  encode_group_user_item_attr_user(User,
-																		   xmpp_codec:enc_xmlns_attrs(__NewTopXMLNS,
+																		   memo_codec:enc_xmlns_attrs(__NewTopXMLNS,
 																					      __TopXMLNS))))),
     {xmlel, <<"group_user_item">>, _attrs, _els}.
 

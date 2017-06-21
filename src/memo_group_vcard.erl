@@ -1,5 +1,5 @@
 %% Created automatically by XML generator (fxml_gen.erl)
-%% Source: xmpp_codec.spec
+%% Source: memo_codec.spec
 
 -module(memo_group_vcard).
 
@@ -26,9 +26,9 @@ do_decode(<<"BINVAL">>, <<"group-vcard-temp">>, El,
     decode_group_vcard_BINVAL(<<"group-vcard-temp">>, Opts,
 			      El);
 do_decode(Name, <<>>, _, _) ->
-    erlang:error({xmpp_codec, {missing_tag_xmlns, Name}});
+    erlang:error({memo_codec, {missing_tag_xmlns, Name}});
 do_decode(Name, XMLNS, _, _) ->
-    erlang:error({xmpp_codec, {unknown_tag, Name, XMLNS}}).
+    erlang:error({memo_codec, {unknown_tag, Name, XMLNS}}).
 
 tags() ->
     [{<<"query">>, <<"group-vcard-temp">>},
@@ -78,7 +78,7 @@ decode_memo_group_vcard_els(__TopXMLNS, __Opts, [],
 decode_memo_group_vcard_els(__TopXMLNS, __Opts,
 			    [{xmlel, <<"GROUP_NAME">>, _attrs, _} = _el | _els],
 			    Group_name, Photo) ->
-    case xmpp_codec:get_attr(<<"xmlns">>, _attrs,
+    case memo_codec:get_attr(<<"xmlns">>, _attrs,
 			     __TopXMLNS)
 	of
       <<"group-vcard-temp">> ->
@@ -94,7 +94,7 @@ decode_memo_group_vcard_els(__TopXMLNS, __Opts,
 decode_memo_group_vcard_els(__TopXMLNS, __Opts,
 			    [{xmlel, <<"PHOTO">>, _attrs, _} = _el | _els],
 			    Group_name, Photo) ->
-    case xmpp_codec:get_attr(<<"xmlns">>, _attrs,
+    case memo_codec:get_attr(<<"xmlns">>, _attrs,
 			     __TopXMLNS)
 	of
       <<"group-vcard-temp">> ->
@@ -135,7 +135,7 @@ encode_memo_group_vcard({memo_group_vcard, Gid,
 			 Photo_version, Group_name, Photo},
 			__TopXMLNS) ->
     __NewTopXMLNS =
-	xmpp_codec:choose_top_xmlns(<<"group-vcard-temp">>, [],
+	memo_codec:choose_top_xmlns(<<"group-vcard-temp">>, [],
 				    __TopXMLNS),
     _els =
 	lists:reverse('encode_memo_group_vcard_$group_name'(Group_name,
@@ -146,7 +146,7 @@ encode_memo_group_vcard({memo_group_vcard, Gid,
     _attrs =
 	encode_memo_group_vcard_attr_photo_version(Photo_version,
 						   encode_memo_group_vcard_attr_gid(Gid,
-										    xmpp_codec:enc_xmlns_attrs(__NewTopXMLNS,
+										    memo_codec:enc_xmlns_attrs(__NewTopXMLNS,
 													       __TopXMLNS))),
     {xmlel, <<"query">>, _attrs, _els}.
 
@@ -202,7 +202,7 @@ decode_group_vcard_PHOTO_els(__TopXMLNS, __Opts, [],
 decode_group_vcard_PHOTO_els(__TopXMLNS, __Opts,
 			     [{xmlel, <<"BINVAL">>, _attrs, _} = _el | _els],
 			     Type, Photo) ->
-    case xmpp_codec:get_attr(<<"xmlns">>, _attrs,
+    case memo_codec:get_attr(<<"xmlns">>, _attrs,
 			     __TopXMLNS)
 	of
       <<"group-vcard-temp">> ->
@@ -217,7 +217,7 @@ decode_group_vcard_PHOTO_els(__TopXMLNS, __Opts,
 decode_group_vcard_PHOTO_els(__TopXMLNS, __Opts,
 			     [{xmlel, <<"TYPE">>, _attrs, _} = _el | _els],
 			     Type, Photo) ->
-    case xmpp_codec:get_attr(<<"xmlns">>, _attrs,
+    case memo_codec:get_attr(<<"xmlns">>, _attrs,
 			     __TopXMLNS)
 	of
       <<"group-vcard-temp">> ->
@@ -238,7 +238,7 @@ encode_group_vcard_PHOTO({group_vcard_photo, Type,
 			  Photo},
 			 __TopXMLNS) ->
     __NewTopXMLNS =
-	xmpp_codec:choose_top_xmlns(<<"group-vcard-temp">>, [],
+	memo_codec:choose_top_xmlns(<<"group-vcard-temp">>, [],
 				    __TopXMLNS),
     _els =
 	lists:reverse('encode_group_vcard_PHOTO_$type'(Type,
@@ -246,7 +246,7 @@ encode_group_vcard_PHOTO({group_vcard_photo, Type,
 						       'encode_group_vcard_PHOTO_$photo'(Photo,
 											 __NewTopXMLNS,
 											 []))),
-    _attrs = xmpp_codec:enc_xmlns_attrs(__NewTopXMLNS,
+    _attrs = memo_codec:enc_xmlns_attrs(__NewTopXMLNS,
 					__TopXMLNS),
     {xmlel, <<"PHOTO">>, _attrs, _els}.
 
@@ -284,15 +284,15 @@ decode_group_vcard_TYPE_els(__TopXMLNS, __Opts,
 
 encode_group_vcard_TYPE(Cdata, __TopXMLNS) ->
     __NewTopXMLNS =
-	xmpp_codec:choose_top_xmlns(<<"group-vcard-temp">>, [],
+	memo_codec:choose_top_xmlns(<<"group-vcard-temp">>, [],
 				    __TopXMLNS),
     _els = encode_group_vcard_TYPE_cdata(Cdata, []),
-    _attrs = xmpp_codec:enc_xmlns_attrs(__NewTopXMLNS,
+    _attrs = memo_codec:enc_xmlns_attrs(__NewTopXMLNS,
 					__TopXMLNS),
     {xmlel, <<"TYPE">>, _attrs, _els}.
 
 decode_group_vcard_TYPE_cdata(__TopXMLNS, <<>>) ->
-    erlang:error({xmpp_codec,
+    erlang:error({memo_codec,
 		  {missing_cdata, <<>>, <<"TYPE">>, __TopXMLNS}});
 decode_group_vcard_TYPE_cdata(__TopXMLNS, _val) -> _val.
 
@@ -319,15 +319,15 @@ decode_group_vcard_GROUP_NAME_els(__TopXMLNS, __Opts,
 
 encode_group_vcard_GROUP_NAME(Cdata, __TopXMLNS) ->
     __NewTopXMLNS =
-	xmpp_codec:choose_top_xmlns(<<"group-vcard-temp">>, [],
+	memo_codec:choose_top_xmlns(<<"group-vcard-temp">>, [],
 				    __TopXMLNS),
     _els = encode_group_vcard_GROUP_NAME_cdata(Cdata, []),
-    _attrs = xmpp_codec:enc_xmlns_attrs(__NewTopXMLNS,
+    _attrs = memo_codec:enc_xmlns_attrs(__NewTopXMLNS,
 					__TopXMLNS),
     {xmlel, <<"GROUP_NAME">>, _attrs, _els}.
 
 decode_group_vcard_GROUP_NAME_cdata(__TopXMLNS, <<>>) ->
-    erlang:error({xmpp_codec,
+    erlang:error({memo_codec,
 		  {missing_cdata, <<>>, <<"GROUP_NAME">>, __TopXMLNS}});
 decode_group_vcard_GROUP_NAME_cdata(__TopXMLNS, _val) ->
     _val.
@@ -355,23 +355,24 @@ decode_group_vcard_BINVAL_els(__TopXMLNS, __Opts,
 
 encode_group_vcard_BINVAL(Cdata, __TopXMLNS) ->
     __NewTopXMLNS =
-	xmpp_codec:choose_top_xmlns(<<"group-vcard-temp">>, [],
+	memo_codec:choose_top_xmlns(<<"group-vcard-temp">>, [],
 				    __TopXMLNS),
     _els = encode_group_vcard_BINVAL_cdata(Cdata, []),
-    _attrs = xmpp_codec:enc_xmlns_attrs(__NewTopXMLNS,
+    _attrs = memo_codec:enc_xmlns_attrs(__NewTopXMLNS,
 					__TopXMLNS),
     {xmlel, <<"BINVAL">>, _attrs, _els}.
 
 decode_group_vcard_BINVAL_cdata(__TopXMLNS, <<>>) ->
-    <<>>;
+    undefined;
 decode_group_vcard_BINVAL_cdata(__TopXMLNS, _val) ->
     case catch base64:decode(_val) of
       {'EXIT', _} ->
-	  erlang:error({xmpp_codec,
+	  erlang:error({memo_codec,
 			{bad_cdata_value, <<>>, <<"BINVAL">>, __TopXMLNS}});
       _res -> _res
     end.
 
-encode_group_vcard_BINVAL_cdata(<<>>, _acc) -> _acc;
+encode_group_vcard_BINVAL_cdata(undefined, _acc) ->
+    _acc;
 encode_group_vcard_BINVAL_cdata(_val, _acc) ->
     [{xmlcdata, base64:encode(_val)} | _acc].

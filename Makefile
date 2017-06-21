@@ -8,7 +8,7 @@ src:
 
 spec: src/xmpp_codec.erl include/xmpp_codec.hrl deps/fast_xml/ebin/fxml_gen.beam
 	$(ERL) -noinput +B -pa ebin -pa deps/*/ebin -eval \
-	'case fxml_gen:compile("specs/xmpp_codec.spec", [{add_type_specs, xmpp_element}, {erl_dir, "src"}, {hrl_dir, "include"}]) of ok -> halt(0); _ -> halt(1) end.'
+	'case fxml_gen:compile("specs/xmpp_codec.spec", [{add_type_specs, xmpp_element}, {erl_dir, "src"}, {hrl_dir, "include"}]) of ok -> case fxml_gen:compile("specs/memo_codec.spec", [{add_type_specs, xmpp_element}, {erl_dir, "src"}, {hrl_dir, "include"}]) of ok -> halt(0); _ -> halt(1) end; _ -> halt(1) end.'
 
 xdata: ebin/xdata_codec.beam
 	$(ERL) -noinput +B -pa ebin -pa deps/*/ebin -eval \

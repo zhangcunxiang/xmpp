@@ -26,6 +26,7 @@
 -include("ns.hrl").
 -include("jid.hrl").
 -include("xmpp_codec.hrl").
+-include("memo_codec.hrl").
 -include("fxml.hrl").
 
 -type stanza() :: iq() | presence() | message().

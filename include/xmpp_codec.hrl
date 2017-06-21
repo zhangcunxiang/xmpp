@@ -1,6 +1,5 @@
 %% Created automatically by XML generator (fxml_gen.erl)
 %% Source: xmpp_codec.spec
-
 -record(text, {lang = <<>> :: binary(),
                data = <<>> :: binary()}).
 -type text() :: #text{}.
@@ -126,14 +125,6 @@
                     data = <<>> :: binary()}).
 -type rsm_first() :: #rsm_first{}.
 
--record(request_info, {sub_type = <<>> :: binary(),
-                       ask_msg = <<>> :: binary(),
-                       join_user = <<>> :: binary(),
-                       invite_user = <<>> :: binary(),
-                       out_user = <<>> :: binary(),
-                       invited_user = <<>> :: binary()}).
--type request_info() :: #request_info{}.
-
 -record(streamhost, {jid :: jid:jid(),
                      host = <<>> :: binary(),
                      port = 1080 :: non_neg_integer()}).
@@ -185,12 +176,6 @@
                     height :: 'undefined' | non_neg_integer()}).
 -type thumbnail() :: #thumbnail{}.
 
--record(topic_user_item, {user = <<>> :: binary(),
-                          server = <<>> :: binary(),
-                          nick = <<>> :: binary(),
-                          addtime = <<>> :: binary()}).
--type topic_user_item() :: #topic_user_item{}.
-
 -record(privilege_perm, {access :: 'message' | 'presence' | 'roster',
                          type :: 'both' | 'get' | 'managed_entity' | 'none' | 'outgoing' | 'roster' | 'set'}).
 -type privilege_perm() :: #privilege_perm{}.
@@ -199,26 +184,6 @@
                       from :: undefined | jid:jid(),
                       to :: undefined | jid:jid()}).
 -type muc_decline() :: #muc_decline{}.
-
--record(auth_info, {type :: 'groupauth' | 'sgroupauth' | 'topicauth',
-                    sub_type = <<>> :: binary(),
-                    info_id = <<>> :: binary(),
-                    info_name = <<>> :: binary(),
-                    auth_msg = <<>> :: binary(),
-                    otype = <<>> :: binary(),
-                    need_resend = <<>> :: binary(),
-                    operate_user = <<>> :: binary(),
-                    target_user = <<>> :: binary(),
-                    nick = <<>> :: binary()}).
--type auth_info() :: #auth_info{}.
-
--record(receipt_info, {type :: 'read' | 'received' | 'server',
-                       msgid = <<>> :: binary(),
-                       topic_name = <<>> :: binary(),
-                       topic_id = <<>> :: binary(),
-                       max_user = <<>> :: binary(),
-                       now_user = <<>> :: binary()}).
--type receipt_info() :: #receipt_info{}.
 
 -record(upload_slot_0, {get :: binary(),
                         put :: binary(),
@@ -250,11 +215,6 @@
                         jid :: undefined | jid:jid(),
                         events = [] :: [binary()]}).
 -type muc_subscribe() :: #muc_subscribe{}.
-
--record(memo_check_account, {account = <<>> :: binary(),
-                             server = <<>> :: binary(),
-                             exist = <<>> :: binary()}).
--type memo_check_account() :: #memo_check_account{}.
 
 -record(stanza_id, {by :: jid:jid(),
                     id = <<>> :: binary()}).
@@ -324,9 +284,6 @@
 -record(nick, {name = <<>> :: binary()}).
 -type nick() :: #nick{}.
 
--record(p1_ack, {}).
--type p1_ack() :: #p1_ack{}.
-
 -record(feature_sm, {xmlns = <<>> :: binary()}).
 -type feature_sm() :: #feature_sm{}.
 
@@ -352,32 +309,6 @@
                        ver :: 'undefined' | binary()}).
 -type roster_query() :: #roster_query{}.
 
--record(search_group_item, {gid = <<>> :: binary(),
-                            gname = <<>> :: binary(),
-                            gphoto = <<>> :: binary(),
-                            gtype = <<>> :: binary()}).
--type search_group_item() :: #search_group_item{}.
-
--record(group_item, {gid = <<>> :: binary(),
-                     gname = <<>> :: binary(),
-                     group_type = <<>> :: binary(),
-                     gcreater :: undefined | jid:jid(),
-                     role = <<>> :: binary(),
-                     photo = <<>> :: binary(),
-                     maxuser = <<>> :: binary()}).
--type group_item() :: #group_item{}.
-
--record(memo_group_relation, {rtype = <<>> :: binary(),
-                              gid = <<>> :: binary(),
-                              request_info :: 'undefined' | #request_info{},
-                              group_items = [] :: [#group_item{}]}).
--type memo_group_relation() :: #memo_group_relation{}.
-
--record(memo_invite_info, {beinviteds = <<>> :: binary(),
-                           invite_num = <<>> :: binary(),
-                           success_num = <<>> :: binary()}).
--type memo_invite_info() :: #memo_invite_info{}.
-
 -record(sm_r, {xmlns = <<>> :: binary()}).
 -type sm_r() :: #sm_r{}.
 
@@ -397,11 +328,6 @@
 
 -record(addresses, {list = [] :: [#address{}]}).
 -type addresses() :: #addresses{}.
-
--record(memo_change_pass, {account = <<>> :: binary(),
-                           newpass = <<>> :: binary(),
-                           vcode = <<>> :: binary()}).
--type memo_change_pass() :: #memo_change_pass{}.
 
 -record('see-other-host', {host :: binary() | inet:ip_address() | {binary() | inet:ip_address(),non_neg_integer()}}).
 -type 'see-other-host'() :: #'see-other-host'{}.
@@ -438,10 +364,6 @@
                       resource :: 'undefined' | binary()}).
 -type legacy_auth() :: #legacy_auth{}.
 
--record(group_vcard_photo, {type :: 'undefined' | binary(),
-                            photo :: 'undefined' | binary()}).
--type group_vcard_photo() :: #group_vcard_photo{}.
-
 -record(ps_subscribe, {node = <<>> :: binary(),
                        jid :: jid:jid()}).
 -type ps_subscribe() :: #ps_subscribe{}.
@@ -450,9 +372,6 @@
                     text = <<>> :: binary()}).
 -type sasl_auth() :: #sasl_auth{}.
 
--record(p1_push, {}).
--type p1_push() :: #p1_push{}.
-
 -record(feature_csi, {xmlns = <<>> :: binary()}).
 -type feature_csi() :: #feature_csi{}.
 
@@ -460,18 +379,6 @@
                      name = <<>> :: binary(),
                      node = <<>> :: binary()}).
 -type disco_item() :: #disco_item{}.
-
--record(search_user_item, {jid :: undefined | jid:jid(),
-                           nick = <<>> :: binary(),
-                           photo = <<>> :: binary()}).
--type search_user_item() :: #search_user_item{}.
-
--record(memo_search, {rtype = <<>> :: binary(),
-                      keywords = <<>> :: binary(),
-                      user_items = [] :: [#search_user_item{}],
-                      group_items = [] :: [#search_group_item{}],
-                      search_account :: 'undefined' | binary()}).
--type memo_search() :: #memo_search{}.
 
 -record(unblock, {items = [] :: [jid:jid()]}).
 -type unblock() :: #unblock{}.
@@ -492,36 +399,6 @@
                           subid = <<>> :: binary(),
                           expiry :: undefined | erlang:timestamp()}).
 -type ps_subscription() :: #ps_subscription{}.
-
--record(chat_info, {type :: 'group' | 'oto' | 'topic',
-                    dispatched = <<>> :: binary(),
-                    content_type = <<>> :: binary(),
-                    target_id = <<>> :: binary(),
-                    target_name = <<>> :: binary(),
-                    max_user = <<>> :: binary(),
-                    now_user = <<>> :: binary()}).
--type chat_info() :: #chat_info{}.
-
--record(memo_info, {memo_type :: 'auth' | 'chat' | 'receipt',
-                    chat_info :: 'undefined' | #chat_info{},
-                    auth_info :: 'undefined' | #auth_info{},
-                    receipt_info :: 'undefined' | #receipt_info{}}).
--type memo_info() :: #memo_info{}.
-
--record(query_topic_info, {tid = <<>> :: binary(),
-                           tname = <<>> :: binary(),
-                           tcreater :: undefined | jid:jid(),
-                           tcreate_time = <<>> :: binary(),
-                           topic_type = <<>> :: binary(),
-                           user_item = [] :: [#topic_user_item{}],
-                           tmaxnum = <<>> :: binary()}).
--type query_topic_info() :: #query_topic_info{}.
-
--record(mod_topic, {rtype = <<>> :: binary(),
-                    code = <<>> :: binary(),
-                    tuser = <<>> :: binary(),
-                    topic_info :: 'undefined' | #query_topic_info{}}).
--type mod_topic() :: #mod_topic{}.
 
 -record(bob_data, {cid = <<>> :: binary(),
                    'max-age' :: 'undefined' | non_neg_integer(),
@@ -586,9 +463,6 @@
 -record(mam_archived, {by :: jid:jid(),
                        id = <<>> :: binary()}).
 -type mam_archived() :: #mam_archived{}.
-
--record(p1_rebind, {}).
--type p1_rebind() :: #p1_rebind{}.
 
 -record(compress_failure, {reason :: 'processing-failed' | 'setup-failed' | 'undefined' | 'unsupported-method'}).
 -type compress_failure() :: #compress_failure{}.
@@ -674,6 +548,10 @@
                   os :: 'undefined' | binary()}).
 -type version() :: #version{}.
 
+-record(push_disable, {jid :: jid:jid(),
+                       node = <<>> :: binary()}).
+-type push_disable() :: #push_disable{}.
+
 -record(legacy_auth_feature, {}).
 -type legacy_auth_feature() :: #legacy_auth_feature{}.
 
@@ -683,12 +561,6 @@
 
 -record(rosterver_feature, {}).
 -type rosterver_feature() :: #rosterver_feature{}.
-
--record(memo_group_vcard, {gid = <<>> :: binary(),
-                           photo_version = <<>> :: binary(),
-                           group_name :: 'undefined' | binary(),
-                           photo :: 'undefined' | #group_vcard_photo{}}).
--type memo_group_vcard() :: #memo_group_vcard{}.
 
 -record(muc_invite, {reason = <<>> :: binary(),
                      from :: undefined | jid:jid(),
@@ -872,6 +744,11 @@
                 fields = [] :: [#xdata_field{}]}).
 -type xdata() :: #xdata{}.
 
+-record(push_enable, {jid :: jid:jid(),
+                      node = <<>> :: binary(),
+                      xdata :: 'undefined' | #xdata{}}).
+-type push_enable() :: #push_enable{}.
+
 -record(xcaptcha, {xdata :: #xdata{}}).
 -type xcaptcha() :: #xcaptcha{}.
 
@@ -974,27 +851,6 @@
                      xdata = [] :: [#xdata{}]}).
 -type disco_info() :: #disco_info{}.
 
--record(group_user_item, {user = <<>> :: binary(),
-                          server = <<>> :: binary(),
-                          nick = <<>> :: binary(),
-                          role = <<>> :: binary()}).
--type group_user_item() :: #group_user_item{}.
-
--record(query_group_info, {otype = <<>> :: binary(),
-                           targetuser = <<>> :: binary(),
-                           gid = <<>> :: binary(),
-                           gname = <<>> :: binary(),
-                           group_type = <<>> :: binary(),
-                           maxuser = <<>> :: binary(),
-                           gcreater :: undefined | jid:jid(),
-                           user_items = [] :: [#group_user_item{}]}).
--type query_group_info() :: #query_group_info{}.
-
--record(memo_group, {rtype = <<>> :: binary(),
-                     group_info :: 'undefined' | #query_group_info{},
-                     group_type = <<>> :: binary()}).
--type memo_group() :: #memo_group{}.
-
 -record(offline_item, {node = <<>> :: binary(),
                        action :: 'remove' | 'undefined' | 'view'}).
 -type offline_item() :: #offline_item{}.
@@ -1029,6 +885,9 @@
 -record(delegation, {delegated = [] :: [#delegated{}],
                      forwarded :: 'undefined' | #forwarded{}}).
 -type delegation() :: #delegation{}.
+
+-record(push_notification, {xdata :: 'undefined' | #xdata{}}).
+-type push_notification() :: #push_notification{}.
 
 -record(mix_join, {jid :: undefined | jid:jid(),
                    subscribe = [] :: [binary()]}).
@@ -1102,9 +961,15 @@
                         xdata_option() |
                         version() |
                         sm_a() |
+                        stanza_id() |
+                        starttls_proceed() |
+                        forwarded() |
+                        client_id() |
+                        sm_resumed() |
+                        xevent() |
+                        privacy_list() |
                         carbons_sent() |
                         mam_archived() |
-                        p1_rebind() |
                         sasl_abort() |
                         db_result() |
                         carbons_received() |
@@ -1114,20 +979,22 @@
                         block_list() |
                         delegated() |
                         rsm_set() |
+                        'see-other-host'() |
+                        hint() |
+                        stream_start() |
                         text() |
                         vcard_org() |
-                        search_group_item() |
-                        group_item() |
+                        shim() |
+                        search_item() |
+                        offline_item() |
                         feature_sm() |
                         roster_item() |
+                        muc_item() |
                         vcard_temp() |
-                        memo_group() |
                         address() |
                         sasl_success() |
                         addresses() |
-                        memo_change_pass() |
                         muc_subscriptions() |
-                        mod_topic() |
                         disco_items() |
                         compress() |
                         bytestreams() |
@@ -1139,15 +1006,8 @@
                         delay() |
                         thumbnail() |
                         vcard_tel() |
-                        receipt_info() |
-                        chat_info() |
-                        query_topic_info() |
-                        query_group_info() |
-                        auth_info() |
-                        memo_info() |
                         vcard_geo() |
                         vcard_photo() |
-                        request_info() |
                         pubsub_owner() |
                         pubsub() |
                         muc_owner() |
@@ -1161,6 +1021,7 @@
                         sasl_failure() |
                         vcard_name() |
                         adhoc_note() |
+                        push_disable() |
                         legacy_auth_feature() |
                         rosterver_feature() |
                         muc_invite() |
@@ -1179,9 +1040,9 @@
                         search() |
                         ps_publish() |
                         nick() |
-                        p1_ack() |
                         block() |
                         delegation() |
+                        push_notification() |
                         mix_join() |
                         xmpp_session() |
                         xdata() |
@@ -1200,15 +1061,12 @@
                         stat() |
                         upload_request() |
                         xdata_field() |
-                        memo_group_vcard() |
                         adhoc_command() |
                         sm_failed() |
                         ping() |
-                        topic_user_item() |
                         privilege_perm() |
                         privacy_item() |
                         disco_item() |
-                        search_user_item() |
                         ps_item() |
                         upload_slot_0() |
                         upload_request_0() |
@@ -1230,13 +1088,11 @@
                         csi() |
                         delegation_query() |
                         mam_query() |
-                        vcard_email() |
                         bookmark_url() |
+                        vcard_email() |
                         vcard_label() |
-                        group_vcard_photo() |
-                        disco_info() |
                         vcard_logo() |
-                        memo_invite_info() |
+                        disco_info() |
                         feature_register() |
                         register() |
                         sm_r() |
@@ -1250,6 +1106,7 @@
                         mix_leave() |
                         muc_subscribe() |
                         privilege() |
+                        push_enable() |
                         muc_unique() |
                         sasl_response() |
                         message() |
@@ -1260,30 +1117,11 @@
                         muc_unsubscribe() |
                         ps_unsubscribe() |
                         chatstate() |
-                        memo_search() |
                         sasl_auth() |
-                        p1_push() |
                         oob_x() |
                         unblock() |
-                        memo_group_relation() |
                         muc_admin() |
                         ps_affiliation() |
                         mam_fin() |
                         bob_data() |
-                        media() |
-                        memo_check_account() |
-                        stanza_id() |
-                        starttls_proceed() |
-                        forwarded() |
-                        client_id() |
-                        sm_resumed() |
-                        xevent() |
-                        privacy_list() |
-                        'see-other-host'() |
-                        hint() |
-                        stream_start() |
-                        shim() |
-                        search_item() |
-                        group_user_item() |
-                        offline_item() |
-                        muc_item().
+                        media().

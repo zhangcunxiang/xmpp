@@ -1,5 +1,5 @@
 %% Created automatically by XML generator (fxml_gen.erl)
-%% Source: xmpp_codec.spec
+%% Source: memo_codec.spec
 
 -module(memo_change_pass).
 
@@ -10,9 +10,9 @@ do_decode(<<"query">>, <<"memo:change:pass">>, El,
     decode_memo_change_pass(<<"memo:change:pass">>, Opts,
 			    El);
 do_decode(Name, <<>>, _, _) ->
-    erlang:error({xmpp_codec, {missing_tag_xmlns, Name}});
+    erlang:error({memo_codec, {missing_tag_xmlns, Name}});
 do_decode(Name, XMLNS, _, _) ->
-    erlang:error({xmpp_codec, {unknown_tag, Name, XMLNS}}).
+    erlang:error({memo_codec, {unknown_tag, Name, XMLNS}}).
 
 tags() -> [{<<"query">>, <<"memo:change:pass">>}].
 
@@ -68,13 +68,13 @@ encode_memo_change_pass({memo_change_pass, Account,
 			 Newpass, Vcode},
 			__TopXMLNS) ->
     __NewTopXMLNS =
-	xmpp_codec:choose_top_xmlns(<<"memo:change:pass">>, [],
+	memo_codec:choose_top_xmlns(<<"memo:change:pass">>, [],
 				    __TopXMLNS),
     _els = [],
     _attrs = encode_memo_change_pass_attr_vcode(Vcode,
 						encode_memo_change_pass_attr_newpass(Newpass,
 										     encode_memo_change_pass_attr_account(Account,
-															  xmpp_codec:enc_xmlns_attrs(__NewTopXMLNS,
+															  memo_codec:enc_xmlns_attrs(__NewTopXMLNS,
 																		     __TopXMLNS)))),
     {xmlel, <<"query">>, _attrs, _els}.
 
