@@ -1096,6 +1096,7 @@
 -type vcard_temp() :: #vcard_temp{}.
 
 -record(memo_device_info, {user = <<>> :: binary(),
+                           server = <<>> :: binary(),
                            device_type = <<>> :: binary(),
                            token = <<>> :: binary(),
                            language = <<>> :: binary(),

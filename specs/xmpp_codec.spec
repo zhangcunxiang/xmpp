@@ -4360,10 +4360,11 @@
 
 -xml(memo_device_info,
     #elem{name = <<"query">>,
-        xmlns = <<"memo:device:info">>,
+        xmlns = <<"jabber:memo:device">>,
         module = 'memo_xep_device',
-        result = {memo_device_info,'$user','$device_type','$token','$language','$device_number'},
+        result = {memo_device_info,'$user','$server','$device_type','$token','$language','$device_number'},
         attrs = [#attr{name = <<"user">>,required= false},
+            #attr{name = <<"server">>,required= false},
             #attr{name = <<"device_type">>,required= false},
             #attr{name = <<"token">>,required= false},
             #attr{name = <<"language">>,required= false},

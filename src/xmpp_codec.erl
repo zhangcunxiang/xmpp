@@ -810,8 +810,6 @@ get_mod(<<"query">>, <<"urn:xmpp:mam:1">>) -> xep0313;
 get_mod(<<"item">>, <<"jabber:iq:search">>) -> xep0055;
 get_mod(<<"stream:stream">>, <<"jabber:server">>) ->
     rfc6120;
-get_mod(<<"query">>, <<"memo:device:info">>) ->
-    memo_xep_device;
 get_mod(<<"remote-server-not-found">>,
 	<<"urn:ietf:params:xml:ns:xmpp-stanzas">>) ->
     rfc6120;
@@ -948,6 +946,8 @@ get_mod(<<"URL">>, <<"vcard-temp">>) -> xep0054;
 get_mod(<<"headers">>,
 	<<"http://jabber.org/protocol/shim">>) ->
     xep0131;
+get_mod(<<"query">>, <<"jabber:memo:device">>) ->
+    memo_xep_device;
 get_mod(<<"jid-malformed">>,
 	<<"urn:ietf:params:xml:ns:xmpp-stanzas">>) ->
     rfc6120;
@@ -1374,6 +1374,8 @@ get_mod({legacy_auth_feature}) -> xep0078;
 get_mod({carbons_disable}) -> xep0280;
 get_mod({memo_search, _, _, _, _, _}) ->
     memo_xep_search;
+get_mod({memo_device_info, _, _, _, _, _, _}) ->
+    memo_xep_device;
 get_mod({last, _, _}) -> xep0012;
 get_mod({compression, _}) -> xep0138;
 get_mod({mam_prefs, _, _, _, _}) -> xep0313;
@@ -1530,8 +1532,6 @@ get_mod({addresses, _}) -> xep0033;
 get_mod({adhoc_command, _, _, _, _, _, _, _, _}) ->
     xep0050;
 get_mod({media, _, _, _}) -> xep0221;
-get_mod({memo_device_info, _, _, _, _, _}) ->
-    memo_xep_device;
 get_mod({identity, _, _, _, _}) -> xep0030;
 get_mod({redirect, _}) -> rfc6120;
 get_mod({muc_history, _, _, _, _}) -> xep0045;
