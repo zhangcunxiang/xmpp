@@ -5,7 +5,7 @@
 
 -compile(export_all).
 
-do_decode(<<"query">>, <<"group-vcard-temp">>, El,
+do_decode(<<"vCard">>, <<"group-vcard-temp">>, El,
 	  Opts) ->
     decode_memo_group_vcard(<<"group-vcard-temp">>, Opts,
 			    El);
@@ -31,7 +31,7 @@ do_decode(Name, XMLNS, _, _) ->
     erlang:error({xmpp_codec, {unknown_tag, Name, XMLNS}}).
 
 tags() ->
-    [{<<"query">>, <<"group-vcard-temp">>},
+    [{<<"vCard">>, <<"group-vcard-temp">>},
      {<<"PHOTO">>, <<"group-vcard-temp">>},
      {<<"TYPE">>, <<"group-vcard-temp">>},
      {<<"GROUP_NAME">>, <<"group-vcard-temp">>},
@@ -40,13 +40,13 @@ tags() ->
 do_encode({group_vcard_photo, _, _} = Photo,
 	  TopXMLNS) ->
     encode_group_vcard_PHOTO(Photo, TopXMLNS);
-do_encode({memo_group_vcard, _, _, _, _} = Query,
+do_encode({memo_group_vcard, _, _, _, _} = Vcard,
 	  TopXMLNS) ->
-    encode_memo_group_vcard(Query, TopXMLNS).
+    encode_memo_group_vcard(Vcard, TopXMLNS).
 
 do_get_name({group_vcard_photo, _, _}) -> <<"PHOTO">>;
 do_get_name({memo_group_vcard, _, _, _, _}) ->
-    <<"query">>.
+    <<"vCard">>.
 
 do_get_ns({group_vcard_photo, _, _}) ->
     <<"group-vcard-temp">>;
@@ -62,7 +62,7 @@ records() ->
     [{group_vcard_photo, 2}, {memo_group_vcard, 4}].
 
 decode_memo_group_vcard(__TopXMLNS, __Opts,
-			{xmlel, <<"query">>, _attrs, _els}) ->
+			{xmlel, <<"vCard">>, _attrs, _els}) ->
     {Group_name, Photo} =
 	decode_memo_group_vcard_els(__TopXMLNS, __Opts, _els,
 				    undefined, undefined),
@@ -148,7 +148,7 @@ encode_memo_group_vcard({memo_group_vcard, Gid,
 						   encode_memo_group_vcard_attr_gid(Gid,
 										    xmpp_codec:enc_xmlns_attrs(__NewTopXMLNS,
 													       __TopXMLNS))),
-    {xmlel, <<"query">>, _attrs, _els}.
+    {xmlel, <<"vCard">>, _attrs, _els}.
 
 'encode_memo_group_vcard_$group_name'(undefined,
 				      __TopXMLNS, _acc) ->
@@ -363,15 +363,10 @@ encode_group_vcard_BINVAL(Cdata, __TopXMLNS) ->
     {xmlel, <<"BINVAL">>, _attrs, _els}.
 
 decode_group_vcard_BINVAL_cdata(__TopXMLNS, <<>>) ->
-    <<>>;
+    erlang:error({xmpp_codec,
+		  {missing_cdata, <<>>, <<"BINVAL">>, __TopXMLNS}});
 decode_group_vcard_BINVAL_cdata(__TopXMLNS, _val) ->
-    case catch base64:decode(_val) of
-      {'EXIT', _} ->
-	  erlang:error({xmpp_codec,
-			{bad_cdata_value, <<>>, <<"BINVAL">>, __TopXMLNS}});
-      _res -> _res
-    end.
+    _val.
 
-encode_group_vcard_BINVAL_cdata(<<>>, _acc) -> _acc;
 encode_group_vcard_BINVAL_cdata(_val, _acc) ->
-    [{xmlcdata, base64:encode(_val)} | _acc].
+    [{xmlcdata, _val} | _acc].

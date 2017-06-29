@@ -4288,8 +4288,7 @@
      #elem{name = <<"BINVAL">>,
            xmlns = <<"group-vcard-temp">>,
 	   module = 'memo_group_vcard',
-           cdata = #cdata{dec = {base64, decode, []},
-                          enc = {base64, encode, []}},
+           cdata = #cdata{required = true,label='$cdata'},
            result = '$cdata'}).
 
 -xml(group_vcard_GROUP_NAME,
@@ -4317,7 +4316,7 @@
 
 
 -xml(memo_group_vcard,
-    #elem{name = <<"query">>,
+    #elem{name = <<"vCard">>,
         xmlns= <<"group-vcard-temp">>,
         module = 'memo_group_vcard',
         result = {memo_group_vcard,'$gid','$photo_version','$group_name','$photo'},

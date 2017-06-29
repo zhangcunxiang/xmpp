@@ -457,8 +457,6 @@ get_mod(<<"query">>, <<"urn:xmpp:delegation:1">>) ->
 get_mod(<<"invalid-options">>,
 	<<"http://jabber.org/protocol/pubsub#errors">>) ->
     xep0060;
-get_mod(<<"query">>, <<"group-vcard-temp">>) ->
-    memo_group_vcard;
 get_mod(<<"query">>, <<"memo:check:account">>) ->
     memo_check_account;
 get_mod(<<"event">>, <<"urn:xmpp:mucsub:0">>) ->
@@ -473,6 +471,8 @@ get_mod(<<"field">>, <<"jabber:x:data">>) -> xep0004;
 get_mod(<<"unsubscribe">>,
 	<<"http://jabber.org/protocol/pubsub">>) ->
     xep0060;
+get_mod(<<"vCard">>, <<"group-vcard-temp">>) ->
+    memo_group_vcard;
 get_mod(<<"presence">>, <<"jabber:server">>) -> rfc6120;
 get_mod(<<"configure">>,
 	<<"http://jabber.org/protocol/pubsub#owner">>) ->
