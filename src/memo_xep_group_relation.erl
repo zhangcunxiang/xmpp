@@ -454,18 +454,20 @@ encode_group_item({group_item, Gid, Gname, Group_type,
     {xmlel, <<"group_item">>, _attrs, _els}.
 
 decode_group_item_attr_gid(__TopXMLNS, undefined) ->
-    <<>>;
+    erlang:error({xmpp_codec,
+		  {missing_attr, <<"gid">>, <<"group_item">>,
+		   __TopXMLNS}});
 decode_group_item_attr_gid(__TopXMLNS, _val) -> _val.
 
-encode_group_item_attr_gid(<<>>, _acc) -> _acc;
 encode_group_item_attr_gid(_val, _acc) ->
     [{<<"gid">>, _val} | _acc].
 
 decode_group_item_attr_gname(__TopXMLNS, undefined) ->
-    <<>>;
+    erlang:error({xmpp_codec,
+		  {missing_attr, <<"gname">>, <<"group_item">>,
+		   __TopXMLNS}});
 decode_group_item_attr_gname(__TopXMLNS, _val) -> _val.
 
-encode_group_item_attr_gname(<<>>, _acc) -> _acc;
 encode_group_item_attr_gname(_val, _acc) ->
     [{<<"gname">>, _val} | _acc].
 
