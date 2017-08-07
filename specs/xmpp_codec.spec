@@ -4077,11 +4077,13 @@
     #elem{name= <<"query">>,
         xmlns= <<"jabber:iq:topic">>,
         module = 'memo_xep_topic',
-        result = {mod_topic,'$rtype','$code','$tuser','$topic_info'},
+        result = {mod_topic,'$rtype','$code','$tuser','$topic_info','$user_topic_list'},
         attrs = [#attr{name = <<"rtype">>,required= false},
                 #attr{name= <<"code">>,required=false},
                 #attr{name = <<"tuser">>,required = false }],
-        refs = [#ref{name= query_topic_info,min = 0, max = 1,label = '$topic_info'}]
+        refs = [#ref{name= query_topic_info,min = 0, max = 1,label = '$topic_info'},
+                #ref{name = query_topic_info,label='$user_topic_list'}
+                ]
                  }).
 
 

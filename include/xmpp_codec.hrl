@@ -513,7 +513,8 @@
 -record(mod_topic, {rtype = <<>> :: binary(),
                     code = <<>> :: binary(),
                     tuser = <<>> :: binary(),
-                    topic_info :: 'undefined' | #query_topic_info{}}).
+                    topic_info :: 'undefined' | #query_topic_info{},
+                    user_topic_list = [] :: [#query_topic_info{}]}).
 -type mod_topic() :: #mod_topic{}.
 
 -record(bob_data, {cid = <<>> :: binary(),

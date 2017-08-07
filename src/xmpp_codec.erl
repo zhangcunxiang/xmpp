@@ -1490,7 +1490,6 @@ get_mod({adhoc_actions, _, _, _, _}) -> xep0050;
 get_mod({adhoc_note, _, _}) -> xep0050;
 get_mod({push_disable, _, _}) -> xep0357;
 get_mod({push_notification, _}) -> xep0357;
-get_mod({mod_topic, _, _, _, _}) -> memo_xep_topic;
 get_mod({disco_item, _, _, _}) -> xep0030;
 get_mod({stat, _, _, _, _}) -> xep0039;
 get_mod({register, _, _, _, _, _, _, _, _, _, _, _, _,
@@ -1560,6 +1559,7 @@ get_mod({mix_join, _, _}) -> xep0369;
 get_mod({address, _, _, _, _, _}) -> xep0033;
 get_mod({thumbnail, _, _, _, _}) -> xep0264;
 get_mod({delegation, _, _}) -> xep0355;
+get_mod({mod_topic, _, _, _, _, _}) -> memo_xep_topic;
 get_mod({sm_enabled, _, _, _, _, _}) -> xep0198;
 get_mod({topic_user_item, _, _, _, _}) ->
     memo_xep_topic;
