@@ -293,17 +293,10 @@ decode_receipt_info_attr_type(__TopXMLNS, undefined) ->
     erlang:error({xmpp_codec,
 		  {missing_attr, <<"type">>, <<"receipt_info">>,
 		   __TopXMLNS}});
-decode_receipt_info_attr_type(__TopXMLNS, _val) ->
-    case catch dec_enum(_val, [server, received, read]) of
-      {'EXIT', _} ->
-	  erlang:error({xmpp_codec,
-			{bad_attr_value, <<"type">>, <<"receipt_info">>,
-			 __TopXMLNS}});
-      _res -> _res
-    end.
+decode_receipt_info_attr_type(__TopXMLNS, _val) -> _val.
 
 encode_receipt_info_attr_type(_val, _acc) ->
-    [{<<"type">>, enc_enum(_val)} | _acc].
+    [{<<"type">>, _val} | _acc].
 
 decode_receipt_info_attr_msgid(__TopXMLNS, undefined) ->
     <<>>;

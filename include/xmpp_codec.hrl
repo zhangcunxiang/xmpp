@@ -211,7 +211,7 @@
                     nick = <<>> :: binary()}).
 -type auth_info() :: #auth_info{}.
 
--record(receipt_info, {type :: 'read' | 'received' | 'server',
+-record(receipt_info, {type = <<>> :: binary(),
                        msgid = <<>> :: binary(),
                        topic_name = <<>> :: binary(),
                        topic_id = <<>> :: binary(),
@@ -664,6 +664,9 @@
                   ver :: 'undefined' | binary(),
                   os :: 'undefined' | binary()}).
 -type version() :: #version{}.
+
+-record(memo_jingle, {}).
+-type memo_jingle() :: #memo_jingle{}.
 
 -record(push_disable, {jid :: jid:jid(),
                        node = <<>> :: binary()}).
@@ -1171,6 +1174,7 @@
                         sasl_failure() |
                         vcard_name() |
                         adhoc_note() |
+                        memo_jingle() |
                         push_disable() |
                         legacy_auth_feature() |
                         rosterver_feature() |

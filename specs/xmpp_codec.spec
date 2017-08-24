@@ -4216,10 +4216,7 @@
         xmlns= <<"jabber:memo:message">>,
         module = 'memo_xep_message',
         result = {receipt_info, '$type','$msgid','$topic_name','$topic_id','$max_user','$now_user'},
-        attrs = [ #attr{name = <<"type">>,
-                        required = true,
-                       enc = {enc_enum, []},
-                       dec = {dec_enum, [[server,received,read]] } },
+        attrs = [ #attr{name = <<"type">>, required = true },
                  #attr{name = <<"msgid">>,required = false},
                  #attr{name = <<"topic_name">>,required = false},
                  #attr{name = <<"topic_id">>,required = false},
@@ -4372,6 +4369,11 @@
             #attr{name = <<"device_number">>,required= false} ]
          }).
 
+-xml(memo_jingle,
+    #elem{name = <<"signaling">>,
+    xmlns= <<"jabber:client">>,
+    module = 'memo_xep_jingle',
+     result = {memo_jingle } } ).
 
 %%memo end%%
 

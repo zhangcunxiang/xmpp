@@ -1010,6 +1010,8 @@ get_mod(<<"query">>,
     xep0030;
 get_mod(<<"last">>, <<"jabber:iq:register">>) ->
     xep0077;
+get_mod(<<"signaling">>, <<"jabber:client">>) ->
+    memo_xep_jingle;
 get_mod(<<"thread">>, <<"jabber:client">>) -> rfc6120;
 get_mod(<<"streamhost-used">>,
 	<<"http://jabber.org/protocol/bytestreams">>) ->
@@ -1376,6 +1378,7 @@ get_mod({memo_search, _, _, _, _, _}) ->
     memo_xep_search;
 get_mod({memo_device_info, _, _, _, _, _, _}) ->
     memo_xep_device;
+get_mod({memo_jingle}) -> memo_xep_jingle;
 get_mod({last, _, _}) -> xep0012;
 get_mod({compression, _}) -> xep0138;
 get_mod({mam_prefs, _, _, _, _}) -> xep0313;
