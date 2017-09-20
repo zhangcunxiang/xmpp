@@ -4320,7 +4320,7 @@
         module = 'memo_group_vcard',
         result = {memo_group_vcard,'$gid','$photo_version','$group_name','$photo'},
         attrs = [#attr{name = <<"gid">>,required= false},
-            #attr{name= <<"photo_version">>,required = false}],
+            #attr{name= <<"photo_version">>,default= <<"">> }],
         refs = [ #ref{name = group_vcard_GROUP_NAME, label='$group_name',min=0,max=1},
             #ref{name = group_vcard_PHOTO,label = '$photo',min=0,max=1}]
             }).
