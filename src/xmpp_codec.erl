@@ -1376,14 +1376,14 @@ get_mod({legacy_auth_feature}) -> xep0078;
 get_mod({carbons_disable}) -> xep0280;
 get_mod({memo_search, _, _, _, _, _}) ->
     memo_xep_search;
-get_mod({memo_device_info, _, _, _, _, _, _}) ->
-    memo_xep_device;
 get_mod({memo_jingle}) -> memo_xep_jingle;
 get_mod({last, _, _}) -> xep0012;
 get_mod({compression, _}) -> xep0138;
 get_mod({mam_prefs, _, _, _, _}) -> xep0313;
 get_mod({query_group_info, _, _, _, _, _, _, _, _}) ->
     memo_xep_group;
+get_mod({chat_info, _, _, _, _, _, _, _, _}) ->
+    memo_xep_message;
 get_mod({muc_user, _, _, _, _, _, _}) -> xep0045;
 get_mod({bytestreams, _, _, _, _, _, _}) -> xep0065;
 get_mod({sasl_auth, _, _}) -> rfc6120;
@@ -1416,6 +1416,8 @@ get_mod({db_feature, _}) -> xep0220;
 get_mod({handshake, _}) -> xep0114;
 get_mod({memo_change_pass, _, _, _}) ->
     memo_change_pass;
+get_mod({memo_device_info, _, _, _, _, _, _, _}) ->
+    memo_xep_device;
 get_mod({message, _, _, _, _, _, _, _, _, _, _}) ->
     rfc6120;
 get_mod({presence, _, _, _, _, _, _, _, _, _, _}) ->
@@ -1547,8 +1549,6 @@ get_mod({muc_unsubscribe, _}) -> p1_mucsub;
 get_mod({sic, _, _, _}) -> xep0279;
 get_mod({query_topic_info, _, _, _, _, _, _, _}) ->
     memo_xep_topic;
-get_mod({chat_info, _, _, _, _, _, _, _}) ->
-    memo_xep_message;
 get_mod({sm_resumed, _, _, _}) -> xep0198;
 get_mod({offline_item, _, _}) -> xep0013;
 get_mod({db_verify, _, _, _, _, _, _}) -> xep0220;

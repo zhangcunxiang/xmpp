@@ -29,7 +29,8 @@ tags() ->
      {<<"auth_info">>, <<"jabber:memo:message">>},
      {<<"chat_info">>, <<"jabber:memo:message">>}].
 
-do_encode({chat_info, _, _, _, _, _, _, _} = Chat_info,
+do_encode({chat_info, _, _, _, _, _, _, _, _} =
+	      Chat_info,
 	  TopXMLNS) ->
     encode_chat_info(Chat_info, TopXMLNS);
 do_encode({auth_info, _, _, _, _, _, _, _, _, _, _} =
@@ -47,7 +48,7 @@ do_encode({memo_info, _, _, _, _} = Memo_info,
 do_get_name({auth_info, _, _, _, _, _, _, _, _, _,
 	     _}) ->
     <<"auth_info">>;
-do_get_name({chat_info, _, _, _, _, _, _, _}) ->
+do_get_name({chat_info, _, _, _, _, _, _, _, _}) ->
     <<"chat_info">>;
 do_get_name({memo_info, _, _, _, _}) -> <<"memo_info">>;
 do_get_name({receipt_info, _, _, _, _, _, _}) ->
@@ -55,16 +56,16 @@ do_get_name({receipt_info, _, _, _, _, _, _}) ->
 
 do_get_ns({auth_info, _, _, _, _, _, _, _, _, _, _}) ->
     <<"jabber:memo:message">>;
-do_get_ns({chat_info, _, _, _, _, _, _, _}) ->
+do_get_ns({chat_info, _, _, _, _, _, _, _, _}) ->
     <<"jabber:memo:message">>;
 do_get_ns({memo_info, _, _, _, _}) ->
     <<"jabber:memo:message">>;
 do_get_ns({receipt_info, _, _, _, _, _, _}) ->
     <<"jabber:memo:message">>.
 
-pp(chat_info, 7) ->
+pp(chat_info, 8) ->
     [type, dispatched, content_type, target_id, target_name,
-     max_user, now_user];
+     send_user, max_user, now_user];
 pp(auth_info, 10) ->
     [type, sub_type, info_id, info_name, auth_msg, otype,
      need_resend, operate_user, target_user, nick];
@@ -75,7 +76,7 @@ pp(memo_info, 4) ->
 pp(_, _) -> no.
 
 records() ->
-    [{chat_info, 7}, {auth_info, 10}, {receipt_info, 6},
+    [{chat_info, 8}, {auth_info, 10}, {receipt_info, 6},
      {memo_info, 4}].
 
 dec_enum(Val, Enums) ->
@@ -578,71 +579,78 @@ encode_auth_info_attr_nick(_val, _acc) ->
 decode_chat_info(__TopXMLNS, __Opts,
 		 {xmlel, <<"chat_info">>, _attrs, _els}) ->
     {Type, Dispatched, Target_id, Content_type, Target_name,
-     Max_user, Now_user} =
+     Send_user, Max_user, Now_user} =
 	decode_chat_info_attrs(__TopXMLNS, _attrs, undefined,
 			       undefined, undefined, undefined, undefined,
-			       undefined, undefined),
+			       undefined, undefined, undefined),
     {chat_info, Type, Dispatched, Content_type, Target_id,
-     Target_name, Max_user, Now_user}.
+     Target_name, Send_user, Max_user, Now_user}.
 
 decode_chat_info_attrs(__TopXMLNS,
 		       [{<<"type">>, _val} | _attrs], _Type, Dispatched,
-		       Target_id, Content_type, Target_name, Max_user,
-		       Now_user) ->
+		       Target_id, Content_type, Target_name, Send_user,
+		       Max_user, Now_user) ->
     decode_chat_info_attrs(__TopXMLNS, _attrs, _val,
 			   Dispatched, Target_id, Content_type, Target_name,
-			   Max_user, Now_user);
+			   Send_user, Max_user, Now_user);
 decode_chat_info_attrs(__TopXMLNS,
 		       [{<<"dispatched">>, _val} | _attrs], Type, _Dispatched,
-		       Target_id, Content_type, Target_name, Max_user,
-		       Now_user) ->
+		       Target_id, Content_type, Target_name, Send_user,
+		       Max_user, Now_user) ->
     decode_chat_info_attrs(__TopXMLNS, _attrs, Type, _val,
-			   Target_id, Content_type, Target_name, Max_user,
-			   Now_user);
-decode_chat_info_attrs(__TopXMLNS,
-		       [{<<"target_id">>, _val} | _attrs], Type, Dispatched,
-		       _Target_id, Content_type, Target_name, Max_user,
-		       Now_user) ->
-    decode_chat_info_attrs(__TopXMLNS, _attrs, Type,
-			   Dispatched, _val, Content_type, Target_name,
+			   Target_id, Content_type, Target_name, Send_user,
 			   Max_user, Now_user);
 decode_chat_info_attrs(__TopXMLNS,
-		       [{<<"content_type">>, _val} | _attrs], Type, Dispatched,
-		       Target_id, _Content_type, Target_name, Max_user,
-		       Now_user) ->
+		       [{<<"target_id">>, _val} | _attrs], Type, Dispatched,
+		       _Target_id, Content_type, Target_name, Send_user,
+		       Max_user, Now_user) ->
     decode_chat_info_attrs(__TopXMLNS, _attrs, Type,
-			   Dispatched, Target_id, _val, Target_name, Max_user,
-			   Now_user);
+			   Dispatched, _val, Content_type, Target_name,
+			   Send_user, Max_user, Now_user);
+decode_chat_info_attrs(__TopXMLNS,
+		       [{<<"content_type">>, _val} | _attrs], Type, Dispatched,
+		       Target_id, _Content_type, Target_name, Send_user,
+		       Max_user, Now_user) ->
+    decode_chat_info_attrs(__TopXMLNS, _attrs, Type,
+			   Dispatched, Target_id, _val, Target_name, Send_user,
+			   Max_user, Now_user);
 decode_chat_info_attrs(__TopXMLNS,
 		       [{<<"target_name">>, _val} | _attrs], Type, Dispatched,
-		       Target_id, Content_type, _Target_name, Max_user,
-		       Now_user) ->
+		       Target_id, Content_type, _Target_name, Send_user,
+		       Max_user, Now_user) ->
     decode_chat_info_attrs(__TopXMLNS, _attrs, Type,
-			   Dispatched, Target_id, Content_type, _val, Max_user,
-			   Now_user);
+			   Dispatched, Target_id, Content_type, _val, Send_user,
+			   Max_user, Now_user);
 decode_chat_info_attrs(__TopXMLNS,
-		       [{<<"max_user">>, _val} | _attrs], Type, Dispatched,
-		       Target_id, Content_type, Target_name, _Max_user,
-		       Now_user) ->
-    decode_chat_info_attrs(__TopXMLNS, _attrs, Type,
-			   Dispatched, Target_id, Content_type, Target_name,
-			   _val, Now_user);
-decode_chat_info_attrs(__TopXMLNS,
-		       [{<<"now_user">>, _val} | _attrs], Type, Dispatched,
-		       Target_id, Content_type, Target_name, Max_user,
-		       _Now_user) ->
-    decode_chat_info_attrs(__TopXMLNS, _attrs, Type,
-			   Dispatched, Target_id, Content_type, Target_name,
-			   Max_user, _val);
-decode_chat_info_attrs(__TopXMLNS, [_ | _attrs], Type,
-		       Dispatched, Target_id, Content_type, Target_name,
+		       [{<<"send_user">>, _val} | _attrs], Type, Dispatched,
+		       Target_id, Content_type, Target_name, _Send_user,
 		       Max_user, Now_user) ->
     decode_chat_info_attrs(__TopXMLNS, _attrs, Type,
 			   Dispatched, Target_id, Content_type, Target_name,
-			   Max_user, Now_user);
+			   _val, Max_user, Now_user);
+decode_chat_info_attrs(__TopXMLNS,
+		       [{<<"max_user">>, _val} | _attrs], Type, Dispatched,
+		       Target_id, Content_type, Target_name, Send_user,
+		       _Max_user, Now_user) ->
+    decode_chat_info_attrs(__TopXMLNS, _attrs, Type,
+			   Dispatched, Target_id, Content_type, Target_name,
+			   Send_user, _val, Now_user);
+decode_chat_info_attrs(__TopXMLNS,
+		       [{<<"now_user">>, _val} | _attrs], Type, Dispatched,
+		       Target_id, Content_type, Target_name, Send_user,
+		       Max_user, _Now_user) ->
+    decode_chat_info_attrs(__TopXMLNS, _attrs, Type,
+			   Dispatched, Target_id, Content_type, Target_name,
+			   Send_user, Max_user, _val);
+decode_chat_info_attrs(__TopXMLNS, [_ | _attrs], Type,
+		       Dispatched, Target_id, Content_type, Target_name,
+		       Send_user, Max_user, Now_user) ->
+    decode_chat_info_attrs(__TopXMLNS, _attrs, Type,
+			   Dispatched, Target_id, Content_type, Target_name,
+			   Send_user, Max_user, Now_user);
 decode_chat_info_attrs(__TopXMLNS, [], Type, Dispatched,
-		       Target_id, Content_type, Target_name, Max_user,
-		       Now_user) ->
+		       Target_id, Content_type, Target_name, Send_user,
+		       Max_user, Now_user) ->
     {decode_chat_info_attr_type(__TopXMLNS, Type),
      decode_chat_info_attr_dispatched(__TopXMLNS,
 				      Dispatched),
@@ -651,12 +659,13 @@ decode_chat_info_attrs(__TopXMLNS, [], Type, Dispatched,
 					Content_type),
      decode_chat_info_attr_target_name(__TopXMLNS,
 				       Target_name),
+     decode_chat_info_attr_send_user(__TopXMLNS, Send_user),
      decode_chat_info_attr_max_user(__TopXMLNS, Max_user),
      decode_chat_info_attr_now_user(__TopXMLNS, Now_user)}.
 
 encode_chat_info({chat_info, Type, Dispatched,
-		  Content_type, Target_id, Target_name, Max_user,
-		  Now_user},
+		  Content_type, Target_id, Target_name, Send_user,
+		  Max_user, Now_user},
 		 __TopXMLNS) ->
     __NewTopXMLNS =
 	xmpp_codec:choose_top_xmlns(<<"jabber:memo:message">>,
@@ -664,13 +673,14 @@ encode_chat_info({chat_info, Type, Dispatched,
     _els = [],
     _attrs = encode_chat_info_attr_now_user(Now_user,
 					    encode_chat_info_attr_max_user(Max_user,
-									   encode_chat_info_attr_target_name(Target_name,
-													     encode_chat_info_attr_content_type(Content_type,
-																		encode_chat_info_attr_target_id(Target_id,
-																						encode_chat_info_attr_dispatched(Dispatched,
-																										 encode_chat_info_attr_type(Type,
-																													    xmpp_codec:enc_xmlns_attrs(__NewTopXMLNS,
-																																       __TopXMLNS)))))))),
+									   encode_chat_info_attr_send_user(Send_user,
+													   encode_chat_info_attr_target_name(Target_name,
+																	     encode_chat_info_attr_content_type(Content_type,
+																						encode_chat_info_attr_target_id(Target_id,
+																										encode_chat_info_attr_dispatched(Dispatched,
+																														 encode_chat_info_attr_type(Type,
+																																	    xmpp_codec:enc_xmlns_attrs(__NewTopXMLNS,
+																																				       __TopXMLNS))))))))),
     {xmlel, <<"chat_info">>, _attrs, _els}.
 
 decode_chat_info_attr_type(__TopXMLNS, undefined) ->
@@ -728,6 +738,16 @@ decode_chat_info_attr_target_name(__TopXMLNS, _val) ->
 encode_chat_info_attr_target_name(<<>>, _acc) -> _acc;
 encode_chat_info_attr_target_name(_val, _acc) ->
     [{<<"target_name">>, _val} | _acc].
+
+decode_chat_info_attr_send_user(__TopXMLNS,
+				undefined) ->
+    <<>>;
+decode_chat_info_attr_send_user(__TopXMLNS, _val) ->
+    _val.
+
+encode_chat_info_attr_send_user(<<>>, _acc) -> _acc;
+encode_chat_info_attr_send_user(_val, _acc) ->
+    [{<<"send_user">>, _val} | _acc].
 
 decode_chat_info_attr_max_user(__TopXMLNS, undefined) ->
     <<>>;

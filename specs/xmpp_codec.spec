@@ -4178,7 +4178,7 @@
         xmlns = <<"jabber:memo:message">>,
         module = 'memo_xep_message',
         result = { chat_info,'$type','$dispatched','$content_type','$target_id',
-        '$target_name','$max_user','$now_user'},
+        '$target_name','$send_user','$max_user','$now_user' },
         attrs = [ #attr{name = <<"type">>,
                             required=true,
                                   enc = {enc_enum, []},
@@ -4187,6 +4187,7 @@
                  #attr{name = <<"target_id">>,required = false},
                 #attr{name = <<"content_type">> ,required = false},
                 #attr{name = <<"target_name">> ,required = false},
+                #attr{name = <<"send_user">>,required=false},
                 #attr{name = <<"max_user">> ,required = false},
                 #attr{name = <<"now_user">> ,required = false}]
         }).
@@ -4360,12 +4361,13 @@
     #elem{name = <<"query">>,
         xmlns = <<"jabber:memo:device">>,
         module = 'memo_xep_device',
-        result = {memo_device_info,'$user','$server','$device_type','$token','$language','$device_number'},
+        result = {memo_device_info,'$user','$server','$device_type','$token','$language','$device_number','$domain_key'},
         attrs = [#attr{name = <<"user">>,required= false},
             #attr{name = <<"server">>,required= false},
             #attr{name = <<"device_type">>,required= false},
             #attr{name = <<"token">>,required= false},
             #attr{name = <<"language">>,required= false},
+            #attr{name = <<"domain_key">>,required=false},
             #attr{name = <<"device_number">>,required= false} ]
          }).
 

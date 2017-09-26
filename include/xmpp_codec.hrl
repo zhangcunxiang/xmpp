@@ -491,6 +491,7 @@
                     content_type = <<>> :: binary(),
                     target_id = <<>> :: binary(),
                     target_name = <<>> :: binary(),
+                    send_user = <<>> :: binary(),
                     max_user = <<>> :: binary(),
                     now_user = <<>> :: binary()}).
 -type chat_info() :: #chat_info{}.
@@ -1104,7 +1105,8 @@
                            device_type = <<>> :: binary(),
                            token = <<>> :: binary(),
                            language = <<>> :: binary(),
-                           device_number = <<>> :: binary()}).
+                           device_number = <<>> :: binary(),
+                           domain_key = <<>> :: binary()}).
 -type memo_device_info() :: #memo_device_info{}.
 
 -record(time, {tzo :: 'undefined' | {integer(),integer()},
