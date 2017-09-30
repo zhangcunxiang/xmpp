@@ -4240,6 +4240,23 @@
         ]
         }).
 
+
+-xml(memo_delay_msg,
+    #elem{name = <<"memo_delay_msg">>,
+        xmlns= <<"jabber:memo:delay">>,
+        module = 'memo_delay_msg',
+        result = {memo_delay_msg,'$msg_id','$packet','$send_time',
+        '$delay_seconds','$time_ref','$state' },
+         attrs = [
+          #attr{name = <<"msg_id">>,required = false },
+         #attr{name = <<"packet">>,required = false },
+            #attr{name = <<"send_time">>,required = false },
+             #attr{name = <<"delay_seconds">> },
+             #attr{name = <<"time_ref">>,required = false},
+              #attr{name = <<"state">>,required = false} ]
+              }).
+
+
 -xml(search_user_item,
     #elem{name = <<"user_item">>,
         xmlns= <<"jabber:memo:search">>,

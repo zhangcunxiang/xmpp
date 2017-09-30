@@ -164,6 +164,14 @@
 -record(mix_leave, {}).
 -type mix_leave() :: #mix_leave{}.
 
+-record(memo_delay_msg, {msg_id = <<>> :: binary(),
+                         packet = <<>> :: binary(),
+                         send_time = <<>> :: binary(),
+                         delay_seconds = <<>> :: binary(),
+                         time_ref = <<>> :: binary(),
+                         state = <<>> :: binary()}).
+-type memo_delay_msg() :: #memo_delay_msg{}.
+
 -record(ping, {}).
 -type ping() :: #ping{}.
 
@@ -1221,6 +1229,7 @@
                         adhoc_command() |
                         sm_failed() |
                         ping() |
+                        memo_delay_msg() |
                         topic_user_item() |
                         privilege_perm() |
                         privacy_item() |

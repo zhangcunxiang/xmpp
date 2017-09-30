@@ -1320,6 +1320,9 @@ get_mod(<<"restricted-xml">>,
     rfc6120;
 get_mod(<<"HOME">>, <<"vcard-temp">>) -> xep0054;
 get_mod(<<"end">>, <<"urn:xmpp:mam:tmp">>) -> xep0313;
+get_mod(<<"memo_delay_msg">>,
+	<<"jabber:memo:delay">>) ->
+    memo_delay_msg;
 get_mod(<<"iq">>, <<"jabber:iq:privacy">>) -> xep0016;
 get_mod(<<"list">>, <<"jabber:iq:privacy">>) -> xep0016;
 get_mod(<<"CATEGORIES">>, <<"vcard-temp">>) -> xep0054;
@@ -1408,6 +1411,8 @@ get_mod({carbons_received, _}) -> xep0280;
 get_mod({carbons_sent, _}) -> xep0280;
 get_mod({hint, _}) -> xep0334;
 get_mod({client_id, _}) -> xep0359;
+get_mod({memo_delay_msg, _, _, _, _, _, _}) ->
+    memo_delay_msg;
 get_mod({disco_items, _, _, _}) -> xep0030;
 get_mod({private, _}) -> xep0049;
 get_mod({sasl_challenge, _}) -> rfc6120;
