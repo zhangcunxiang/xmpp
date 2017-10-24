@@ -668,13 +668,6 @@ get_mod(<<"password">>,
 	<<"http://jabber.org/protocol/muc#user">>) ->
     xep0045;
 get_mod(<<"never">>, <<"urn:xmpp:mam:1">>) -> xep0313;
-get_mod(<<"bad-format">>,
-	<<"urn:ietf:params:xml:ns:xmpp-streams">>) ->
-    rfc6120;
-get_mod(<<"STREET">>, <<"vcard-temp">>) -> xep0054;
-get_mod(<<"status">>,
-	<<"http://jabber.org/protocol/muc#user">>) ->
-    xep0045;
 get_mod(<<"password">>,
 	<<"http://jabber.org/protocol/muc#owner">>) ->
     xep0045;
@@ -876,6 +869,8 @@ get_mod(<<"paused">>,
 get_mod(<<"stream:stream">>,
 	<<"jabber:component:accept">>) ->
     rfc6120;
+get_mod(<<"URL">>, <<"group-vcard-temp">>) ->
+    memo_group_vcard;
 get_mod(<<"version">>, <<"jabber:iq:version">>) ->
     xep0092;
 get_mod(<<"email">>, <<"jabber:iq:register">>) ->
@@ -1371,6 +1366,13 @@ get_mod(<<"invalid-from">>,
 get_mod(<<"items">>,
 	<<"http://jabber.org/protocol/pubsub">>) ->
     xep0060;
+get_mod(<<"bad-format">>,
+	<<"urn:ietf:params:xml:ns:xmpp-streams">>) ->
+    rfc6120;
+get_mod(<<"STREET">>, <<"vcard-temp">>) -> xep0054;
+get_mod(<<"status">>,
+	<<"http://jabber.org/protocol/muc#user">>) ->
+    xep0045;
 get_mod(Name, XMLNS) ->
     xmpp_codec_external:lookup(Name, XMLNS).
 
@@ -1421,8 +1423,6 @@ get_mod({db_feature, _}) -> xep0220;
 get_mod({handshake, _}) -> xep0114;
 get_mod({memo_change_pass, _, _, _}) ->
     memo_change_pass;
-get_mod({memo_device_info, _, _, _, _, _, _, _}) ->
-    memo_xep_device;
 get_mod({message, _, _, _, _, _, _, _, _, _, _}) ->
     rfc6120;
 get_mod({presence, _, _, _, _, _, _, _, _, _, _}) ->
@@ -1500,6 +1500,8 @@ get_mod({adhoc_actions, _, _, _, _}) -> xep0050;
 get_mod({adhoc_note, _, _}) -> xep0050;
 get_mod({push_disable, _, _}) -> xep0357;
 get_mod({push_notification, _}) -> xep0357;
+get_mod({memo_device_info, _, _, _, _, _, _, _, _}) ->
+    memo_xep_device;
 get_mod({disco_item, _, _, _}) -> xep0030;
 get_mod({stat, _, _, _, _}) -> xep0039;
 get_mod({register, _, _, _, _, _, _, _, _, _, _, _, _,
@@ -1510,8 +1512,6 @@ get_mod({mam_result, _, _, _, _}) -> xep0313;
 get_mod({sm_failed, _, _, _, _}) -> xep0198;
 get_mod({upload_request, _, _, _, _}) -> xep0363;
 get_mod({search_user_item, _, _, _}) -> memo_xep_search;
-get_mod({memo_group_vcard, _, _, _, _}) ->
-    memo_group_vcard;
 get_mod({version, _, _, _}) -> xep0092;
 get_mod({vcard_org, _, _}) -> xep0054;
 get_mod({ps_items, _, _, _, _, _, _}) -> xep0060;
@@ -1572,6 +1572,8 @@ get_mod({sm_enabled, _, _, _, _, _}) -> xep0198;
 get_mod({topic_user_item, _, _, _, _}) ->
     memo_xep_topic;
 get_mod({group_vcard_photo, _, _}) -> memo_group_vcard;
+get_mod({memo_group_vcard, _, _, _, _, _}) ->
+    memo_group_vcard;
 get_mod({vcard_email, _, _, _, _, _, _}) -> xep0054;
 get_mod({ps_affiliation, _, _, _, _}) -> xep0060;
 get_mod({feature_csi, _}) -> xep0352;

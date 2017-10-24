@@ -691,12 +691,6 @@
 -record(rosterver_feature, {}).
 -type rosterver_feature() :: #rosterver_feature{}.
 
--record(memo_group_vcard, {gid = <<>> :: binary(),
-                           photo_version = <<>> :: binary(),
-                           group_name :: 'undefined' | binary(),
-                           photo :: 'undefined' | #group_vcard_photo{}}).
--type memo_group_vcard() :: #memo_group_vcard{}.
-
 -record(muc_invite, {reason = <<>> :: binary(),
                      from :: undefined | jid:jid(),
                      to :: undefined | jid:jid(),
@@ -811,6 +805,13 @@
                               nick :: 'undefined' | binary(),
                               password :: 'undefined' | binary()}).
 -type bookmark_conference() :: #bookmark_conference{}.
+
+-record(memo_group_vcard, {gid = <<>> :: binary(),
+                           photo_version = <<>> :: binary(),
+                           group_name :: 'undefined' | binary(),
+                           photo :: 'undefined' | #group_vcard_photo{},
+                           photo_url :: 'undefined' | binary()}).
+-type memo_group_vcard() :: #memo_group_vcard{}.
 
 -record(xmpp_session, {optional = false :: boolean()}).
 -type xmpp_session() :: #xmpp_session{}.
@@ -1114,7 +1115,8 @@
                            token = <<>> :: binary(),
                            language = <<>> :: binary(),
                            device_number = <<>> :: binary(),
-                           domain_key = <<>> :: binary()}).
+                           domain_key = <<>> :: binary(),
+                           is_debug = <<>> :: binary()}).
 -type memo_device_info() :: #memo_device_info{}.
 
 -record(time, {tzo :: 'undefined' | {integer(),integer()},

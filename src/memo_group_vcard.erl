@@ -9,6 +9,10 @@ do_decode(<<"vCard">>, <<"group-vcard-temp">>, El,
 	  Opts) ->
     decode_memo_group_vcard(<<"group-vcard-temp">>, Opts,
 			    El);
+do_decode(<<"URL">>, <<"group-vcard-temp">>, El,
+	  Opts) ->
+    decode_group_vcard_PHOTO_URL(<<"group-vcard-temp">>,
+				 Opts, El);
 do_decode(<<"PHOTO">>, <<"group-vcard-temp">>, El,
 	  Opts) ->
     decode_group_vcard_PHOTO(<<"group-vcard-temp">>, Opts,
@@ -32,6 +36,7 @@ do_decode(Name, XMLNS, _, _) ->
 
 tags() ->
     [{<<"vCard">>, <<"group-vcard-temp">>},
+     {<<"URL">>, <<"group-vcard-temp">>},
      {<<"PHOTO">>, <<"group-vcard-temp">>},
      {<<"TYPE">>, <<"group-vcard-temp">>},
      {<<"GROUP_NAME">>, <<"group-vcard-temp">>},
@@ -40,44 +45,44 @@ tags() ->
 do_encode({group_vcard_photo, _, _} = Photo,
 	  TopXMLNS) ->
     encode_group_vcard_PHOTO(Photo, TopXMLNS);
-do_encode({memo_group_vcard, _, _, _, _} = Vcard,
+do_encode({memo_group_vcard, _, _, _, _, _} = Vcard,
 	  TopXMLNS) ->
     encode_memo_group_vcard(Vcard, TopXMLNS).
 
 do_get_name({group_vcard_photo, _, _}) -> <<"PHOTO">>;
-do_get_name({memo_group_vcard, _, _, _, _}) ->
+do_get_name({memo_group_vcard, _, _, _, _, _}) ->
     <<"vCard">>.
 
 do_get_ns({group_vcard_photo, _, _}) ->
     <<"group-vcard-temp">>;
-do_get_ns({memo_group_vcard, _, _, _, _}) ->
+do_get_ns({memo_group_vcard, _, _, _, _, _}) ->
     <<"group-vcard-temp">>.
 
 pp(group_vcard_photo, 2) -> [type, photo];
-pp(memo_group_vcard, 4) ->
-    [gid, photo_version, group_name, photo];
+pp(memo_group_vcard, 5) ->
+    [gid, photo_version, group_name, photo, photo_url];
 pp(_, _) -> no.
 
 records() ->
-    [{group_vcard_photo, 2}, {memo_group_vcard, 4}].
+    [{group_vcard_photo, 2}, {memo_group_vcard, 5}].
 
 decode_memo_group_vcard(__TopXMLNS, __Opts,
 			{xmlel, <<"vCard">>, _attrs, _els}) ->
-    {Group_name, Photo} =
+    {Group_name, Photo_url, Photo} =
 	decode_memo_group_vcard_els(__TopXMLNS, __Opts, _els,
-				    undefined, undefined),
+				    undefined, undefined, undefined),
     {Gid, Photo_version} =
 	decode_memo_group_vcard_attrs(__TopXMLNS, _attrs,
 				      undefined, undefined),
     {memo_group_vcard, Gid, Photo_version, Group_name,
-     Photo}.
+     Photo, Photo_url}.
 
 decode_memo_group_vcard_els(__TopXMLNS, __Opts, [],
-			    Group_name, Photo) ->
-    {Group_name, Photo};
+			    Group_name, Photo_url, Photo) ->
+    {Group_name, Photo_url, Photo};
 decode_memo_group_vcard_els(__TopXMLNS, __Opts,
 			    [{xmlel, <<"GROUP_NAME">>, _attrs, _} = _el | _els],
-			    Group_name, Photo) ->
+			    Group_name, Photo_url, Photo) ->
     case xmpp_codec:get_attr(<<"xmlns">>, _attrs,
 			     __TopXMLNS)
 	of
@@ -86,30 +91,46 @@ decode_memo_group_vcard_els(__TopXMLNS, __Opts,
 				      decode_group_vcard_GROUP_NAME(<<"group-vcard-temp">>,
 								    __Opts,
 								    _el),
-				      Photo);
+				      Photo_url, Photo);
       _ ->
 	  decode_memo_group_vcard_els(__TopXMLNS, __Opts, _els,
-				      Group_name, Photo)
+				      Group_name, Photo_url, Photo)
     end;
 decode_memo_group_vcard_els(__TopXMLNS, __Opts,
 			    [{xmlel, <<"PHOTO">>, _attrs, _} = _el | _els],
-			    Group_name, Photo) ->
+			    Group_name, Photo_url, Photo) ->
+    case xmpp_codec:get_attr(<<"xmlns">>, _attrs,
+			     __TopXMLNS)
+	of
+      <<"group-vcard-temp">> ->
+	  decode_memo_group_vcard_els(__TopXMLNS, __Opts, _els,
+				      Group_name, Photo_url,
+				      decode_group_vcard_PHOTO(<<"group-vcard-temp">>,
+							       __Opts, _el));
+      _ ->
+	  decode_memo_group_vcard_els(__TopXMLNS, __Opts, _els,
+				      Group_name, Photo_url, Photo)
+    end;
+decode_memo_group_vcard_els(__TopXMLNS, __Opts,
+			    [{xmlel, <<"URL">>, _attrs, _} = _el | _els],
+			    Group_name, Photo_url, Photo) ->
     case xmpp_codec:get_attr(<<"xmlns">>, _attrs,
 			     __TopXMLNS)
 	of
       <<"group-vcard-temp">> ->
 	  decode_memo_group_vcard_els(__TopXMLNS, __Opts, _els,
 				      Group_name,
-				      decode_group_vcard_PHOTO(<<"group-vcard-temp">>,
-							       __Opts, _el));
+				      decode_group_vcard_PHOTO_URL(<<"group-vcard-temp">>,
+								   __Opts, _el),
+				      Photo);
       _ ->
 	  decode_memo_group_vcard_els(__TopXMLNS, __Opts, _els,
-				      Group_name, Photo)
+				      Group_name, Photo_url, Photo)
     end;
 decode_memo_group_vcard_els(__TopXMLNS, __Opts,
-			    [_ | _els], Group_name, Photo) ->
+			    [_ | _els], Group_name, Photo_url, Photo) ->
     decode_memo_group_vcard_els(__TopXMLNS, __Opts, _els,
-				Group_name, Photo).
+				Group_name, Photo_url, Photo).
 
 decode_memo_group_vcard_attrs(__TopXMLNS,
 			      [{<<"gid">>, _val} | _attrs], _Gid,
@@ -132,7 +153,7 @@ decode_memo_group_vcard_attrs(__TopXMLNS, [], Gid,
 						Photo_version)}.
 
 encode_memo_group_vcard({memo_group_vcard, Gid,
-			 Photo_version, Group_name, Photo},
+			 Photo_version, Group_name, Photo, Photo_url},
 			__TopXMLNS) ->
     __NewTopXMLNS =
 	xmpp_codec:choose_top_xmlns(<<"group-vcard-temp">>, [],
@@ -140,9 +161,11 @@ encode_memo_group_vcard({memo_group_vcard, Gid,
     _els =
 	lists:reverse('encode_memo_group_vcard_$group_name'(Group_name,
 							    __NewTopXMLNS,
-							    'encode_memo_group_vcard_$photo'(Photo,
-											     __NewTopXMLNS,
-											     []))),
+							    'encode_memo_group_vcard_$photo_url'(Photo_url,
+												 __NewTopXMLNS,
+												 'encode_memo_group_vcard_$photo'(Photo,
+																  __NewTopXMLNS,
+																  [])))),
     _attrs =
 	encode_memo_group_vcard_attr_photo_version(Photo_version,
 						   encode_memo_group_vcard_attr_gid(Gid,
@@ -156,6 +179,14 @@ encode_memo_group_vcard({memo_group_vcard, Gid,
 'encode_memo_group_vcard_$group_name'(Group_name,
 				      __TopXMLNS, _acc) ->
     [encode_group_vcard_GROUP_NAME(Group_name, __TopXMLNS)
+     | _acc].
+
+'encode_memo_group_vcard_$photo_url'(undefined,
+				     __TopXMLNS, _acc) ->
+    _acc;
+'encode_memo_group_vcard_$photo_url'(Photo_url,
+				     __TopXMLNS, _acc) ->
+    [encode_group_vcard_PHOTO_URL(Photo_url, __TopXMLNS)
      | _acc].
 
 'encode_memo_group_vcard_$photo'(undefined, __TopXMLNS,
@@ -188,6 +219,42 @@ encode_memo_group_vcard_attr_photo_version(<<>>,
 encode_memo_group_vcard_attr_photo_version(_val,
 					   _acc) ->
     [{<<"photo_version">>, _val} | _acc].
+
+decode_group_vcard_PHOTO_URL(__TopXMLNS, __Opts,
+			     {xmlel, <<"URL">>, _attrs, _els}) ->
+    Cdata = decode_group_vcard_PHOTO_URL_els(__TopXMLNS,
+					     __Opts, _els, <<>>),
+    Cdata.
+
+decode_group_vcard_PHOTO_URL_els(__TopXMLNS, __Opts, [],
+				 Cdata) ->
+    decode_group_vcard_PHOTO_URL_cdata(__TopXMLNS, Cdata);
+decode_group_vcard_PHOTO_URL_els(__TopXMLNS, __Opts,
+				 [{xmlcdata, _data} | _els], Cdata) ->
+    decode_group_vcard_PHOTO_URL_els(__TopXMLNS, __Opts,
+				     _els, <<Cdata/binary, _data/binary>>);
+decode_group_vcard_PHOTO_URL_els(__TopXMLNS, __Opts,
+				 [_ | _els], Cdata) ->
+    decode_group_vcard_PHOTO_URL_els(__TopXMLNS, __Opts,
+				     _els, Cdata).
+
+encode_group_vcard_PHOTO_URL(Cdata, __TopXMLNS) ->
+    __NewTopXMLNS =
+	xmpp_codec:choose_top_xmlns(<<"group-vcard-temp">>, [],
+				    __TopXMLNS),
+    _els = encode_group_vcard_PHOTO_URL_cdata(Cdata, []),
+    _attrs = xmpp_codec:enc_xmlns_attrs(__NewTopXMLNS,
+					__TopXMLNS),
+    {xmlel, <<"URL">>, _attrs, _els}.
+
+decode_group_vcard_PHOTO_URL_cdata(__TopXMLNS, <<>>) ->
+    <<>>;
+decode_group_vcard_PHOTO_URL_cdata(__TopXMLNS, _val) ->
+    _val.
+
+encode_group_vcard_PHOTO_URL_cdata(<<>>, _acc) -> _acc;
+encode_group_vcard_PHOTO_URL_cdata(_val, _acc) ->
+    [{xmlcdata, _val} | _acc].
 
 decode_group_vcard_PHOTO(__TopXMLNS, __Opts,
 			 {xmlel, <<"PHOTO">>, _attrs, _els}) ->

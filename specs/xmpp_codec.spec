@@ -4331,16 +4331,21 @@
                 #ref{name = group_vcard_TYPE,label ='$type',max=1,min=0}]
                 }).
 
+-xml(group_vcard_PHOTO_URL,
+    #elem{name = <<"URL">>,xmlns= <<"group-vcard-temp">>,
+    module = 'memo_group_vcard',
+    result = '$cdata' }).
 
 -xml(memo_group_vcard,
     #elem{name = <<"vCard">>,
         xmlns= <<"group-vcard-temp">>,
         module = 'memo_group_vcard',
-        result = {memo_group_vcard,'$gid','$photo_version','$group_name','$photo'},
+        result = {memo_group_vcard,'$gid','$photo_version','$group_name','$photo','$photo_url' },
         attrs = [#attr{name = <<"gid">>,required= false},
             #attr{name= <<"photo_version">>,default= <<"">> }],
         refs = [ #ref{name = group_vcard_GROUP_NAME, label='$group_name',min=0,max=1},
-            #ref{name = group_vcard_PHOTO,label = '$photo',min=0,max=1}]
+            #ref{name = group_vcard_PHOTO,label = '$photo',min=0,max=1},
+            #ref{name = group_vcard_PHOTO_URL,label='$photo_url',min=0,max=1 } ]
             }).
 
 
@@ -4378,13 +4383,14 @@
     #elem{name = <<"query">>,
         xmlns = <<"jabber:memo:device">>,
         module = 'memo_xep_device',
-        result = {memo_device_info,'$user','$server','$device_type','$token','$language','$device_number','$domain_key'},
+        result = {memo_device_info,'$user','$server','$device_type','$token','$language','$device_number','$domain_key','$is_debug'},
         attrs = [#attr{name = <<"user">>,required= false},
             #attr{name = <<"server">>,required= false},
             #attr{name = <<"device_type">>,required= false},
             #attr{name = <<"token">>,required= false},
             #attr{name = <<"language">>,required= false},
             #attr{name = <<"domain_key">>,required=false},
+            #attr{name = <<"is_debug">>,required=false},
             #attr{name = <<"device_number">>,required= false} ]
          }).
 
