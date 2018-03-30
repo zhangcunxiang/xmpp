@@ -516,7 +516,8 @@
                      height = <<>> :: binary(),
                      width = <<>> :: binary(),
                      length = <<>> :: binary(),
-                     scene_id = <<>> :: binary()}).
+                     scene_id = <<>> :: binary(),
+                     share_user = <<>> :: binary()}).
 -type memo_scene() :: #memo_scene{}.
 
 -record(memo_scene_list, {role = <<>> :: binary(),
@@ -1158,6 +1159,7 @@
                         ps_retract() |
                         bookmark_conference() |
                         mix_participant() |
+                        memo_scene_list() |
                         starttls_failure() |
                         muc_subscriptions() |
                         sm_resume() |
@@ -1174,6 +1176,7 @@
                         memo_change_pass() |
                         privacy_query() |
                         compress_failure() |
+                        search() |
                         muc_decline() |
                         upload_request_0() |
                         sasl_mechanisms() |
@@ -1185,10 +1188,10 @@
                         starttls() |
                         stats() |
                         stream_features() |
+                        text() |
                         muc_subscribe() |
                         xdata() |
                         last() |
-                        text() |
                         vcard_name() |
                         memo_delay_msg() |
                         query_group_info() |
@@ -1207,7 +1210,6 @@
                         group_vcard_photo() |
                         search_item() |
                         privilege_perm() |
-                        search() |
                         position() |
                         privacy_item() |
                         sm_a() |
@@ -1330,7 +1332,6 @@
                         xcaptcha() |
                         block() |
                         ps_error() |
-                        memo_scene_list() |
                         adhoc_actions() |
                         sasl_response() |
                         push_enable() |
