@@ -4400,6 +4400,64 @@
     module = 'memo_xep_jingle',
      result = {memo_jingle } } ).
 
+-xml(postion,
+    #elem{name = <<"postion">>,
+    xmlns = <<"jabber:memo:scene">>,
+    module = 'memo_xep_scene',
+    result = { position, '$x','$y','$z'},
+    attrs = [ #attr{name = <<"x">>,required=false},
+    #attr{name = <<"y">>,required=false},
+    #attr{name = <<"z">>,required=false}] ).
+
+-xml(size,
+    #elem{name = <<"size">>,
+    xmlns = <<"jabber:memo:scene">>,
+    module = 'memo_xep_scene',
+    result = { position, '$l','$w','$h'},
+    attrs = [ #attr{name = <<"l">>,required=false},
+    #attr{name = <<"w">>,required=false},
+    #attr{name = <<"h">>,required=false}] ).
+
+
+-xml(trans_form,
+    #elem{name = <<"trans_form">>,xmlns = <<"jabber:memo:scene">>,
+    module = 'memo_xep_scene',
+    result = { trans_form, '$position','$size'},
+    refs = [ #ref{ name= position,label = '$position',min=0,max=1},
+    #ref{ name = size,label = '$size',min=0,max=1}] }).
+
+-xml(material_profile,
+    #elem{name = <<"profile">>,xmlns= <<"jabber:memo:scene">>,
+    module = 'memo_xep_scene',
+    result = { material_profile, '$trans_form','$mac_address','$type','$name'},
+    refs = [ #ref{name = trans_form, label = '$trans_form'} ],
+    attrs = [ #attr{name = <<"mac_address">>,required = false},
+    #attr{name = <<"type">>,required = false},
+    #attr{name = <<"name">>,required = false} ] }).
+
+-xml(memo_scene,
+    #elem{name = <<"query">>,xmlns= <<"jabber:memo:scene">>,
+        module = 'memo_xep_scene',
+        result = { memo_scene, '$profile','$name','$rtype','$role',
+        '$height','$width','$length','$scene_id'},
+        attrs = [ #attr{name = <<"name">>,required = false},
+        #attr{name = <<"rtype">>,required = false},
+        #attr{name = <<"role">>,required = false},
+        #attr{name = <<"height">>,required = false},
+        #attr{name = <<"width">>,required = false},
+        #attr{name = <<"height">>,required = false},
+        #attr{name = <<"scene_id">>,required = false} ],
+        refs = [ #ref{name = material_profile, label = '$profile'} }).
+
+-xml(memo_scene_list,
+    #elem{name = <<"query">>,xmlns= <<"jabber:memo:scene:list">>,
+            module = 'memo_xep_scene_list',
+            result = { memo_scene_list, '$memo_scene'},
+            refs = [ #ref{name = memo_scene,label = "$memo_scene"} ]
+            }).
+
+
+
 %%memo end%%
 
 
