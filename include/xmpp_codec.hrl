@@ -156,10 +156,10 @@
 -record(mix_leave, {}).
 -type mix_leave() :: #mix_leave{}.
 
--record(position, {l = <<>> :: binary(),
-                   w = <<>> :: binary(),
-                   h = <<>> :: binary()}).
--type position() :: #position{}.
+-record(size, {l = <<>> :: binary(),
+               w = <<>> :: binary(),
+               h = <<>> :: binary()}).
+-type size() :: #size{}.
 
 -record(muc_unsubscribe, {jid :: undefined | jid:jid()}).
 -type muc_unsubscribe() :: #muc_unsubscribe{}.
@@ -499,11 +499,16 @@
                           expiry :: undefined | erlang:timestamp()}).
 -type ps_subscription() :: #ps_subscription{}.
 
+-record(position, {x = <<>> :: binary(),
+                   y = <<>> :: binary(),
+                   z = <<>> :: binary()}).
+-type position() :: #position{}.
+
 -record(trans_form, {position :: 'undefined' | #position{},
-                     size :: 'undefined' | #position{}}).
+                     size :: 'undefined' | #size{}}).
 -type trans_form() :: #trans_form{}.
 
--record(profile, {trans_form = [] :: [#trans_form{}],
+-record(profile, {trans_form :: 'undefined' | #trans_form{},
                   mac_address = <<>> :: binary(),
                   type = <<>> :: binary(),
                   name = <<>> :: binary()}).
@@ -1168,7 +1173,6 @@
                         sm_failed() |
                         delay() |
                         delegation() |
-                        text() |
                         rsm_first() |
                         trans_form() |
                         muc_actor() |
@@ -1181,6 +1185,7 @@
                         upload_request_0() |
                         sasl_mechanisms() |
                         compression() |
+                        search() |
                         'see-other-host'() |
                         x_conference() |
                         roster_item() |
@@ -1201,6 +1206,7 @@
                         roster_query() |
                         mam_fin() |
                         redirect() |
+                        text() |
                         privilege() |
                         version() |
                         delegation_query() |
@@ -1249,7 +1255,6 @@
                         register() |
                         thumbnail() |
                         bind() |
-                        search() |
                         shim() |
                         disco_items() |
                         mam_query() |
@@ -1292,6 +1297,7 @@
                         ps_subscribe() |
                         request_info() |
                         db_result() |
+                        size() |
                         sm_resumed() |
                         memo_group_vcard() |
                         memo_scene() |

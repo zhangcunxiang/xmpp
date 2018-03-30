@@ -4413,7 +4413,7 @@
     #elem{name = <<"size">>,
     xmlns = <<"jabber:memo:scene">>,
     module = 'memo_xep_scene',
-    result = { position, '$l','$w','$h'},
+    result = { size, '$l','$w','$h'},
     attrs = [ #attr{name = <<"l">>,required=false},
     #attr{name = <<"w">>,required=false},
     #attr{name = <<"h">>,required=false} ]} ).
@@ -4430,7 +4430,7 @@
     #elem{name = <<"profile">>,xmlns= <<"jabber:memo:scene">>,
     module = 'memo_xep_scene',
     result = { profile, '$trans_form','$mac_address','$type','$name'},
-    refs = [ #ref{name = trans_form, label = '$trans_form'} ],
+    refs = [ #ref{name = trans_form, label = '$trans_form',max=1,min=0 } ],
     attrs = [ #attr{name = <<"mac_address">>,required = false},
     #attr{name = <<"type">>,required = false},
     #attr{name = <<"name">>,required = false} ] }).

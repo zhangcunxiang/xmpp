@@ -35,7 +35,7 @@ tags() ->
 
 do_encode({position, _, _, _} = Position, TopXMLNS) ->
     encode_position(Position, TopXMLNS);
-do_encode({position, _, _, _} = Size, TopXMLNS) ->
+do_encode({size, _, _, _} = Size, TopXMLNS) ->
     encode_size(Size, TopXMLNS);
 do_encode({trans_form, _, _} = Trans_form, TopXMLNS) ->
     encode_trans_form(Trans_form, TopXMLNS);
@@ -49,8 +49,8 @@ do_encode({memo_scene, _, _, _, _, _, _, _, _, _} =
 do_get_name({memo_scene, _, _, _, _, _, _, _, _, _}) ->
     <<"query">>;
 do_get_name({position, _, _, _}) -> <<"position">>;
-do_get_name({position, _, _, _}) -> <<"size">>;
 do_get_name({profile, _, _, _, _}) -> <<"profile">>;
+do_get_name({size, _, _, _}) -> <<"size">>;
 do_get_name({trans_form, _, _}) -> <<"trans_form">>.
 
 do_get_ns({memo_scene, _, _, _, _, _, _, _, _, _}) ->
@@ -59,10 +59,12 @@ do_get_ns({position, _, _, _}) ->
     <<"jabber:memo:scene">>;
 do_get_ns({profile, _, _, _, _}) ->
     <<"jabber:memo:scene">>;
+do_get_ns({size, _, _, _}) -> <<"jabber:memo:scene">>;
 do_get_ns({trans_form, _, _}) ->
     <<"jabber:memo:scene">>.
 
-pp(position, 3) -> [l, w, h];
+pp(position, 3) -> [x, y, z];
+pp(size, 3) -> [l, w, h];
 pp(trans_form, 2) -> [position, size];
 pp(profile, 4) -> [trans_form, mac_address, type, name];
 pp(memo_scene, 9) ->
@@ -71,8 +73,8 @@ pp(memo_scene, 9) ->
 pp(_, _) -> no.
 
 records() ->
-    [{position, 3}, {trans_form, 2}, {profile, 4},
-     {memo_scene, 9}].
+    [{position, 3}, {size, 3}, {trans_form, 2},
+     {profile, 4}, {memo_scene, 9}].
 
 decode_memo_scene(__TopXMLNS, __Opts,
 		  {xmlel, <<"query">>, _attrs, _els}) ->
@@ -266,7 +268,7 @@ encode_memo_scene_attr_scene_id(_val, _acc) ->
 decode_material_profile(__TopXMLNS, __Opts,
 			{xmlel, <<"profile">>, _attrs, _els}) ->
     Trans_form = decode_material_profile_els(__TopXMLNS,
-					     __Opts, _els, []),
+					     __Opts, _els, undefined),
     {Mac_address, Type, Name} =
 	decode_material_profile_attrs(__TopXMLNS, _attrs,
 				      undefined, undefined, undefined),
@@ -274,7 +276,7 @@ decode_material_profile(__TopXMLNS, __Opts,
 
 decode_material_profile_els(__TopXMLNS, __Opts, [],
 			    Trans_form) ->
-    lists:reverse(Trans_form);
+    Trans_form;
 decode_material_profile_els(__TopXMLNS, __Opts,
 			    [{xmlel, <<"trans_form">>, _attrs, _} = _el | _els],
 			    Trans_form) ->
@@ -283,9 +285,8 @@ decode_material_profile_els(__TopXMLNS, __Opts,
 	of
       <<"jabber:memo:scene">> ->
 	  decode_material_profile_els(__TopXMLNS, __Opts, _els,
-				      [decode_trans_form(<<"jabber:memo:scene">>,
-							 __Opts, _el)
-				       | Trans_form]);
+				      decode_trans_form(<<"jabber:memo:scene">>,
+							__Opts, _el));
       _ ->
 	  decode_material_profile_els(__TopXMLNS, __Opts, _els,
 				      Trans_form)
@@ -337,16 +338,12 @@ encode_material_profile({profile, Trans_form,
 																		     __TopXMLNS)))),
     {xmlel, <<"profile">>, _attrs, _els}.
 
-'encode_material_profile_$trans_form'([], __TopXMLNS,
-				      _acc) ->
-    _acc;
-'encode_material_profile_$trans_form'([Trans_form
-				       | _els],
+'encode_material_profile_$trans_form'(undefined,
 				      __TopXMLNS, _acc) ->
-    'encode_material_profile_$trans_form'(_els, __TopXMLNS,
-					  [encode_trans_form(Trans_form,
-							     __TopXMLNS)
-					   | _acc]).
+    _acc;
+'encode_material_profile_$trans_form'(Trans_form,
+				      __TopXMLNS, _acc) ->
+    [encode_trans_form(Trans_form, __TopXMLNS) | _acc].
 
 decode_material_profile_attr_mac_address(__TopXMLNS,
 					 undefined) ->
@@ -455,7 +452,7 @@ decode_size(__TopXMLNS, __Opts,
 	    {xmlel, <<"size">>, _attrs, _els}) ->
     {L, W, H} = decode_size_attrs(__TopXMLNS, _attrs,
 				  undefined, undefined, undefined),
-    {position, L, W, H}.
+    {size, L, W, H}.
 
 decode_size_attrs(__TopXMLNS,
 		  [{<<"l">>, _val} | _attrs], _L, W, H) ->
@@ -473,7 +470,7 @@ decode_size_attrs(__TopXMLNS, [], L, W, H) ->
      decode_size_attr_w(__TopXMLNS, W),
      decode_size_attr_h(__TopXMLNS, H)}.
 
-encode_size({position, L, W, H}, __TopXMLNS) ->
+encode_size({size, L, W, H}, __TopXMLNS) ->
     __NewTopXMLNS =
 	xmpp_codec:choose_top_xmlns(<<"jabber:memo:scene">>, [],
 				    __TopXMLNS),
