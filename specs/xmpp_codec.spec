@@ -4400,14 +4400,14 @@
     module = 'memo_xep_jingle',
      result = {memo_jingle } } ).
 
--xml(postion,
-    #elem{name = <<"postion">>,
+-xml(position,
+    #elem{name = <<"position">>,
     xmlns = <<"jabber:memo:scene">>,
     module = 'memo_xep_scene',
     result = { position, '$x','$y','$z'},
     attrs = [ #attr{name = <<"x">>,required=false},
     #attr{name = <<"y">>,required=false},
-    #attr{name = <<"z">>,required=false}] ).
+    #attr{name = <<"z">>,required=false} ]} ).
 
 -xml(size,
     #elem{name = <<"size">>,
@@ -4416,7 +4416,7 @@
     result = { position, '$l','$w','$h'},
     attrs = [ #attr{name = <<"l">>,required=false},
     #attr{name = <<"w">>,required=false},
-    #attr{name = <<"h">>,required=false}] ).
+    #attr{name = <<"h">>,required=false} ]} ).
 
 
 -xml(trans_form,
@@ -4440,20 +4440,22 @@
         module = 'memo_xep_scene',
         result = { memo_scene, '$profile','$name','$rtype','$role',
         '$height','$width','$length','$scene_id'},
+        refs = [ #ref{name = material_profile, label = '$profile'}],
         attrs = [ #attr{name = <<"name">>,required = false},
         #attr{name = <<"rtype">>,required = false},
         #attr{name = <<"role">>,required = false},
         #attr{name = <<"height">>,required = false},
         #attr{name = <<"width">>,required = false},
-        #attr{name = <<"height">>,required = false},
-        #attr{name = <<"scene_id">>,required = false} ],
-        refs = [ #ref{name = material_profile, label = '$profile'} }).
+        #attr{name = <<"length">>,required = false},
+        #attr{name = <<"scene_id">>,required = false} ]
+         }).
 
 -xml(memo_scene_list,
     #elem{name = <<"query">>,xmlns= <<"jabber:memo:scene:list">>,
             module = 'memo_xep_scene_list',
-            result = { memo_scene_list, '$memo_scene'},
-            refs = [ #ref{name = memo_scene,label = "$memo_scene"} ]
+            result = { memo_scene_list ,'$role' ,'$memo_scene'},
+            attrs = [ #attr{name = <<"role">>,required = false } ],
+            refs = [ #ref{name = memo_scene, label = '$memo_scene'} ]
             }).
 
 
