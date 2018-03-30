@@ -1168,6 +1168,7 @@
                         sm_failed() |
                         delay() |
                         delegation() |
+                        text() |
                         rsm_first() |
                         trans_form() |
                         muc_actor() |
@@ -1176,7 +1177,6 @@
                         memo_change_pass() |
                         privacy_query() |
                         compress_failure() |
-                        search() |
                         muc_decline() |
                         upload_request_0() |
                         sasl_mechanisms() |
@@ -1188,7 +1188,6 @@
                         starttls() |
                         stats() |
                         stream_features() |
-                        text() |
                         muc_subscribe() |
                         xdata() |
                         last() |
@@ -1250,6 +1249,7 @@
                         register() |
                         thumbnail() |
                         bind() |
+                        search() |
                         shim() |
                         disco_items() |
                         mam_query() |

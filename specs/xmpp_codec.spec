@@ -4404,7 +4404,7 @@
     #elem{name = <<"position">>,
     xmlns = <<"jabber:memo:scene">>,
     module = 'memo_xep_scene',
-    result = { position, '$x','$y','$z'},
+    result = { position, '$x','$y','$z' },
     attrs = [ #attr{name = <<"x">>,required=false},
     #attr{name = <<"y">>,required=false},
     #attr{name = <<"z">>,required=false} ]} ).
