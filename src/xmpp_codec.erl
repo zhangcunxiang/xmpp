@@ -1404,6 +1404,7 @@ get_mod({chat_info, _, _, _, _, _, _, _, _}) ->
     memo_xep_message;
 get_mod({muc_user, _, _, _, _, _, _}) -> xep0045;
 get_mod({bytestreams, _, _, _, _, _, _}) -> xep0065;
+get_mod({profile, _, _, _, _}) -> memo_xep_scene;
 get_mod({sasl_auth, _, _}) -> rfc6120;
 get_mod({vcard_logo, _, _, _}) -> xep0054;
 get_mod({ps_item, _, _, _, _, _}) -> xep0060;
@@ -1527,8 +1528,6 @@ get_mod({muc_subscribe, _, _, _, _}) -> p1_mucsub;
 get_mod({auth_info, _, _, _, _, _, _, _, _, _, _}) ->
     memo_xep_message;
 get_mod({position, _, _, _}) -> memo_xep_scene;
-get_mod({material_profile, _, _, _, _}) ->
-    memo_xep_scene;
 get_mod({roster_item, _, _, _, _, _}) -> rfc6121;
 get_mod({vcard_tel, _, _, _, _, _, _, _, _, _, _, _, _,
 	 _, _}) ->

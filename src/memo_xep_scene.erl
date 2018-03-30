@@ -39,60 +39,57 @@ do_encode({position, _, _, _} = Size, TopXMLNS) ->
     encode_size(Size, TopXMLNS);
 do_encode({trans_form, _, _} = Trans_form, TopXMLNS) ->
     encode_trans_form(Trans_form, TopXMLNS);
-do_encode({material_profile, _, _, _, _} = Profile,
-	  TopXMLNS) ->
+do_encode({profile, _, _, _, _} = Profile, TopXMLNS) ->
     encode_material_profile(Profile, TopXMLNS);
 do_encode({memo_scene, _, _, _, _, _, _, _, _} = Query,
 	  TopXMLNS) ->
     encode_memo_scene(Query, TopXMLNS).
 
-do_get_name({material_profile, _, _, _, _}) ->
-    <<"profile">>;
 do_get_name({memo_scene, _, _, _, _, _, _, _, _}) ->
     <<"query">>;
 do_get_name({position, _, _, _}) -> <<"position">>;
 do_get_name({position, _, _, _}) -> <<"size">>;
+do_get_name({profile, _, _, _, _}) -> <<"profile">>;
 do_get_name({trans_form, _, _}) -> <<"trans_form">>.
 
-do_get_ns({material_profile, _, _, _, _}) ->
-    <<"jabber:memo:scene">>;
 do_get_ns({memo_scene, _, _, _, _, _, _, _, _}) ->
     <<"jabber:memo:scene">>;
 do_get_ns({position, _, _, _}) ->
+    <<"jabber:memo:scene">>;
+do_get_ns({profile, _, _, _, _}) ->
     <<"jabber:memo:scene">>;
 do_get_ns({trans_form, _, _}) ->
     <<"jabber:memo:scene">>.
 
 pp(position, 3) -> [l, w, h];
 pp(trans_form, 2) -> [position, size];
-pp(material_profile, 4) ->
-    [trans_form, mac_address, type, name];
+pp(profile, 4) -> [trans_form, mac_address, type, name];
 pp(memo_scene, 8) ->
-    [profile, name, rtype, role, height, width, length,
+    [profiles, name, rtype, role, height, width, length,
      scene_id];
 pp(_, _) -> no.
 
 records() ->
-    [{position, 3}, {trans_form, 2}, {material_profile, 4},
+    [{position, 3}, {trans_form, 2}, {profile, 4},
      {memo_scene, 8}].
 
 decode_memo_scene(__TopXMLNS, __Opts,
 		  {xmlel, <<"query">>, _attrs, _els}) ->
-    Profile = decode_memo_scene_els(__TopXMLNS, __Opts,
-				    _els, []),
+    Profiles = decode_memo_scene_els(__TopXMLNS, __Opts,
+				     _els, []),
     {Name, Rtype, Role, Height, Width, Length, Scene_id} =
 	decode_memo_scene_attrs(__TopXMLNS, _attrs, undefined,
 				undefined, undefined, undefined, undefined,
 				undefined, undefined),
-    {memo_scene, Profile, Name, Rtype, Role, Height, Width,
+    {memo_scene, Profiles, Name, Rtype, Role, Height, Width,
      Length, Scene_id}.
 
 decode_memo_scene_els(__TopXMLNS, __Opts, [],
-		      Profile) ->
-    lists:reverse(Profile);
+		      Profiles) ->
+    lists:reverse(Profiles);
 decode_memo_scene_els(__TopXMLNS, __Opts,
 		      [{xmlel, <<"profile">>, _attrs, _} = _el | _els],
-		      Profile) ->
+		      Profiles) ->
     case xmpp_codec:get_attr(<<"xmlns">>, _attrs,
 			     __TopXMLNS)
 	of
@@ -100,14 +97,15 @@ decode_memo_scene_els(__TopXMLNS, __Opts,
 	  decode_memo_scene_els(__TopXMLNS, __Opts, _els,
 				[decode_material_profile(<<"jabber:memo:scene">>,
 							 __Opts, _el)
-				 | Profile]);
+				 | Profiles]);
       _ ->
-	  decode_memo_scene_els(__TopXMLNS, __Opts, _els, Profile)
+	  decode_memo_scene_els(__TopXMLNS, __Opts, _els,
+				Profiles)
     end;
 decode_memo_scene_els(__TopXMLNS, __Opts, [_ | _els],
-		      Profile) ->
+		      Profiles) ->
     decode_memo_scene_els(__TopXMLNS, __Opts, _els,
-			  Profile).
+			  Profiles).
 
 decode_memo_scene_attrs(__TopXMLNS,
 			[{<<"name">>, _val} | _attrs], _Name, Rtype, Role,
@@ -158,15 +156,15 @@ decode_memo_scene_attrs(__TopXMLNS, [], Name, Rtype,
      decode_memo_scene_attr_length(__TopXMLNS, Length),
      decode_memo_scene_attr_scene_id(__TopXMLNS, Scene_id)}.
 
-encode_memo_scene({memo_scene, Profile, Name, Rtype,
+encode_memo_scene({memo_scene, Profiles, Name, Rtype,
 		   Role, Height, Width, Length, Scene_id},
 		  __TopXMLNS) ->
     __NewTopXMLNS =
 	xmpp_codec:choose_top_xmlns(<<"jabber:memo:scene">>, [],
 				    __TopXMLNS),
     _els =
-	lists:reverse('encode_memo_scene_$profile'(Profile,
-						   __NewTopXMLNS, [])),
+	lists:reverse('encode_memo_scene_$profiles'(Profiles,
+						    __NewTopXMLNS, [])),
     _attrs = encode_memo_scene_attr_scene_id(Scene_id,
 					     encode_memo_scene_attr_length(Length,
 									   encode_memo_scene_attr_width(Width,
@@ -178,13 +176,13 @@ encode_memo_scene({memo_scene, Profile, Name, Rtype,
 																														      __TopXMLNS)))))))),
     {xmlel, <<"query">>, _attrs, _els}.
 
-'encode_memo_scene_$profile'([], __TopXMLNS, _acc) ->
+'encode_memo_scene_$profiles'([], __TopXMLNS, _acc) ->
     _acc;
-'encode_memo_scene_$profile'([Profile | _els],
-			     __TopXMLNS, _acc) ->
-    'encode_memo_scene_$profile'(_els, __TopXMLNS,
-				 [encode_material_profile(Profile, __TopXMLNS)
-				  | _acc]).
+'encode_memo_scene_$profiles'([Profiles | _els],
+			      __TopXMLNS, _acc) ->
+    'encode_memo_scene_$profiles'(_els, __TopXMLNS,
+				  [encode_material_profile(Profiles, __TopXMLNS)
+				   | _acc]).
 
 decode_memo_scene_attr_name(__TopXMLNS, undefined) ->
     <<>>;
@@ -251,7 +249,7 @@ decode_material_profile(__TopXMLNS, __Opts,
     {Mac_address, Type, Name} =
 	decode_material_profile_attrs(__TopXMLNS, _attrs,
 				      undefined, undefined, undefined),
-    {material_profile, Trans_form, Mac_address, Type, Name}.
+    {profile, Trans_form, Mac_address, Type, Name}.
 
 decode_material_profile_els(__TopXMLNS, __Opts, [],
 			    Trans_form) ->
@@ -302,7 +300,7 @@ decode_material_profile_attrs(__TopXMLNS, [],
      decode_material_profile_attr_type(__TopXMLNS, Type),
      decode_material_profile_attr_name(__TopXMLNS, Name)}.
 
-encode_material_profile({material_profile, Trans_form,
+encode_material_profile({profile, Trans_form,
 			 Mac_address, Type, Name},
 			__TopXMLNS) ->
     __NewTopXMLNS =

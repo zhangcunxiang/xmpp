@@ -503,13 +503,13 @@
                      size :: 'undefined' | #position{}}).
 -type trans_form() :: #trans_form{}.
 
--record(material_profile, {trans_form = [] :: [#trans_form{}],
-                           mac_address = <<>> :: binary(),
-                           type = <<>> :: binary(),
-                           name = <<>> :: binary()}).
--type material_profile() :: #material_profile{}.
+-record(profile, {trans_form = [] :: [#trans_form{}],
+                  mac_address = <<>> :: binary(),
+                  type = <<>> :: binary(),
+                  name = <<>> :: binary()}).
+-type profile() :: #profile{}.
 
--record(memo_scene, {profile = [] :: [#material_profile{}],
+-record(memo_scene, {profiles = [] :: [#profile{}],
                      name = <<>> :: binary(),
                      rtype = <<>> :: binary(),
                      role = <<>> :: binary(),
@@ -1177,7 +1177,6 @@
                         muc_decline() |
                         upload_request_0() |
                         sasl_mechanisms() |
-                        material_profile() |
                         compression() |
                         'see-other-host'() |
                         x_conference() |
@@ -1189,6 +1188,7 @@
                         muc_subscribe() |
                         xdata() |
                         last() |
+                        text() |
                         vcard_name() |
                         memo_delay_msg() |
                         query_group_info() |
@@ -1207,6 +1207,7 @@
                         group_vcard_photo() |
                         search_item() |
                         privilege_perm() |
+                        search() |
                         position() |
                         privacy_item() |
                         sm_a() |
@@ -1273,10 +1274,10 @@
                         privacy_list() |
                         stat() |
                         vcard_tel() |
-                        search() |
                         pubsub() |
                         chatstate() |
                         time() |
+                        profile() |
                         mam_prefs() |
                         bob_data() |
                         streamhost() |
@@ -1314,7 +1315,6 @@
                         message() |
                         xdata_field() |
                         feature_csi() |
-                        text() |
                         muc_destroy() |
                         stanza_id() |
                         group_user_item() |
