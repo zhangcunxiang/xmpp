@@ -1185,7 +1185,6 @@
                         upload_request_0() |
                         sasl_mechanisms() |
                         compression() |
-                        search() |
                         'see-other-host'() |
                         x_conference() |
                         roster_item() |
@@ -1240,6 +1239,7 @@
                         starttls_proceed() |
                         csi() |
                         expire() |
+                        search() |
                         memo_check_account() |
                         sasl_auth() |
                         query_topic_info() |
