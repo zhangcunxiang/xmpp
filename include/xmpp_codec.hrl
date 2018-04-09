@@ -1206,6 +1206,7 @@
                         roster_query() |
                         mam_fin() |
                         redirect() |
+                        text() |
                         privilege() |
                         version() |
                         delegation_query() |
@@ -1241,7 +1242,6 @@
                         expire() |
                         memo_check_account() |
                         sasl_auth() |
-                        text() |
                         query_topic_info() |
                         sm_enabled() |
                         memo_group_relation() |
@@ -1263,6 +1263,7 @@
                         block_list() |
                         vcard_xupdate() |
                         forwarded() |
+                        search() |
                         upload_slot_0() |
                         carbons_sent() |
                         ps_unsubscribe() |
@@ -1298,7 +1299,6 @@
                         ps_subscribe() |
                         request_info() |
                         db_result() |
-                        search() |
                         size() |
                         sm_resumed() |
                         memo_group_vcard() |
