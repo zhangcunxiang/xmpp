@@ -4429,10 +4429,11 @@
 -xml(material_profile,
     #elem{name = <<"profile">>,xmlns= <<"jabber:memo:scene">>,
     module = 'memo_xep_scene',
-    result = { profile, '$trans_form','$mac_address','$type','$name'},
+    result = { profile, '$trans_form','$mac_address','$type','$name','$scene_id'},
     refs = [ #ref{name = trans_form, label = '$trans_form',max=1,min=0 } ],
     attrs = [ #attr{name = <<"mac_address">>,required = false},
     #attr{name = <<"type">>,required = false},
+    #attr{name = <<"scene_id">> ,required = false},
     #attr{name = <<"name">>,required = false} ] }).
 
 -xml(memo_scene,

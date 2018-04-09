@@ -511,7 +511,8 @@
 -record(profile, {trans_form :: 'undefined' | #trans_form{},
                   mac_address = <<>> :: binary(),
                   type = <<>> :: binary(),
-                  name = <<>> :: binary()}).
+                  name = <<>> :: binary(),
+                  scene_id = <<>> :: binary()}).
 -type profile() :: #profile{}.
 
 -record(memo_scene, {profiles = [] :: [#profile{}],
@@ -1205,7 +1206,6 @@
                         roster_query() |
                         mam_fin() |
                         redirect() |
-                        text() |
                         privilege() |
                         version() |
                         delegation_query() |
@@ -1239,9 +1239,9 @@
                         starttls_proceed() |
                         csi() |
                         expire() |
-                        search() |
                         memo_check_account() |
                         sasl_auth() |
+                        text() |
                         query_topic_info() |
                         sm_enabled() |
                         memo_group_relation() |
@@ -1252,6 +1252,7 @@
                         vcard_email() |
                         chat_info() |
                         sasl_failure() |
+                        memo_scene() |
                         register() |
                         thumbnail() |
                         bind() |
@@ -1297,10 +1298,10 @@
                         ps_subscribe() |
                         request_info() |
                         db_result() |
+                        search() |
                         size() |
                         sm_resumed() |
                         memo_group_vcard() |
-                        memo_scene() |
                         sm_r() |
                         group_item() |
                         legacy_auth_feature() |

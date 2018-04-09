@@ -1404,7 +1404,6 @@ get_mod({chat_info, _, _, _, _, _, _, _, _}) ->
     memo_xep_message;
 get_mod({muc_user, _, _, _, _, _, _}) -> xep0045;
 get_mod({bytestreams, _, _, _, _, _, _}) -> xep0065;
-get_mod({profile, _, _, _, _}) -> memo_xep_scene;
 get_mod({sasl_auth, _, _}) -> rfc6120;
 get_mod({vcard_logo, _, _, _}) -> xep0054;
 get_mod({ps_item, _, _, _, _, _}) -> xep0060;
@@ -1466,6 +1465,7 @@ get_mod({pubsub, _, _, _, _, _, _, _, _, _, _, _, _, _,
     xep0060;
 get_mod({x_conference, _, _, _, _, _}) -> xep0249;
 get_mod({csi, _}) -> xep0352;
+get_mod({profile, _, _, _, _, _}) -> memo_xep_scene;
 get_mod({disco_info, _, _, _, _}) -> xep0030;
 get_mod({sm_a, _, _}) -> xep0198;
 get_mod({oob_x, _, _, _}) -> xep0066;
