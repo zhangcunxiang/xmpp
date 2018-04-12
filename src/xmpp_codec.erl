@@ -1465,7 +1465,6 @@ get_mod({pubsub, _, _, _, _, _, _, _, _, _, _, _, _, _,
     xep0060;
 get_mod({x_conference, _, _, _, _, _}) -> xep0249;
 get_mod({csi, _}) -> xep0352;
-get_mod({profile, _, _, _, _, _}) -> memo_xep_scene;
 get_mod({disco_info, _, _, _, _}) -> xep0030;
 get_mod({sm_a, _, _}) -> xep0198;
 get_mod({oob_x, _, _, _}) -> xep0066;
@@ -1543,6 +1542,7 @@ get_mod({sm_r, _}) -> xep0198;
 get_mod({media_uri, _, _}) -> xep0221;
 get_mod({upload_slot_0, _, _, _}) -> xep0363;
 get_mod({delegation_query, _, _}) -> xep0355;
+get_mod({profile, _, _, _, _, _, _}) -> memo_xep_scene;
 get_mod({sasl_success, _}) -> rfc6120;
 get_mod({compress, _}) -> xep0138;
 get_mod({xdata_field, _, _, _, _, _, _, _, _}) ->

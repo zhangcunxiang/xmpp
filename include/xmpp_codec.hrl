@@ -512,7 +512,8 @@
                   mac_address = <<>> :: binary(),
                   type = <<>> :: binary(),
                   name = <<>> :: binary(),
-                  scene_id = <<>> :: binary()}).
+                  scene_id = <<>> :: binary(),
+                  message = <<>> :: binary()}).
 -type profile() :: #profile{}.
 
 -record(memo_scene, {profiles = [] :: [#profile{}],
@@ -1170,6 +1171,7 @@
                         muc_subscriptions() |
                         sm_resume() |
                         ps_publish() |
+                        text() |
                         receipt_info() |
                         sm_failed() |
                         delay() |
@@ -1206,7 +1208,6 @@
                         roster_query() |
                         mam_fin() |
                         redirect() |
-                        text() |
                         privilege() |
                         version() |
                         delegation_query() |
@@ -1242,6 +1243,7 @@
                         expire() |
                         memo_check_account() |
                         sasl_auth() |
+                        search() |
                         query_topic_info() |
                         sm_enabled() |
                         memo_group_relation() |
@@ -1263,7 +1265,6 @@
                         block_list() |
                         vcard_xupdate() |
                         forwarded() |
-                        search() |
                         upload_slot_0() |
                         carbons_sent() |
                         ps_unsubscribe() |
