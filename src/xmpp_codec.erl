@@ -1413,6 +1413,7 @@ get_mod({mam_fin, _, _, _, _, _}) -> xep0313;
 get_mod({legacy_auth, _, _, _, _}) -> xep0078;
 get_mod({stream_features, _}) -> rfc6120;
 get_mod({muc_item, _, _, _, _, _, _, _}) -> xep0045;
+get_mod({memo_info, _, _, _, _, _}) -> memo_xep_message;
 get_mod({block_list, _}) -> xep0191;
 get_mod({'see-other-host', _}) -> rfc6120;
 get_mod({muc_destroy, _, _, _, _}) -> xep0045;
@@ -1591,7 +1592,6 @@ get_mod({feature_csi, _}) -> xep0352;
 get_mod({memo_group_relation, _, _, _, _}) ->
     memo_xep_group_relation;
 get_mod({rsm_set, _, _, _, _, _, _, _}) -> xep0059;
-get_mod({memo_info, _, _, _, _}) -> memo_xep_message;
 get_mod({unblock, _}) -> xep0191;
 get_mod({stat_error, _, _}) -> xep0039;
 get_mod({sasl_abort}) -> rfc6120;
