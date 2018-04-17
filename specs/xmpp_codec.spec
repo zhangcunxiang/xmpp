@@ -4229,7 +4229,7 @@
     #elem{name = <<"memo_info">>,
         xmlns= <<"jabber:memo:message">>,
         module = 'memo_xep_message',
-        result = {memo_info,'$memo_type','$chat_info','$auth_info','$receipt_info','$track_info'},
+        result = {memo_info,'$memo_type','$chat_info','$auth_info','$receipt_info','$scene_info'},
         attrs = [ #attr{name = <<"memo_type">>,
                             required = true,
                             enc = {enc_enum, []},
@@ -4237,7 +4237,7 @@
         refs = [#ref{name = chat_info ,max=1,min =0,label = '$chat_info'},
             #ref{name = auth_info ,max = 1,min = 0, label = '$auth_info'},
             #ref{name = receipt_info ,max = 1,min = 0, label = '$receipt_info'},
-            #ref{name = material_profile ,label = '$track_info'}
+            #ref{name = memo_scene,max=1,min=0 ,label = '$scene_info'}
         ]
         }).
 

@@ -74,7 +74,7 @@ pp(receipt_info, 6) ->
     [type, msgid, topic_name, topic_id, max_user, now_user];
 pp(memo_info, 5) ->
     [memo_type, chat_info, auth_info, receipt_info,
-     track_info];
+     scene_info];
 pp(_, _) -> no.
 
 records() ->
@@ -91,86 +91,83 @@ enc_enum(Atom) -> erlang:atom_to_binary(Atom, utf8).
 
 decode_memo_info(__TopXMLNS, __Opts,
 		 {xmlel, <<"memo_info">>, _attrs, _els}) ->
-    {Track_info, Receipt_info, Auth_info, Chat_info} =
-	decode_memo_info_els(__TopXMLNS, __Opts, _els, [],
-			     undefined, undefined, undefined),
+    {Scene_info, Receipt_info, Auth_info, Chat_info} =
+	decode_memo_info_els(__TopXMLNS, __Opts, _els,
+			     undefined, undefined, undefined, undefined),
     Memo_type = decode_memo_info_attrs(__TopXMLNS, _attrs,
 				       undefined),
     {memo_info, Memo_type, Chat_info, Auth_info,
-     Receipt_info, Track_info}.
+     Receipt_info, Scene_info}.
 
-decode_memo_info_els(__TopXMLNS, __Opts, [], Track_info,
+decode_memo_info_els(__TopXMLNS, __Opts, [], Scene_info,
 		     Receipt_info, Auth_info, Chat_info) ->
-    {lists:reverse(Track_info), Receipt_info, Auth_info,
-     Chat_info};
+    {Scene_info, Receipt_info, Auth_info, Chat_info};
 decode_memo_info_els(__TopXMLNS, __Opts,
 		     [{xmlel, <<"chat_info">>, _attrs, _} = _el | _els],
-		     Track_info, Receipt_info, Auth_info, Chat_info) ->
+		     Scene_info, Receipt_info, Auth_info, Chat_info) ->
     case xmpp_codec:get_attr(<<"xmlns">>, _attrs,
 			     __TopXMLNS)
 	of
       <<"jabber:memo:message">> ->
 	  decode_memo_info_els(__TopXMLNS, __Opts, _els,
-			       Track_info, Receipt_info, Auth_info,
+			       Scene_info, Receipt_info, Auth_info,
 			       decode_chat_info(<<"jabber:memo:message">>,
 						__Opts, _el));
       _ ->
 	  decode_memo_info_els(__TopXMLNS, __Opts, _els,
-			       Track_info, Receipt_info, Auth_info, Chat_info)
+			       Scene_info, Receipt_info, Auth_info, Chat_info)
     end;
 decode_memo_info_els(__TopXMLNS, __Opts,
 		     [{xmlel, <<"auth_info">>, _attrs, _} = _el | _els],
-		     Track_info, Receipt_info, Auth_info, Chat_info) ->
+		     Scene_info, Receipt_info, Auth_info, Chat_info) ->
     case xmpp_codec:get_attr(<<"xmlns">>, _attrs,
 			     __TopXMLNS)
 	of
       <<"jabber:memo:message">> ->
 	  decode_memo_info_els(__TopXMLNS, __Opts, _els,
-			       Track_info, Receipt_info,
+			       Scene_info, Receipt_info,
 			       decode_auth_info(<<"jabber:memo:message">>,
 						__Opts, _el),
 			       Chat_info);
       _ ->
 	  decode_memo_info_els(__TopXMLNS, __Opts, _els,
-			       Track_info, Receipt_info, Auth_info, Chat_info)
+			       Scene_info, Receipt_info, Auth_info, Chat_info)
     end;
 decode_memo_info_els(__TopXMLNS, __Opts,
 		     [{xmlel, <<"receipt_info">>, _attrs, _} = _el | _els],
-		     Track_info, Receipt_info, Auth_info, Chat_info) ->
+		     Scene_info, Receipt_info, Auth_info, Chat_info) ->
     case xmpp_codec:get_attr(<<"xmlns">>, _attrs,
 			     __TopXMLNS)
 	of
       <<"jabber:memo:message">> ->
 	  decode_memo_info_els(__TopXMLNS, __Opts, _els,
-			       Track_info,
+			       Scene_info,
 			       decode_receipt_info(<<"jabber:memo:message">>,
 						   __Opts, _el),
 			       Auth_info, Chat_info);
       _ ->
 	  decode_memo_info_els(__TopXMLNS, __Opts, _els,
-			       Track_info, Receipt_info, Auth_info, Chat_info)
+			       Scene_info, Receipt_info, Auth_info, Chat_info)
     end;
 decode_memo_info_els(__TopXMLNS, __Opts,
-		     [{xmlel, <<"profile">>, _attrs, _} = _el | _els],
-		     Track_info, Receipt_info, Auth_info, Chat_info) ->
+		     [{xmlel, <<"query">>, _attrs, _} = _el | _els],
+		     Scene_info, Receipt_info, Auth_info, Chat_info) ->
     case xmpp_codec:get_attr(<<"xmlns">>, _attrs,
 			     __TopXMLNS)
 	of
       <<"jabber:memo:scene">> ->
 	  decode_memo_info_els(__TopXMLNS, __Opts, _els,
-			       [memo_xep_scene:decode_material_profile(<<"jabber:memo:scene">>,
-								       __Opts,
-								       _el)
-				| Track_info],
+			       memo_xep_scene:decode_memo_scene(<<"jabber:memo:scene">>,
+								__Opts, _el),
 			       Receipt_info, Auth_info, Chat_info);
       _ ->
 	  decode_memo_info_els(__TopXMLNS, __Opts, _els,
-			       Track_info, Receipt_info, Auth_info, Chat_info)
+			       Scene_info, Receipt_info, Auth_info, Chat_info)
     end;
 decode_memo_info_els(__TopXMLNS, __Opts, [_ | _els],
-		     Track_info, Receipt_info, Auth_info, Chat_info) ->
+		     Scene_info, Receipt_info, Auth_info, Chat_info) ->
     decode_memo_info_els(__TopXMLNS, __Opts, _els,
-			 Track_info, Receipt_info, Auth_info, Chat_info).
+			 Scene_info, Receipt_info, Auth_info, Chat_info).
 
 decode_memo_info_attrs(__TopXMLNS,
 		       [{<<"memo_type">>, _val} | _attrs], _Memo_type) ->
@@ -182,13 +179,13 @@ decode_memo_info_attrs(__TopXMLNS, [], Memo_type) ->
     decode_memo_info_attr_memo_type(__TopXMLNS, Memo_type).
 
 encode_memo_info({memo_info, Memo_type, Chat_info,
-		  Auth_info, Receipt_info, Track_info},
+		  Auth_info, Receipt_info, Scene_info},
 		 __TopXMLNS) ->
     __NewTopXMLNS =
 	xmpp_codec:choose_top_xmlns(<<"jabber:memo:message">>,
 				    [], __TopXMLNS),
     _els =
-	lists:reverse('encode_memo_info_$track_info'(Track_info,
+	lists:reverse('encode_memo_info_$scene_info'(Scene_info,
 						     __NewTopXMLNS,
 						     'encode_memo_info_$receipt_info'(Receipt_info,
 										      __NewTopXMLNS,
@@ -202,14 +199,14 @@ encode_memo_info({memo_info, Memo_type, Chat_info,
 									__TopXMLNS)),
     {xmlel, <<"memo_info">>, _attrs, _els}.
 
-'encode_memo_info_$track_info'([], __TopXMLNS, _acc) ->
+'encode_memo_info_$scene_info'(undefined, __TopXMLNS,
+			       _acc) ->
     _acc;
-'encode_memo_info_$track_info'([Track_info | _els],
-			       __TopXMLNS, _acc) ->
-    'encode_memo_info_$track_info'(_els, __TopXMLNS,
-				   [memo_xep_scene:encode_material_profile(Track_info,
-									   __TopXMLNS)
-				    | _acc]).
+'encode_memo_info_$scene_info'(Scene_info, __TopXMLNS,
+			       _acc) ->
+    [memo_xep_scene:encode_memo_scene(Scene_info,
+				      __TopXMLNS)
+     | _acc].
 
 'encode_memo_info_$receipt_info'(undefined, __TopXMLNS,
 				 _acc) ->

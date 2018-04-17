@@ -545,7 +545,7 @@
                     chat_info :: 'undefined' | #chat_info{},
                     auth_info :: 'undefined' | #auth_info{},
                     receipt_info :: 'undefined' | #receipt_info{},
-                    track_info = [] :: [#profile{}]}).
+                    scene_info :: 'undefined' | #memo_scene{}}).
 -type memo_info() :: #memo_info{}.
 
 -record(query_topic_info, {tid = <<>> :: binary(),
@@ -1171,6 +1171,7 @@
                         sm_resume() |
                         ps_publish() |
                         receipt_info() |
+                        text() |
                         sm_failed() |
                         delay() |
                         delegation() |
@@ -1215,6 +1216,7 @@
                         privilege_perm() |
                         position() |
                         privacy_item() |
+                        memo_scene() |
                         sm_a() |
                         stream_error() |
                         sic() |
@@ -1254,7 +1256,6 @@
                         bind() |
                         shim() |
                         disco_items() |
-                        memo_scene() |
                         mam_query() |
                         muc_item() |
                         memo_delay_msg() |
@@ -1274,8 +1275,8 @@
                         vcard_geo() |
                         feature_register() |
                         compress() |
-                        search() |
                         delegated() |
+                        search() |
                         memo_change_pass() |
                         ps_affiliation() |
                         privacy_list() |
@@ -1345,7 +1346,6 @@
                         sasl_response() |
                         push_enable() |
                         vcard_adr() |
-                        text() |
                         ps_items() |
                         offline_item() |
                         adhoc_command() |
