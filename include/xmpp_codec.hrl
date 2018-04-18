@@ -524,7 +524,8 @@
                      width = <<>> :: binary(),
                      length = <<>> :: binary(),
                      scene_id = <<>> :: binary(),
-                     share_user = <<>> :: binary()}).
+                     share_user = <<>> :: binary(),
+                     creator = <<>> :: binary()}).
 -type memo_scene() :: #memo_scene{}.
 
 -record(memo_scene_list, {role = <<>> :: binary(),
@@ -1171,7 +1172,6 @@
                         sm_resume() |
                         ps_publish() |
                         receipt_info() |
-                        text() |
                         sm_failed() |
                         delay() |
                         delegation() |
@@ -1198,6 +1198,7 @@
                         xdata() |
                         last() |
                         vcard_name() |
+                        text() |
                         query_group_info() |
                         memo_group_vcard() |
                         legacy_auth() |
@@ -1205,12 +1206,14 @@
                         mod_topic() |
                         vcard_photo() |
                         roster_query() |
+                        search() |
                         mam_fin() |
                         redirect() |
                         privilege() |
                         version() |
                         delegation_query() |
                         memo_info() |
+                        memo_scene_list() |
                         ps_item() |
                         search_item() |
                         privilege_perm() |
@@ -1276,7 +1279,6 @@
                         feature_register() |
                         compress() |
                         delegated() |
-                        search() |
                         memo_change_pass() |
                         ps_affiliation() |
                         privacy_list() |
@@ -1297,7 +1299,6 @@
                         pubsub_owner() |
                         auth_info() |
                         bookmark_storage() |
-                        memo_scene_list() |
                         ps_subscribe() |
                         request_info() |
                         db_result() |

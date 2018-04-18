@@ -1440,6 +1440,8 @@ get_mod({ps_retract, _, _, _}) -> xep0060;
 get_mod({streamhost, _, _, _}) -> xep0065;
 get_mod({privilege_perm, _, _}) -> xep0356;
 get_mod({trans_form, _, _}) -> memo_xep_scene;
+get_mod({memo_scene, _, _, _, _, _, _, _, _, _, _}) ->
+    memo_xep_scene;
 get_mod({iq, _, _, _, _, _, _, _}) -> rfc6120;
 get_mod({vcard_adr, _, _, _, _, _, _, _, _, _, _, _, _,
 	 _, _}) ->
@@ -1605,8 +1607,6 @@ get_mod({starttls_failure}) -> rfc6120;
 get_mod({bob_data, _, _, _, _}) -> xep0231;
 get_mod({bind, _, _}) -> rfc6120;
 get_mod({rsm_first, _, _}) -> xep0059;
-get_mod({memo_scene, _, _, _, _, _, _, _, _, _}) ->
-    memo_xep_scene;
 get_mod({caps, _, _, _, _}) -> xep0115;
 get_mod({xdata, _, _, _, _, _, _}) -> xep0004;
 get_mod({ps_options, _, _, _, _}) -> xep0060;

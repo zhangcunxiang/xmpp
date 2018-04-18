@@ -4442,7 +4442,7 @@
     #elem{name = <<"query">>,xmlns= <<"jabber:memo:scene">>,
         module = 'memo_xep_scene',
         result = { memo_scene, '$profiles','$name','$rtype','$role',
-        '$height','$width','$length','$scene_id','$share_user'},
+        '$height','$width','$length','$scene_id','$share_user','$creator'},
         refs = [ #ref{name = material_profile, label = '$profiles'}],
         attrs = [ #attr{name = <<"name">>,required = false},
         #attr{name = <<"rtype">>,required = false},
@@ -4451,6 +4451,7 @@
         #attr{name = <<"width">>,required = false},
         #attr{name = <<"length">>,required = false},
         #attr{name = <<"share_user">>,required = false},
+        #attr{name = <<"creator">>,required=false},
         #attr{name = <<"scene_id">>,required = false} ]
          }).
 
