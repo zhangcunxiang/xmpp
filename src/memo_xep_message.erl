@@ -235,7 +235,8 @@ decode_memo_info_attr_memo_type(__TopXMLNS,
 		  {missing_attr, <<"memo_type">>, <<"memo_info">>,
 		   __TopXMLNS}});
 decode_memo_info_attr_memo_type(__TopXMLNS, _val) ->
-    case catch dec_enum(_val, [chat, auth, receipt, track])
+    case catch dec_enum(_val,
+			[chat, auth, receipt, track, share, in_out])
 	of
       {'EXIT', _} ->
 	  erlang:error({xmpp_codec,
