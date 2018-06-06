@@ -4467,10 +4467,11 @@
 -xml(memo_send_sms,
     #elem{name = <<"query">>,xmlns= <<"jabber:memo:send:sms">>,
         module = 'memo_xep_send_sms',
-        result = { memo_send_sms,'$account' },
-        attrs = [ #attr{name = <<"account">>,required= true}]
+        result = { memo_send_sms,'$country_code','$phone_number','$lang' },
+        attrs = [ #attr{name = <<"country_code">>,required= true},
+        #attr{name = <<"phone_number">>,required = true},
+         #attr{name = <<"lang">>,required = false }]
         }).
-
 
 
 

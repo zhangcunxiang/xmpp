@@ -1433,6 +1433,7 @@ get_mod({db_feature, _}) -> xep0220;
 get_mod({handshake, _}) -> xep0114;
 get_mod({memo_change_pass, _, _, _}) ->
     memo_change_pass;
+get_mod({memo_send_sms, _, _, _}) -> memo_xep_send_sms;
 get_mod({message, _, _, _, _, _, _, _, _, _, _}) ->
     rfc6120;
 get_mod({presence, _, _, _, _, _, _, _, _, _, _}) ->
@@ -1558,7 +1559,6 @@ get_mod({addresses, _}) -> xep0033;
 get_mod({adhoc_command, _, _, _, _, _, _, _, _}) ->
     xep0050;
 get_mod({media, _, _, _}) -> xep0221;
-get_mod({memo_send_sms, _}) -> memo_xep_send_sms;
 get_mod({identity, _, _, _, _}) -> xep0030;
 get_mod({redirect, _}) -> rfc6120;
 get_mod({muc_history, _, _, _, _}) -> xep0045;

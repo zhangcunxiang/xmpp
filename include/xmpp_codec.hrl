@@ -407,7 +407,9 @@
 -record(addresses, {list = [] :: [#address{}]}).
 -type addresses() :: #addresses{}.
 
--record(memo_send_sms, {account = <<>> :: binary()}).
+-record(memo_send_sms, {country_code = <<>> :: binary(),
+                        phone_number = <<>> :: binary(),
+                        lang = <<>> :: binary()}).
 -type memo_send_sms() :: #memo_send_sms{}.
 
 -record(memo_change_pass, {account = <<>> :: binary(),
@@ -1264,7 +1266,6 @@
                         muc_item() |
                         block_list() |
                         memo_delay_msg() |
-                        text() |
                         memo_scene_list() |
                         vcard_xupdate() |
                         forwarded() |
@@ -1276,7 +1277,6 @@
                         vcard_key() |
                         vcard_logo() |
                         mix_join() |
-                        search() |
                         memo_group() |
                         carbons_private() |
                         xmpp_session() |
@@ -1331,6 +1331,7 @@
                         message() |
                         xdata_field() |
                         feature_csi() |
+                        text() |
                         muc_destroy() |
                         stanza_id() |
                         group_user_item() |
@@ -1361,6 +1362,7 @@
                         push_notification() |
                         presence() |
                         sasl_success() |
+                        search() |
                         compressed() |
                         ps_subscription() |
                         rosterver_feature() |

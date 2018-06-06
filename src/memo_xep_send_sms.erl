@@ -16,52 +16,97 @@ do_decode(Name, XMLNS, _, _) ->
 
 tags() -> [{<<"query">>, <<"jabber:memo:send:sms">>}].
 
-do_encode({memo_send_sms, _} = Query, TopXMLNS) ->
+do_encode({memo_send_sms, _, _, _} = Query, TopXMLNS) ->
     encode_memo_send_sms(Query, TopXMLNS).
 
-do_get_name({memo_send_sms, _}) -> <<"query">>.
+do_get_name({memo_send_sms, _, _, _}) -> <<"query">>.
 
-do_get_ns({memo_send_sms, _}) ->
+do_get_ns({memo_send_sms, _, _, _}) ->
     <<"jabber:memo:send:sms">>.
 
-pp(memo_send_sms, 1) -> [account];
+pp(memo_send_sms, 3) ->
+    [country_code, phone_number, lang];
 pp(_, _) -> no.
 
-records() -> [{memo_send_sms, 1}].
+records() -> [{memo_send_sms, 3}].
 
 decode_memo_send_sms(__TopXMLNS, __Opts,
 		     {xmlel, <<"query">>, _attrs, _els}) ->
-    Account = decode_memo_send_sms_attrs(__TopXMLNS, _attrs,
-					 undefined),
-    {memo_send_sms, Account}.
+    {Country_code, Phone_number, Lang} =
+	decode_memo_send_sms_attrs(__TopXMLNS, _attrs,
+				   undefined, undefined, undefined),
+    {memo_send_sms, Country_code, Phone_number, Lang}.
 
 decode_memo_send_sms_attrs(__TopXMLNS,
-			   [{<<"account">>, _val} | _attrs], _Account) ->
-    decode_memo_send_sms_attrs(__TopXMLNS, _attrs, _val);
+			   [{<<"country_code">>, _val} | _attrs], _Country_code,
+			   Phone_number, Lang) ->
+    decode_memo_send_sms_attrs(__TopXMLNS, _attrs, _val,
+			       Phone_number, Lang);
+decode_memo_send_sms_attrs(__TopXMLNS,
+			   [{<<"phone_number">>, _val} | _attrs], Country_code,
+			   _Phone_number, Lang) ->
+    decode_memo_send_sms_attrs(__TopXMLNS, _attrs,
+			       Country_code, _val, Lang);
+decode_memo_send_sms_attrs(__TopXMLNS,
+			   [{<<"lang">>, _val} | _attrs], Country_code,
+			   Phone_number, _Lang) ->
+    decode_memo_send_sms_attrs(__TopXMLNS, _attrs,
+			       Country_code, Phone_number, _val);
 decode_memo_send_sms_attrs(__TopXMLNS, [_ | _attrs],
-			   Account) ->
-    decode_memo_send_sms_attrs(__TopXMLNS, _attrs, Account);
-decode_memo_send_sms_attrs(__TopXMLNS, [], Account) ->
-    decode_memo_send_sms_attr_account(__TopXMLNS, Account).
+			   Country_code, Phone_number, Lang) ->
+    decode_memo_send_sms_attrs(__TopXMLNS, _attrs,
+			       Country_code, Phone_number, Lang);
+decode_memo_send_sms_attrs(__TopXMLNS, [], Country_code,
+			   Phone_number, Lang) ->
+    {decode_memo_send_sms_attr_country_code(__TopXMLNS,
+					    Country_code),
+     decode_memo_send_sms_attr_phone_number(__TopXMLNS,
+					    Phone_number),
+     decode_memo_send_sms_attr_lang(__TopXMLNS, Lang)}.
 
-encode_memo_send_sms({memo_send_sms, Account},
+encode_memo_send_sms({memo_send_sms, Country_code,
+		      Phone_number, Lang},
 		     __TopXMLNS) ->
     __NewTopXMLNS =
 	xmpp_codec:choose_top_xmlns(<<"jabber:memo:send:sms">>,
 				    [], __TopXMLNS),
     _els = [],
-    _attrs = encode_memo_send_sms_attr_account(Account,
-					       xmpp_codec:enc_xmlns_attrs(__NewTopXMLNS,
-									  __TopXMLNS)),
+    _attrs = encode_memo_send_sms_attr_lang(Lang,
+					    encode_memo_send_sms_attr_phone_number(Phone_number,
+										   encode_memo_send_sms_attr_country_code(Country_code,
+															  xmpp_codec:enc_xmlns_attrs(__NewTopXMLNS,
+																		     __TopXMLNS)))),
     {xmlel, <<"query">>, _attrs, _els}.
 
-decode_memo_send_sms_attr_account(__TopXMLNS,
-				  undefined) ->
+decode_memo_send_sms_attr_country_code(__TopXMLNS,
+				       undefined) ->
     erlang:error({xmpp_codec,
-		  {missing_attr, <<"account">>, <<"query">>,
+		  {missing_attr, <<"country_code">>, <<"query">>,
 		   __TopXMLNS}});
-decode_memo_send_sms_attr_account(__TopXMLNS, _val) ->
+decode_memo_send_sms_attr_country_code(__TopXMLNS,
+				       _val) ->
     _val.
 
-encode_memo_send_sms_attr_account(_val, _acc) ->
-    [{<<"account">>, _val} | _acc].
+encode_memo_send_sms_attr_country_code(_val, _acc) ->
+    [{<<"country_code">>, _val} | _acc].
+
+decode_memo_send_sms_attr_phone_number(__TopXMLNS,
+				       undefined) ->
+    erlang:error({xmpp_codec,
+		  {missing_attr, <<"phone_number">>, <<"query">>,
+		   __TopXMLNS}});
+decode_memo_send_sms_attr_phone_number(__TopXMLNS,
+				       _val) ->
+    _val.
+
+encode_memo_send_sms_attr_phone_number(_val, _acc) ->
+    [{<<"phone_number">>, _val} | _acc].
+
+decode_memo_send_sms_attr_lang(__TopXMLNS, undefined) ->
+    <<>>;
+decode_memo_send_sms_attr_lang(__TopXMLNS, _val) ->
+    _val.
+
+encode_memo_send_sms_attr_lang(<<>>, _acc) -> _acc;
+encode_memo_send_sms_attr_lang(_val, _acc) ->
+    [{<<"lang">>, _val} | _acc].
