@@ -948,6 +948,8 @@ get_mod(<<"optional">>,
 	<<"urn:ietf:params:xml:ns:xmpp-session">>) ->
     rfc3921;
 get_mod(<<"offline">>, <<"jabber:x:event">>) -> xep0022;
+get_mod(<<"query">>, <<"jabber:memo:send:sms">>) ->
+    memo_xep_send_sms;
 get_mod(<<"default">>, <<"jabber:iq:privacy">>) ->
     xep0016;
 get_mod(<<"bind">>,
@@ -1556,6 +1558,7 @@ get_mod({addresses, _}) -> xep0033;
 get_mod({adhoc_command, _, _, _, _, _, _, _, _}) ->
     xep0050;
 get_mod({media, _, _, _}) -> xep0221;
+get_mod({memo_send_sms, _}) -> memo_xep_send_sms;
 get_mod({identity, _, _, _, _}) -> xep0030;
 get_mod({redirect, _}) -> rfc6120;
 get_mod({muc_history, _, _, _, _}) -> xep0045;

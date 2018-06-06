@@ -407,6 +407,9 @@
 -record(addresses, {list = [] :: [#address{}]}).
 -type addresses() :: #addresses{}.
 
+-record(memo_send_sms, {account = <<>> :: binary()}).
+-type memo_send_sms() :: #memo_send_sms{}.
+
 -record(memo_change_pass, {account = <<>> :: binary(),
                            newpass = <<>> :: binary(),
                            vcode = <<>> :: binary()}).
@@ -467,12 +470,6 @@
                      node = <<>> :: binary()}).
 -type disco_item() :: #disco_item{}.
 
--record(unblock, {items = [] :: [jid:jid()]}).
--type unblock() :: #unblock{}.
-
--record(block, {items = [] :: [jid:jid()]}).
--type block() :: #block{}.
-
 -record(search_user_item, {jid :: undefined | jid:jid(),
                            nick = <<>> :: binary(),
                            photo = <<>> :: binary()}).
@@ -484,6 +481,12 @@
                       group_items = [] :: [#search_group_item{}],
                       search_account :: 'undefined' | binary()}).
 -type memo_search() :: #memo_search{}.
+
+-record(unblock, {items = [] :: [jid:jid()]}).
+-type unblock() :: #unblock{}.
+
+-record(block, {items = [] :: [jid:jid()]}).
+-type block() :: #block{}.
 
 -record(compression, {methods = [] :: [binary()]}).
 -type compression() :: #compression{}.
@@ -1198,7 +1201,6 @@
                         muc_subscribe() |
                         xdata() |
                         last() |
-                        search() |
                         vcard_name() |
                         memo_invite_info() |
                         query_group_info() |
@@ -1262,6 +1264,7 @@
                         muc_item() |
                         block_list() |
                         memo_delay_msg() |
+                        text() |
                         memo_scene_list() |
                         vcard_xupdate() |
                         forwarded() |
@@ -1269,11 +1272,12 @@
                         carbons_sent() |
                         ps_unsubscribe() |
                         upload_slot() |
+                        memo_send_sms() |
                         vcard_key() |
                         vcard_logo() |
                         mix_join() |
+                        search() |
                         memo_group() |
-                        text() |
                         carbons_private() |
                         xmpp_session() |
                         vcard_geo() |
