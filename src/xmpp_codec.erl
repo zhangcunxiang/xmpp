@@ -1440,8 +1440,6 @@ get_mod({ps_retract, _, _, _}) -> xep0060;
 get_mod({streamhost, _, _, _}) -> xep0065;
 get_mod({privilege_perm, _, _}) -> xep0356;
 get_mod({trans_form, _, _}) -> memo_xep_scene;
-get_mod({memo_scene, _, _, _, _, _, _, _, _, _, _}) ->
-    memo_xep_scene;
 get_mod({iq, _, _, _, _, _, _, _}) -> rfc6120;
 get_mod({vcard_adr, _, _, _, _, _, _, _, _, _, _, _, _,
 	 _, _}) ->
@@ -1524,6 +1522,9 @@ get_mod({mam_result, _, _, _, _}) -> xep0313;
 get_mod({sm_failed, _, _, _, _}) -> xep0198;
 get_mod({upload_request, _, _, _, _}) -> xep0363;
 get_mod({search_user_item, _, _, _}) -> memo_xep_search;
+get_mod({memo_scene, _, _, _, _, _, _, _, _, _, _,
+	 _}) ->
+    memo_xep_scene;
 get_mod({version, _, _, _}) -> xep0092;
 get_mod({vcard_org, _, _}) -> xep0054;
 get_mod({ps_items, _, _, _, _, _, _}) -> xep0060;

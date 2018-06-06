@@ -520,6 +520,7 @@
                      name = <<>> :: binary(),
                      rtype = <<>> :: binary(),
                      role = <<>> :: binary(),
+                     type = <<>> :: binary(),
                      height = <<>> :: binary(),
                      width = <<>> :: binary(),
                      length = <<>> :: binary(),
@@ -1197,10 +1198,10 @@
                         muc_subscribe() |
                         xdata() |
                         last() |
+                        search() |
                         vcard_name() |
                         memo_invite_info() |
                         query_group_info() |
-                        search() |
                         legacy_auth() |
                         xevent() |
                         mod_topic() |
@@ -1242,7 +1243,6 @@
                         expire() |
                         group_vcard_photo() |
                         sasl_auth() |
-                        text() |
                         query_topic_info() |
                         sm_enabled() |
                         memo_group_relation() |
@@ -1273,6 +1273,7 @@
                         vcard_logo() |
                         mix_join() |
                         memo_group() |
+                        text() |
                         carbons_private() |
                         xmpp_session() |
                         vcard_geo() |

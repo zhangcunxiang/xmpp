@@ -42,12 +42,13 @@ do_encode({trans_form, _, _} = Trans_form, TopXMLNS) ->
 do_encode({profile, _, _, _, _, _, _} = Profile,
 	  TopXMLNS) ->
     encode_material_profile(Profile, TopXMLNS);
-do_encode({memo_scene, _, _, _, _, _, _, _, _, _, _} =
+do_encode({memo_scene, _, _, _, _, _, _, _, _, _, _,
+	   _} =
 	      Query,
 	  TopXMLNS) ->
     encode_memo_scene(Query, TopXMLNS).
 
-do_get_name({memo_scene, _, _, _, _, _, _, _, _, _,
+do_get_name({memo_scene, _, _, _, _, _, _, _, _, _, _,
 	     _}) ->
     <<"query">>;
 do_get_name({position, _, _, _}) -> <<"position">>;
@@ -56,7 +57,8 @@ do_get_name({profile, _, _, _, _, _, _}) ->
 do_get_name({size, _, _, _}) -> <<"size">>;
 do_get_name({trans_form, _, _}) -> <<"trans_form">>.
 
-do_get_ns({memo_scene, _, _, _, _, _, _, _, _, _, _}) ->
+do_get_ns({memo_scene, _, _, _, _, _, _, _, _, _, _,
+	   _}) ->
     <<"jabber:memo:scene">>;
 do_get_ns({position, _, _, _}) ->
     <<"jabber:memo:scene">>;
@@ -72,26 +74,27 @@ pp(trans_form, 2) -> [position, size];
 pp(profile, 6) ->
     [trans_form, mac_address, type, name, scene_id,
      message];
-pp(memo_scene, 10) ->
-    [profiles, name, rtype, role, height, width, length,
-     scene_id, share_user, creator];
+pp(memo_scene, 11) ->
+    [profiles, name, rtype, role, type, height, width,
+     length, scene_id, share_user, creator];
 pp(_, _) -> no.
 
 records() ->
     [{position, 3}, {size, 3}, {trans_form, 2},
-     {profile, 6}, {memo_scene, 10}].
+     {profile, 6}, {memo_scene, 11}].
 
 decode_memo_scene(__TopXMLNS, __Opts,
 		  {xmlel, <<"query">>, _attrs, _els}) ->
     Profiles = decode_memo_scene_els(__TopXMLNS, __Opts,
 				     _els, []),
-    {Name, Rtype, Role, Height, Width, Length, Share_user,
-     Creator, Scene_id} =
+    {Name, Rtype, Type, Role, Height, Width, Length,
+     Share_user, Creator, Scene_id} =
 	decode_memo_scene_attrs(__TopXMLNS, _attrs, undefined,
 				undefined, undefined, undefined, undefined,
-				undefined, undefined, undefined, undefined),
-    {memo_scene, Profiles, Name, Rtype, Role, Height, Width,
-     Length, Scene_id, Share_user, Creator}.
+				undefined, undefined, undefined, undefined,
+				undefined),
+    {memo_scene, Profiles, Name, Rtype, Role, Type, Height,
+     Width, Length, Scene_id, Share_user, Creator}.
 
 decode_memo_scene_els(__TopXMLNS, __Opts, [],
 		      Profiles) ->
@@ -117,76 +120,84 @@ decode_memo_scene_els(__TopXMLNS, __Opts, [_ | _els],
 			  Profiles).
 
 decode_memo_scene_attrs(__TopXMLNS,
-			[{<<"name">>, _val} | _attrs], _Name, Rtype, Role,
+			[{<<"name">>, _val} | _attrs], _Name, Rtype, Type, Role,
 			Height, Width, Length, Share_user, Creator, Scene_id) ->
     decode_memo_scene_attrs(__TopXMLNS, _attrs, _val, Rtype,
-			    Role, Height, Width, Length, Share_user, Creator,
-			    Scene_id);
+			    Type, Role, Height, Width, Length, Share_user,
+			    Creator, Scene_id);
 decode_memo_scene_attrs(__TopXMLNS,
-			[{<<"rtype">>, _val} | _attrs], Name, _Rtype, Role,
-			Height, Width, Length, Share_user, Creator, Scene_id) ->
+			[{<<"rtype">>, _val} | _attrs], Name, _Rtype, Type,
+			Role, Height, Width, Length, Share_user, Creator,
+			Scene_id) ->
     decode_memo_scene_attrs(__TopXMLNS, _attrs, Name, _val,
-			    Role, Height, Width, Length, Share_user, Creator,
-			    Scene_id);
+			    Type, Role, Height, Width, Length, Share_user,
+			    Creator, Scene_id);
 decode_memo_scene_attrs(__TopXMLNS,
-			[{<<"role">>, _val} | _attrs], Name, Rtype, _Role,
+			[{<<"type">>, _val} | _attrs], Name, Rtype, _Type, Role,
 			Height, Width, Length, Share_user, Creator, Scene_id) ->
     decode_memo_scene_attrs(__TopXMLNS, _attrs, Name, Rtype,
-			    _val, Height, Width, Length, Share_user, Creator,
-			    Scene_id);
+			    _val, Role, Height, Width, Length, Share_user,
+			    Creator, Scene_id);
 decode_memo_scene_attrs(__TopXMLNS,
-			[{<<"height">>, _val} | _attrs], Name, Rtype, Role,
-			_Height, Width, Length, Share_user, Creator,
+			[{<<"role">>, _val} | _attrs], Name, Rtype, Type, _Role,
+			Height, Width, Length, Share_user, Creator, Scene_id) ->
+    decode_memo_scene_attrs(__TopXMLNS, _attrs, Name, Rtype,
+			    Type, _val, Height, Width, Length, Share_user,
+			    Creator, Scene_id);
+decode_memo_scene_attrs(__TopXMLNS,
+			[{<<"height">>, _val} | _attrs], Name, Rtype, Type,
+			Role, _Height, Width, Length, Share_user, Creator,
 			Scene_id) ->
     decode_memo_scene_attrs(__TopXMLNS, _attrs, Name, Rtype,
-			    Role, _val, Width, Length, Share_user, Creator,
-			    Scene_id);
+			    Type, Role, _val, Width, Length, Share_user,
+			    Creator, Scene_id);
 decode_memo_scene_attrs(__TopXMLNS,
-			[{<<"width">>, _val} | _attrs], Name, Rtype, Role,
+			[{<<"width">>, _val} | _attrs], Name, Rtype, Type, Role,
 			Height, _Width, Length, Share_user, Creator,
 			Scene_id) ->
     decode_memo_scene_attrs(__TopXMLNS, _attrs, Name, Rtype,
-			    Role, Height, _val, Length, Share_user, Creator,
-			    Scene_id);
+			    Type, Role, Height, _val, Length, Share_user,
+			    Creator, Scene_id);
 decode_memo_scene_attrs(__TopXMLNS,
-			[{<<"length">>, _val} | _attrs], Name, Rtype, Role,
-			Height, Width, _Length, Share_user, Creator,
+			[{<<"length">>, _val} | _attrs], Name, Rtype, Type,
+			Role, Height, Width, _Length, Share_user, Creator,
 			Scene_id) ->
     decode_memo_scene_attrs(__TopXMLNS, _attrs, Name, Rtype,
-			    Role, Height, Width, _val, Share_user, Creator,
-			    Scene_id);
+			    Type, Role, Height, Width, _val, Share_user,
+			    Creator, Scene_id);
 decode_memo_scene_attrs(__TopXMLNS,
-			[{<<"share_user">>, _val} | _attrs], Name, Rtype, Role,
-			Height, Width, Length, _Share_user, Creator,
+			[{<<"share_user">>, _val} | _attrs], Name, Rtype, Type,
+			Role, Height, Width, Length, _Share_user, Creator,
 			Scene_id) ->
     decode_memo_scene_attrs(__TopXMLNS, _attrs, Name, Rtype,
-			    Role, Height, Width, Length, _val, Creator,
+			    Type, Role, Height, Width, Length, _val, Creator,
 			    Scene_id);
 decode_memo_scene_attrs(__TopXMLNS,
-			[{<<"creator">>, _val} | _attrs], Name, Rtype, Role,
-			Height, Width, Length, Share_user, _Creator,
+			[{<<"creator">>, _val} | _attrs], Name, Rtype, Type,
+			Role, Height, Width, Length, Share_user, _Creator,
 			Scene_id) ->
     decode_memo_scene_attrs(__TopXMLNS, _attrs, Name, Rtype,
-			    Role, Height, Width, Length, Share_user, _val,
+			    Type, Role, Height, Width, Length, Share_user, _val,
 			    Scene_id);
 decode_memo_scene_attrs(__TopXMLNS,
-			[{<<"scene_id">>, _val} | _attrs], Name, Rtype, Role,
-			Height, Width, Length, Share_user, Creator,
+			[{<<"scene_id">>, _val} | _attrs], Name, Rtype, Type,
+			Role, Height, Width, Length, Share_user, Creator,
 			_Scene_id) ->
     decode_memo_scene_attrs(__TopXMLNS, _attrs, Name, Rtype,
-			    Role, Height, Width, Length, Share_user, Creator,
-			    _val);
+			    Type, Role, Height, Width, Length, Share_user,
+			    Creator, _val);
 decode_memo_scene_attrs(__TopXMLNS, [_ | _attrs], Name,
-			Rtype, Role, Height, Width, Length, Share_user, Creator,
-			Scene_id) ->
+			Rtype, Type, Role, Height, Width, Length, Share_user,
+			Creator, Scene_id) ->
     decode_memo_scene_attrs(__TopXMLNS, _attrs, Name, Rtype,
-			    Role, Height, Width, Length, Share_user, Creator,
-			    Scene_id);
+			    Type, Role, Height, Width, Length, Share_user,
+			    Creator, Scene_id);
 decode_memo_scene_attrs(__TopXMLNS, [], Name, Rtype,
-			Role, Height, Width, Length, Share_user, Creator,
+			Type, Role, Height, Width, Length, Share_user, Creator,
 			Scene_id) ->
     {decode_memo_scene_attr_name(__TopXMLNS, Name),
      decode_memo_scene_attr_rtype(__TopXMLNS, Rtype),
+     decode_memo_scene_attr_type(__TopXMLNS, Type),
      decode_memo_scene_attr_role(__TopXMLNS, Role),
      decode_memo_scene_attr_height(__TopXMLNS, Height),
      decode_memo_scene_attr_width(__TopXMLNS, Width),
@@ -197,7 +208,7 @@ decode_memo_scene_attrs(__TopXMLNS, [], Name, Rtype,
      decode_memo_scene_attr_scene_id(__TopXMLNS, Scene_id)}.
 
 encode_memo_scene({memo_scene, Profiles, Name, Rtype,
-		   Role, Height, Width, Length, Scene_id, Share_user,
+		   Role, Type, Height, Width, Length, Scene_id, Share_user,
 		   Creator},
 		  __TopXMLNS) ->
     __NewTopXMLNS =
@@ -213,10 +224,11 @@ encode_memo_scene({memo_scene, Profiles, Name, Rtype,
 																	    encode_memo_scene_attr_width(Width,
 																					 encode_memo_scene_attr_height(Height,
 																								       encode_memo_scene_attr_role(Role,
-																												   encode_memo_scene_attr_rtype(Rtype,
-																																encode_memo_scene_attr_name(Name,
-																																			    xmpp_codec:enc_xmlns_attrs(__NewTopXMLNS,
-																																						       __TopXMLNS)))))))))),
+																												   encode_memo_scene_attr_type(Type,
+																															       encode_memo_scene_attr_rtype(Rtype,
+																																			    encode_memo_scene_attr_name(Name,
+																																							xmpp_codec:enc_xmlns_attrs(__NewTopXMLNS,
+																																										   __TopXMLNS))))))))))),
     {xmlel, <<"query">>, _attrs, _els}.
 
 'encode_memo_scene_$profiles'([], __TopXMLNS, _acc) ->
@@ -242,6 +254,14 @@ decode_memo_scene_attr_rtype(__TopXMLNS, _val) -> _val.
 encode_memo_scene_attr_rtype(<<>>, _acc) -> _acc;
 encode_memo_scene_attr_rtype(_val, _acc) ->
     [{<<"rtype">>, _val} | _acc].
+
+decode_memo_scene_attr_type(__TopXMLNS, undefined) ->
+    <<>>;
+decode_memo_scene_attr_type(__TopXMLNS, _val) -> _val.
+
+encode_memo_scene_attr_type(<<>>, _acc) -> _acc;
+encode_memo_scene_attr_type(_val, _acc) ->
+    [{<<"type">>, _val} | _acc].
 
 decode_memo_scene_attr_role(__TopXMLNS, undefined) ->
     <<>>;
