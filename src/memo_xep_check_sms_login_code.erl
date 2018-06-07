@@ -17,51 +17,68 @@ do_decode(Name, XMLNS, _, _) ->
 tags() ->
     [{<<"query">>, <<"jabber:memo:check:sms:login:code">>}].
 
-do_encode({memo_check_sms_login_code, _, _} = Query,
+do_encode({memo_check_sms_login_code, _, _, _, _} =
+	      Query,
 	  TopXMLNS) ->
     encode_memo_check_sms_login_code(Query, TopXMLNS).
 
-do_get_name({memo_check_sms_login_code, _, _}) ->
+do_get_name({memo_check_sms_login_code, _, _, _, _}) ->
     <<"query">>.
 
-do_get_ns({memo_check_sms_login_code, _, _}) ->
+do_get_ns({memo_check_sms_login_code, _, _, _, _}) ->
     <<"jabber:memo:check:sms:login:code">>.
 
-pp(memo_check_sms_login_code, 2) -> [code, pass];
+pp(memo_check_sms_login_code, 4) ->
+    [user, host, code, pass];
 pp(_, _) -> no.
 
-records() -> [{memo_check_sms_login_code, 2}].
+records() -> [{memo_check_sms_login_code, 4}].
 
 decode_memo_check_sms_login_code(__TopXMLNS, __Opts,
 				 {xmlel, <<"query">>, _attrs, _els}) ->
-    {Code, Pass} =
+    {User, Host, Code, Pass} =
 	decode_memo_check_sms_login_code_attrs(__TopXMLNS,
-					       _attrs, undefined, undefined),
-    {memo_check_sms_login_code, Code, Pass}.
+					       _attrs, undefined, undefined,
+					       undefined, undefined),
+    {memo_check_sms_login_code, User, Host, Code, Pass}.
 
 decode_memo_check_sms_login_code_attrs(__TopXMLNS,
-				       [{<<"code">>, _val} | _attrs], _Code,
-				       Pass) ->
+				       [{<<"user">>, _val} | _attrs], _User,
+				       Host, Code, Pass) ->
     decode_memo_check_sms_login_code_attrs(__TopXMLNS,
-					   _attrs, _val, Pass);
+					   _attrs, _val, Host, Code, Pass);
 decode_memo_check_sms_login_code_attrs(__TopXMLNS,
-				       [{<<"pass">>, _val} | _attrs], Code,
-				       _Pass) ->
+				       [{<<"host">>, _val} | _attrs], User,
+				       _Host, Code, Pass) ->
     decode_memo_check_sms_login_code_attrs(__TopXMLNS,
-					   _attrs, Code, _val);
+					   _attrs, User, _val, Code, Pass);
 decode_memo_check_sms_login_code_attrs(__TopXMLNS,
-				       [_ | _attrs], Code, Pass) ->
+				       [{<<"code">>, _val} | _attrs], User,
+				       Host, _Code, Pass) ->
     decode_memo_check_sms_login_code_attrs(__TopXMLNS,
-					   _attrs, Code, Pass);
+					   _attrs, User, Host, _val, Pass);
+decode_memo_check_sms_login_code_attrs(__TopXMLNS,
+				       [{<<"pass">>, _val} | _attrs], User,
+				       Host, Code, _Pass) ->
+    decode_memo_check_sms_login_code_attrs(__TopXMLNS,
+					   _attrs, User, Host, Code, _val);
+decode_memo_check_sms_login_code_attrs(__TopXMLNS,
+				       [_ | _attrs], User, Host, Code, Pass) ->
+    decode_memo_check_sms_login_code_attrs(__TopXMLNS,
+					   _attrs, User, Host, Code, Pass);
 decode_memo_check_sms_login_code_attrs(__TopXMLNS, [],
-				       Code, Pass) ->
-    {decode_memo_check_sms_login_code_attr_code(__TopXMLNS,
+				       User, Host, Code, Pass) ->
+    {decode_memo_check_sms_login_code_attr_user(__TopXMLNS,
+						User),
+     decode_memo_check_sms_login_code_attr_host(__TopXMLNS,
+						Host),
+     decode_memo_check_sms_login_code_attr_code(__TopXMLNS,
 						Code),
      decode_memo_check_sms_login_code_attr_pass(__TopXMLNS,
 						Pass)}.
 
 encode_memo_check_sms_login_code({memo_check_sms_login_code,
-				  Code, Pass},
+				  User, Host, Code, Pass},
 				 __TopXMLNS) ->
     __NewTopXMLNS =
 	xmpp_codec:choose_top_xmlns(<<"jabber:memo:check:sms:login:code">>,
@@ -70,9 +87,39 @@ encode_memo_check_sms_login_code({memo_check_sms_login_code,
     _attrs =
 	encode_memo_check_sms_login_code_attr_pass(Pass,
 						   encode_memo_check_sms_login_code_attr_code(Code,
-											      xmpp_codec:enc_xmlns_attrs(__NewTopXMLNS,
-															 __TopXMLNS))),
+											      encode_memo_check_sms_login_code_attr_host(Host,
+																	 encode_memo_check_sms_login_code_attr_user(User,
+																						    xmpp_codec:enc_xmlns_attrs(__NewTopXMLNS,
+																									       __TopXMLNS))))),
     {xmlel, <<"query">>, _attrs, _els}.
+
+decode_memo_check_sms_login_code_attr_user(__TopXMLNS,
+					   undefined) ->
+    <<>>;
+decode_memo_check_sms_login_code_attr_user(__TopXMLNS,
+					   _val) ->
+    _val.
+
+encode_memo_check_sms_login_code_attr_user(<<>>,
+					   _acc) ->
+    _acc;
+encode_memo_check_sms_login_code_attr_user(_val,
+					   _acc) ->
+    [{<<"user">>, _val} | _acc].
+
+decode_memo_check_sms_login_code_attr_host(__TopXMLNS,
+					   undefined) ->
+    <<>>;
+decode_memo_check_sms_login_code_attr_host(__TopXMLNS,
+					   _val) ->
+    _val.
+
+encode_memo_check_sms_login_code_attr_host(<<>>,
+					   _acc) ->
+    _acc;
+encode_memo_check_sms_login_code_attr_host(_val,
+					   _acc) ->
+    [{<<"host">>, _val} | _acc].
 
 decode_memo_check_sms_login_code_attr_code(__TopXMLNS,
 					   undefined) ->
@@ -88,12 +135,14 @@ encode_memo_check_sms_login_code_attr_code(_val,
 
 decode_memo_check_sms_login_code_attr_pass(__TopXMLNS,
 					   undefined) ->
-    erlang:error({xmpp_codec,
-		  {missing_attr, <<"pass">>, <<"query">>, __TopXMLNS}});
+    <<>>;
 decode_memo_check_sms_login_code_attr_pass(__TopXMLNS,
 					   _val) ->
     _val.
 
+encode_memo_check_sms_login_code_attr_pass(<<>>,
+					   _acc) ->
+    _acc;
 encode_memo_check_sms_login_code_attr_pass(_val,
 					   _acc) ->
     [{<<"pass">>, _val} | _acc].

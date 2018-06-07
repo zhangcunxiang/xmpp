@@ -718,7 +718,9 @@
                      continue :: 'undefined' | binary()}).
 -type muc_invite() :: #muc_invite{}.
 
--record(memo_check_sms_login_code, {code = <<>> :: binary(),
+-record(memo_check_sms_login_code, {user = <<>> :: binary(),
+                                    host = <<>> :: binary(),
+                                    code = <<>> :: binary(),
                                     pass = <<>> :: binary()}).
 -type memo_check_sms_login_code() :: #memo_check_sms_login_code{}.
 
@@ -1222,7 +1224,6 @@
                         delegation_query() |
                         memo_info() |
                         ps_item() |
-                        search() |
                         search_item() |
                         privilege_perm() |
                         position() |
@@ -1246,6 +1247,7 @@
                         ps_event() |
                         addresses() |
                         ping() |
+                        text() |
                         handshake() |
                         starttls_proceed() |
                         csi() |
@@ -1314,7 +1316,6 @@
                         size() |
                         sm_resumed() |
                         trans_form() |
-                        text() |
                         sm_r() |
                         group_item() |
                         memo_change_pass() |
@@ -1322,6 +1323,7 @@
                         topic_user_item() |
                         client_id() |
                         muc() |
+                        search() |
                         muc_invite() |
                         address() |
                         muc_owner() |

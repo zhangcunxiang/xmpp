@@ -1514,8 +1514,6 @@ get_mod({push_disable, _, _}) -> xep0357;
 get_mod({push_notification, _}) -> xep0357;
 get_mod({memo_device_info, _, _, _, _, _, _, _, _}) ->
     memo_xep_device;
-get_mod({memo_check_sms_login_code, _, _}) ->
-    memo_xep_check_sms_login_code;
 get_mod({disco_item, _, _, _}) -> xep0030;
 get_mod({stat, _, _, _, _}) -> xep0039;
 get_mod({register, _, _, _, _, _, _, _, _, _, _, _, _,
@@ -1621,6 +1619,8 @@ get_mod({expire, _, _}) -> xep0023;
 get_mod({privilege, _, _}) -> xep0356;
 get_mod({stanza_error, _, _, _, _, _, _}) -> rfc6120;
 get_mod({muc_invite, _, _, _, _}) -> xep0045;
+get_mod({memo_check_sms_login_code, _, _, _, _}) ->
+    memo_xep_check_sms_login_code;
 get_mod({ps_event, _, _, _, _, _, _}) -> xep0060;
 get_mod({memo_group, _, _, _}) -> memo_xep_group;
 get_mod({sasl_mechanisms, _}) -> rfc6120;

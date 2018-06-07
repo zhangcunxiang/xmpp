@@ -4476,9 +4476,12 @@
 -xml(memo_check_sms_login_code,
     #elem{name = <<"query">>,xmlns= <<"jabber:memo:check:sms:login:code">>,
     module = 'memo_xep_check_sms_login_code',
-    result = { memo_check_sms_login_code,'$code','$pass'},
-    attrs = [ #attr{name = <<"code">>,required = true},
-    #attr{ name = <<"pass">>,required = true}] }).
+    result = { memo_check_sms_login_code,'$user','$host','$code','$pass'},
+    attrs = [
+    #attr{name = <<"user">>,required = false},
+    #attr{name = <<"host">>,required = false},
+    #attr{name = <<"code">>,required = true},
+    #attr{ name = <<"pass">>,required = false}] }).
 
 
 
