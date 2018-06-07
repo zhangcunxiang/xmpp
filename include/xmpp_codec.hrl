@@ -1233,6 +1233,7 @@
                         sic() |
                         disco_info() |
                         private() |
+                        search() |
                         bookmark_url() |
                         memo_check_account() |
                         sm_enable() |
@@ -1247,7 +1248,6 @@
                         ps_event() |
                         addresses() |
                         ping() |
-                        text() |
                         handshake() |
                         starttls_proceed() |
                         csi() |
@@ -1300,6 +1300,7 @@
                         pubsub() |
                         chatstate() |
                         time() |
+                        text() |
                         profile() |
                         mam_prefs() |
                         bob_data() |
@@ -1323,7 +1324,6 @@
                         topic_user_item() |
                         client_id() |
                         muc() |
-                        search() |
                         muc_invite() |
                         address() |
                         muc_owner() |
