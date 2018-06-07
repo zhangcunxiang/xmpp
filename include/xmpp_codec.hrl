@@ -718,6 +718,10 @@
                      continue :: 'undefined' | binary()}).
 -type muc_invite() :: #muc_invite{}.
 
+-record(memo_check_sms_login_code, {code = <<>> :: binary(),
+                                    pass = <<>> :: binary()}).
+-type memo_check_sms_login_code() :: #memo_check_sms_login_code{}.
+
 -record(delegated, {ns = <<>> :: binary(),
                     attrs = [] :: [binary()]}).
 -type delegated() :: #delegated{}.
@@ -1218,6 +1222,7 @@
                         delegation_query() |
                         memo_info() |
                         ps_item() |
+                        search() |
                         search_item() |
                         privilege_perm() |
                         position() |
@@ -1262,6 +1267,7 @@
                         shim() |
                         disco_items() |
                         search_group_item() |
+                        memo_check_sms_login_code() |
                         mam_query() |
                         muc_item() |
                         block_list() |
@@ -1308,6 +1314,7 @@
                         size() |
                         sm_resumed() |
                         trans_form() |
+                        text() |
                         sm_r() |
                         group_item() |
                         memo_change_pass() |
@@ -1331,7 +1338,6 @@
                         message() |
                         xdata_field() |
                         feature_csi() |
-                        text() |
                         muc_destroy() |
                         stanza_id() |
                         group_user_item() |
@@ -1362,7 +1368,6 @@
                         push_notification() |
                         presence() |
                         sasl_success() |
-                        search() |
                         compressed() |
                         ps_subscription() |
                         rosterver_feature() |

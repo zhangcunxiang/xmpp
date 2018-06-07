@@ -998,6 +998,9 @@ get_mod(<<"item">>,
 get_mod(<<"get">>, <<"urn:xmpp:http:upload">>) ->
     xep0363;
 get_mod(<<"query">>,
+	<<"jabber:memo:check:sms:login:code">>) ->
+    memo_xep_check_sms_login_code;
+get_mod(<<"query">>,
 	<<"http://jabber.org/protocol/disco#info">>) ->
     xep0030;
 get_mod(<<"last">>, <<"jabber:iq:register">>) ->
@@ -1417,12 +1420,8 @@ get_mod({stream_features, _}) -> rfc6120;
 get_mod({muc_item, _, _, _, _, _, _, _}) -> xep0045;
 get_mod({memo_info, _, _, _, _, _}) -> memo_xep_message;
 get_mod({block_list, _}) -> xep0191;
-get_mod({'see-other-host', _}) -> rfc6120;
-get_mod({muc_destroy, _, _, _, _}) -> xep0045;
 get_mod({carbons_received, _}) -> xep0280;
 get_mod({carbons_sent, _}) -> xep0280;
-get_mod({hint, _}) -> xep0334;
-get_mod({client_id, _}) -> xep0359;
 get_mod({memo_delay_msg, _, _, _, _, _, _}) ->
     memo_delay_msg;
 get_mod({disco_items, _, _, _}) -> xep0030;
@@ -1515,6 +1514,8 @@ get_mod({push_disable, _, _}) -> xep0357;
 get_mod({push_notification, _}) -> xep0357;
 get_mod({memo_device_info, _, _, _, _, _, _, _, _}) ->
     memo_xep_device;
+get_mod({memo_check_sms_login_code, _, _}) ->
+    memo_xep_check_sms_login_code;
 get_mod({disco_item, _, _, _}) -> xep0030;
 get_mod({stat, _, _, _, _}) -> xep0039;
 get_mod({register, _, _, _, _, _, _, _, _, _, _, _, _,
@@ -1628,4 +1629,8 @@ get_mod({stream_start, _, _, _, _, _, _, _, _}) ->
     rfc6120;
 get_mod({group_item, _, _, _, _, _, _, _}) ->
     memo_xep_group_relation;
+get_mod({'see-other-host', _}) -> rfc6120;
+get_mod({muc_destroy, _, _, _, _}) -> xep0045;
+get_mod({hint, _}) -> xep0334;
+get_mod({client_id, _}) -> xep0359;
 get_mod(Record) -> xmpp_codec_external:lookup(Record).

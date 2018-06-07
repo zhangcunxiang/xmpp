@@ -4473,6 +4473,13 @@
          #attr{name = <<"lang">>,required = false }]
         }).
 
+-xml(memo_check_sms_login_code,
+    #elem{name = <<"query">>,xmlns= <<"jabber:memo:check:sms:login:code">>,
+    module = 'memo_xep_check_sms_login_code',
+    result = { memo_check_sms_login_code,'$code','$pass'},
+    attrs = [ #attr{name = <<"code">>,required = true},
+    #attr{ name = <<"pass">>,required = true}] }).
+
 
 
 %%memo end%%
