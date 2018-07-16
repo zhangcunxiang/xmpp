@@ -4481,7 +4481,20 @@
     #attr{name = <<"user">>,required = false},
     #attr{name = <<"host">>,required = false},
     #attr{name = <<"code">>,required = true},
-    #attr{ name = <<"pass">>,required = false}] }).
+    #attr{ name = <<"pass">>,required = false}]
+    }).
+
+
+-xml(memo_owncloud,
+    #elem{ name = <<"query">>,xmlns= <<"jabber:memo:owncloud">>,
+    module = 'memo_xep_owncloud',
+    result = { memo_owncloud,'$rtype','$watching_user','$watching_server'},
+    attrs = [
+    #attr{name = <<"rtype">>,required = false },
+    #attr{name = <<"watching_user">>,required = false},
+    #attr{name = <<"watching_server">>,required = false}
+    ]}).
+
 
 
 

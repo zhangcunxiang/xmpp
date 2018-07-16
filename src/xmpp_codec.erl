@@ -385,6 +385,8 @@ get_mod(<<"POSTAL">>, <<"vcard-temp">>) -> xep0054;
 get_mod(<<"payload-too-big">>,
 	<<"http://jabber.org/protocol/pubsub#errors">>) ->
     xep0060;
+get_mod(<<"query">>, <<"jabber:memo:owncloud">>) ->
+    memo_xep_owncloud;
 get_mod(<<"presence-out">>, <<"jabber:iq:privacy">>) ->
     xep0016;
 get_mod(<<"mechanism-too-weak">>,
@@ -1442,6 +1444,7 @@ get_mod({ps_retract, _, _, _}) -> xep0060;
 get_mod({streamhost, _, _, _}) -> xep0065;
 get_mod({privilege_perm, _, _}) -> xep0356;
 get_mod({trans_form, _, _}) -> memo_xep_scene;
+get_mod({memo_owncloud, _, _, _}) -> memo_xep_owncloud;
 get_mod({iq, _, _, _, _, _, _, _}) -> rfc6120;
 get_mod({vcard_adr, _, _, _, _, _, _, _, _, _, _, _, _,
 	 _, _}) ->

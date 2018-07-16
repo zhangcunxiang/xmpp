@@ -417,6 +417,11 @@
                            vcode = <<>> :: binary()}).
 -type memo_change_pass() :: #memo_change_pass{}.
 
+-record(memo_owncloud, {rtype = <<>> :: binary(),
+                        watching_user = <<>> :: binary(),
+                        watching_server = <<>> :: binary()}).
+-type memo_owncloud() :: #memo_owncloud{}.
+
 -record(starttls, {required = false :: boolean()}).
 -type starttls() :: #starttls{}.
 
@@ -1182,6 +1187,7 @@
                         memo_search() |
                         starttls_failure() |
                         muc_subscriptions() |
+                        search() |
                         sm_resume() |
                         ps_publish() |
                         receipt_info() |
@@ -1212,6 +1218,7 @@
                         vcard_name() |
                         memo_invite_info() |
                         query_group_info() |
+                        memo_owncloud() |
                         legacy_auth() |
                         xevent() |
                         mod_topic() |
@@ -1233,7 +1240,6 @@
                         sic() |
                         disco_info() |
                         private() |
-                        search() |
                         bookmark_url() |
                         memo_check_account() |
                         sm_enable() |
@@ -1300,7 +1306,6 @@
                         pubsub() |
                         chatstate() |
                         time() |
-                        text() |
                         profile() |
                         mam_prefs() |
                         bob_data() |
@@ -1352,6 +1357,7 @@
                         memo_scene() |
                         sasl_challenge() |
                         vcard_temp() |
+                        text() |
                         nick() |
                         xcaptcha() |
                         block() |
