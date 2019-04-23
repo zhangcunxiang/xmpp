@@ -4243,7 +4243,7 @@
         attrs = [ #attr{name = <<"memo_type">>,
                             required = true,
                             enc = {enc_enum, []},
-                            dec = {dec_enum, [[chat,auth,receipt,track,share,in_out]] }}],
+                            dec = {dec_enum, [[chat,auth,receipt,track,share,in_out, gateway]] }}],
         refs = [#ref{name = chat_info ,max=1,min =0,label = '$chat_info'},
             #ref{name = auth_info ,max = 1,min = 0, label = '$auth_info'},
             #ref{name = receipt_info ,max = 1,min = 0, label = '$receipt_info'},
