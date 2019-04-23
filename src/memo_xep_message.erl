@@ -8,6 +8,10 @@
 do_decode(<<"memo_info">>, <<"jabber:memo:message">>,
 	  El, Opts) ->
     decode_memo_info(<<"jabber:memo:message">>, Opts, El);
+do_decode(<<"gateway_info">>, <<"jabber:memo:message">>,
+	  El, Opts) ->
+    decode_gateway_subdevice(<<"jabber:memo:message">>,
+			     Opts, El);
 do_decode(<<"receipt_info">>, <<"jabber:memo:message">>,
 	  El, Opts) ->
     decode_receipt_info(<<"jabber:memo:message">>, Opts,
@@ -25,6 +29,7 @@ do_decode(Name, XMLNS, _, _) ->
 
 tags() ->
     [{<<"memo_info">>, <<"jabber:memo:message">>},
+     {<<"gateway_info">>, <<"jabber:memo:message">>},
      {<<"receipt_info">>, <<"jabber:memo:message">>},
      {<<"auth_info">>, <<"jabber:memo:message">>},
      {<<"chat_info">>, <<"jabber:memo:message">>}].
@@ -41,7 +46,10 @@ do_encode({receipt_info, _, _, _, _, _, _} =
 	      Receipt_info,
 	  TopXMLNS) ->
     encode_receipt_info(Receipt_info, TopXMLNS);
-do_encode({memo_info, _, _, _, _, _} = Memo_info,
+do_encode({geteway_subdevice, _, _, _} = Gateway_info,
+	  TopXMLNS) ->
+    encode_gateway_subdevice(Gateway_info, TopXMLNS);
+do_encode({memo_info, _, _, _, _, _, _} = Memo_info,
 	  TopXMLNS) ->
     encode_memo_info(Memo_info, TopXMLNS).
 
@@ -50,7 +58,9 @@ do_get_name({auth_info, _, _, _, _, _, _, _, _, _,
     <<"auth_info">>;
 do_get_name({chat_info, _, _, _, _, _, _, _, _}) ->
     <<"chat_info">>;
-do_get_name({memo_info, _, _, _, _, _}) ->
+do_get_name({geteway_subdevice, _, _, _}) ->
+    <<"gateway_info">>;
+do_get_name({memo_info, _, _, _, _, _, _}) ->
     <<"memo_info">>;
 do_get_name({receipt_info, _, _, _, _, _, _}) ->
     <<"receipt_info">>.
@@ -59,7 +69,9 @@ do_get_ns({auth_info, _, _, _, _, _, _, _, _, _, _}) ->
     <<"jabber:memo:message">>;
 do_get_ns({chat_info, _, _, _, _, _, _, _, _}) ->
     <<"jabber:memo:message">>;
-do_get_ns({memo_info, _, _, _, _, _}) ->
+do_get_ns({geteway_subdevice, _, _, _}) ->
+    <<"jabber:memo:message">>;
+do_get_ns({memo_info, _, _, _, _, _, _}) ->
     <<"jabber:memo:message">>;
 do_get_ns({receipt_info, _, _, _, _, _, _}) ->
     <<"jabber:memo:message">>.
@@ -72,14 +84,16 @@ pp(auth_info, 10) ->
      need_resend, operate_user, target_user, nick];
 pp(receipt_info, 6) ->
     [type, msgid, topic_name, topic_id, max_user, now_user];
-pp(memo_info, 5) ->
+pp(geteway_subdevice, 3) ->
+    [gateway_id, subdevice_id, subdevice_type];
+pp(memo_info, 6) ->
     [memo_type, chat_info, auth_info, receipt_info,
-     scene_info];
+     scene_info, gateway_subdevice];
 pp(_, _) -> no.
 
 records() ->
     [{chat_info, 8}, {auth_info, 10}, {receipt_info, 6},
-     {memo_info, 5}].
+     {geteway_subdevice, 3}, {memo_info, 6}].
 
 dec_enum(Val, Enums) ->
     AtomVal = erlang:binary_to_existing_atom(Val, utf8),
@@ -91,83 +105,116 @@ enc_enum(Atom) -> erlang:atom_to_binary(Atom, utf8).
 
 decode_memo_info(__TopXMLNS, __Opts,
 		 {xmlel, <<"memo_info">>, _attrs, _els}) ->
-    {Scene_info, Receipt_info, Auth_info, Chat_info} =
+    {Gateway_subdevice, Scene_info, Receipt_info, Auth_info,
+     Chat_info} =
 	decode_memo_info_els(__TopXMLNS, __Opts, _els,
-			     undefined, undefined, undefined, undefined),
+			     undefined, undefined, undefined, undefined,
+			     undefined),
     Memo_type = decode_memo_info_attrs(__TopXMLNS, _attrs,
 				       undefined),
     {memo_info, Memo_type, Chat_info, Auth_info,
-     Receipt_info, Scene_info}.
+     Receipt_info, Scene_info, Gateway_subdevice}.
 
-decode_memo_info_els(__TopXMLNS, __Opts, [], Scene_info,
-		     Receipt_info, Auth_info, Chat_info) ->
-    {Scene_info, Receipt_info, Auth_info, Chat_info};
+decode_memo_info_els(__TopXMLNS, __Opts, [],
+		     Gateway_subdevice, Scene_info, Receipt_info, Auth_info,
+		     Chat_info) ->
+    {Gateway_subdevice, Scene_info, Receipt_info, Auth_info,
+     Chat_info};
 decode_memo_info_els(__TopXMLNS, __Opts,
 		     [{xmlel, <<"chat_info">>, _attrs, _} = _el | _els],
-		     Scene_info, Receipt_info, Auth_info, Chat_info) ->
+		     Gateway_subdevice, Scene_info, Receipt_info, Auth_info,
+		     Chat_info) ->
     case xmpp_codec:get_attr(<<"xmlns">>, _attrs,
 			     __TopXMLNS)
 	of
       <<"jabber:memo:message">> ->
 	  decode_memo_info_els(__TopXMLNS, __Opts, _els,
-			       Scene_info, Receipt_info, Auth_info,
+			       Gateway_subdevice, Scene_info, Receipt_info,
+			       Auth_info,
 			       decode_chat_info(<<"jabber:memo:message">>,
 						__Opts, _el));
       _ ->
 	  decode_memo_info_els(__TopXMLNS, __Opts, _els,
-			       Scene_info, Receipt_info, Auth_info, Chat_info)
+			       Gateway_subdevice, Scene_info, Receipt_info,
+			       Auth_info, Chat_info)
     end;
 decode_memo_info_els(__TopXMLNS, __Opts,
 		     [{xmlel, <<"auth_info">>, _attrs, _} = _el | _els],
-		     Scene_info, Receipt_info, Auth_info, Chat_info) ->
+		     Gateway_subdevice, Scene_info, Receipt_info, Auth_info,
+		     Chat_info) ->
     case xmpp_codec:get_attr(<<"xmlns">>, _attrs,
 			     __TopXMLNS)
 	of
       <<"jabber:memo:message">> ->
 	  decode_memo_info_els(__TopXMLNS, __Opts, _els,
-			       Scene_info, Receipt_info,
+			       Gateway_subdevice, Scene_info, Receipt_info,
 			       decode_auth_info(<<"jabber:memo:message">>,
 						__Opts, _el),
 			       Chat_info);
       _ ->
 	  decode_memo_info_els(__TopXMLNS, __Opts, _els,
-			       Scene_info, Receipt_info, Auth_info, Chat_info)
+			       Gateway_subdevice, Scene_info, Receipt_info,
+			       Auth_info, Chat_info)
     end;
 decode_memo_info_els(__TopXMLNS, __Opts,
 		     [{xmlel, <<"receipt_info">>, _attrs, _} = _el | _els],
-		     Scene_info, Receipt_info, Auth_info, Chat_info) ->
+		     Gateway_subdevice, Scene_info, Receipt_info, Auth_info,
+		     Chat_info) ->
     case xmpp_codec:get_attr(<<"xmlns">>, _attrs,
 			     __TopXMLNS)
 	of
       <<"jabber:memo:message">> ->
 	  decode_memo_info_els(__TopXMLNS, __Opts, _els,
-			       Scene_info,
+			       Gateway_subdevice, Scene_info,
 			       decode_receipt_info(<<"jabber:memo:message">>,
 						   __Opts, _el),
 			       Auth_info, Chat_info);
       _ ->
 	  decode_memo_info_els(__TopXMLNS, __Opts, _els,
-			       Scene_info, Receipt_info, Auth_info, Chat_info)
+			       Gateway_subdevice, Scene_info, Receipt_info,
+			       Auth_info, Chat_info)
     end;
 decode_memo_info_els(__TopXMLNS, __Opts,
 		     [{xmlel, <<"query">>, _attrs, _} = _el | _els],
-		     Scene_info, Receipt_info, Auth_info, Chat_info) ->
+		     Gateway_subdevice, Scene_info, Receipt_info, Auth_info,
+		     Chat_info) ->
     case xmpp_codec:get_attr(<<"xmlns">>, _attrs,
 			     __TopXMLNS)
 	of
       <<"jabber:memo:scene">> ->
 	  decode_memo_info_els(__TopXMLNS, __Opts, _els,
+			       Gateway_subdevice,
 			       memo_xep_scene:decode_memo_scene(<<"jabber:memo:scene">>,
 								__Opts, _el),
 			       Receipt_info, Auth_info, Chat_info);
       _ ->
 	  decode_memo_info_els(__TopXMLNS, __Opts, _els,
-			       Scene_info, Receipt_info, Auth_info, Chat_info)
+			       Gateway_subdevice, Scene_info, Receipt_info,
+			       Auth_info, Chat_info)
+    end;
+decode_memo_info_els(__TopXMLNS, __Opts,
+		     [{xmlel, <<"gateway_info">>, _attrs, _} = _el | _els],
+		     Gateway_subdevice, Scene_info, Receipt_info, Auth_info,
+		     Chat_info) ->
+    case xmpp_codec:get_attr(<<"xmlns">>, _attrs,
+			     __TopXMLNS)
+	of
+      <<"jabber:memo:message">> ->
+	  decode_memo_info_els(__TopXMLNS, __Opts, _els,
+			       decode_gateway_subdevice(<<"jabber:memo:message">>,
+							__Opts, _el),
+			       Scene_info, Receipt_info, Auth_info, Chat_info);
+      _ ->
+	  decode_memo_info_els(__TopXMLNS, __Opts, _els,
+			       Gateway_subdevice, Scene_info, Receipt_info,
+			       Auth_info, Chat_info)
     end;
 decode_memo_info_els(__TopXMLNS, __Opts, [_ | _els],
-		     Scene_info, Receipt_info, Auth_info, Chat_info) ->
+		     Gateway_subdevice, Scene_info, Receipt_info, Auth_info,
+		     Chat_info) ->
     decode_memo_info_els(__TopXMLNS, __Opts, _els,
-			 Scene_info, Receipt_info, Auth_info, Chat_info).
+			 Gateway_subdevice, Scene_info, Receipt_info, Auth_info,
+			 Chat_info).
 
 decode_memo_info_attrs(__TopXMLNS,
 		       [{<<"memo_type">>, _val} | _attrs], _Memo_type) ->
@@ -179,25 +226,35 @@ decode_memo_info_attrs(__TopXMLNS, [], Memo_type) ->
     decode_memo_info_attr_memo_type(__TopXMLNS, Memo_type).
 
 encode_memo_info({memo_info, Memo_type, Chat_info,
-		  Auth_info, Receipt_info, Scene_info},
+		  Auth_info, Receipt_info, Scene_info, Gateway_subdevice},
 		 __TopXMLNS) ->
     __NewTopXMLNS =
 	xmpp_codec:choose_top_xmlns(<<"jabber:memo:message">>,
 				    [], __TopXMLNS),
     _els =
-	lists:reverse('encode_memo_info_$scene_info'(Scene_info,
-						     __NewTopXMLNS,
-						     'encode_memo_info_$receipt_info'(Receipt_info,
-										      __NewTopXMLNS,
-										      'encode_memo_info_$auth_info'(Auth_info,
-														    __NewTopXMLNS,
-														    'encode_memo_info_$chat_info'(Chat_info,
-																		  __NewTopXMLNS,
-																		  []))))),
+	lists:reverse('encode_memo_info_$gateway_subdevice'(Gateway_subdevice,
+							    __NewTopXMLNS,
+							    'encode_memo_info_$scene_info'(Scene_info,
+											   __NewTopXMLNS,
+											   'encode_memo_info_$receipt_info'(Receipt_info,
+															    __NewTopXMLNS,
+															    'encode_memo_info_$auth_info'(Auth_info,
+																			  __NewTopXMLNS,
+																			  'encode_memo_info_$chat_info'(Chat_info,
+																							__NewTopXMLNS,
+																							[])))))),
     _attrs = encode_memo_info_attr_memo_type(Memo_type,
 					     xmpp_codec:enc_xmlns_attrs(__NewTopXMLNS,
 									__TopXMLNS)),
     {xmlel, <<"memo_info">>, _attrs, _els}.
+
+'encode_memo_info_$gateway_subdevice'(undefined,
+				      __TopXMLNS, _acc) ->
+    _acc;
+'encode_memo_info_$gateway_subdevice'(Gateway_subdevice,
+				      __TopXMLNS, _acc) ->
+    [encode_gateway_subdevice(Gateway_subdevice, __TopXMLNS)
+     | _acc].
 
 'encode_memo_info_$scene_info'(undefined, __TopXMLNS,
 			       _acc) ->
@@ -247,6 +304,96 @@ decode_memo_info_attr_memo_type(__TopXMLNS, _val) ->
 
 encode_memo_info_attr_memo_type(_val, _acc) ->
     [{<<"memo_type">>, enc_enum(_val)} | _acc].
+
+decode_gateway_subdevice(__TopXMLNS, __Opts,
+			 {xmlel, <<"gateway_info">>, _attrs, _els}) ->
+    {Gateway_id, Subdevice_id, Subdevice_type} =
+	decode_gateway_subdevice_attrs(__TopXMLNS, _attrs,
+				       undefined, undefined, undefined),
+    {geteway_subdevice, Gateway_id, Subdevice_id,
+     Subdevice_type}.
+
+decode_gateway_subdevice_attrs(__TopXMLNS,
+			       [{<<"gateway_id">>, _val} | _attrs], _Gateway_id,
+			       Subdevice_id, Subdevice_type) ->
+    decode_gateway_subdevice_attrs(__TopXMLNS, _attrs, _val,
+				   Subdevice_id, Subdevice_type);
+decode_gateway_subdevice_attrs(__TopXMLNS,
+			       [{<<"subdevice_id">>, _val} | _attrs],
+			       Gateway_id, _Subdevice_id, Subdevice_type) ->
+    decode_gateway_subdevice_attrs(__TopXMLNS, _attrs,
+				   Gateway_id, _val, Subdevice_type);
+decode_gateway_subdevice_attrs(__TopXMLNS,
+			       [{<<"subdevice_type">>, _val} | _attrs],
+			       Gateway_id, Subdevice_id, _Subdevice_type) ->
+    decode_gateway_subdevice_attrs(__TopXMLNS, _attrs,
+				   Gateway_id, Subdevice_id, _val);
+decode_gateway_subdevice_attrs(__TopXMLNS, [_ | _attrs],
+			       Gateway_id, Subdevice_id, Subdevice_type) ->
+    decode_gateway_subdevice_attrs(__TopXMLNS, _attrs,
+				   Gateway_id, Subdevice_id, Subdevice_type);
+decode_gateway_subdevice_attrs(__TopXMLNS, [],
+			       Gateway_id, Subdevice_id, Subdevice_type) ->
+    {decode_gateway_subdevice_attr_gateway_id(__TopXMLNS,
+					      Gateway_id),
+     decode_gateway_subdevice_attr_subdevice_id(__TopXMLNS,
+						Subdevice_id),
+     decode_gateway_subdevice_attr_subdevice_type(__TopXMLNS,
+						  Subdevice_type)}.
+
+encode_gateway_subdevice({geteway_subdevice, Gateway_id,
+			  Subdevice_id, Subdevice_type},
+			 __TopXMLNS) ->
+    __NewTopXMLNS =
+	xmpp_codec:choose_top_xmlns(<<"jabber:memo:message">>,
+				    [], __TopXMLNS),
+    _els = [],
+    _attrs =
+	encode_gateway_subdevice_attr_subdevice_type(Subdevice_type,
+						     encode_gateway_subdevice_attr_subdevice_id(Subdevice_id,
+												encode_gateway_subdevice_attr_gateway_id(Gateway_id,
+																	 xmpp_codec:enc_xmlns_attrs(__NewTopXMLNS,
+																				    __TopXMLNS)))),
+    {xmlel, <<"gateway_info">>, _attrs, _els}.
+
+decode_gateway_subdevice_attr_gateway_id(__TopXMLNS,
+					 undefined) ->
+    erlang:error({xmpp_codec,
+		  {missing_attr, <<"gateway_id">>, <<"gateway_info">>,
+		   __TopXMLNS}});
+decode_gateway_subdevice_attr_gateway_id(__TopXMLNS,
+					 _val) ->
+    _val.
+
+encode_gateway_subdevice_attr_gateway_id(_val, _acc) ->
+    [{<<"gateway_id">>, _val} | _acc].
+
+decode_gateway_subdevice_attr_subdevice_id(__TopXMLNS,
+					   undefined) ->
+    erlang:error({xmpp_codec,
+		  {missing_attr, <<"subdevice_id">>, <<"gateway_info">>,
+		   __TopXMLNS}});
+decode_gateway_subdevice_attr_subdevice_id(__TopXMLNS,
+					   _val) ->
+    _val.
+
+encode_gateway_subdevice_attr_subdevice_id(_val,
+					   _acc) ->
+    [{<<"subdevice_id">>, _val} | _acc].
+
+decode_gateway_subdevice_attr_subdevice_type(__TopXMLNS,
+					     undefined) ->
+    <<>>;
+decode_gateway_subdevice_attr_subdevice_type(__TopXMLNS,
+					     _val) ->
+    _val.
+
+encode_gateway_subdevice_attr_subdevice_type(<<>>,
+					     _acc) ->
+    _acc;
+encode_gateway_subdevice_attr_subdevice_type(_val,
+					     _acc) ->
+    [{<<"subdevice_type">>, _val} | _acc].
 
 decode_receipt_info(__TopXMLNS, __Opts,
 		    {xmlel, <<"receipt_info">>, _attrs, _els}) ->

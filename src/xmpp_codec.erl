@@ -686,14 +686,7 @@ get_mod(<<"invalid-jid">>,
 get_mod(<<"query">>, <<"jabber:iq:topic">>) ->
     memo_xep_topic;
 get_mod(<<"iq">>, <<"jabber:client">>) -> rfc6120;
-get_mod(<<"not-acceptable">>,
-	<<"urn:ietf:params:xml:ns:xmpp-stanzas">>) ->
-    rfc6120;
-get_mod(<<"SUFFIX">>, <<"vcard-temp">>) -> xep0054;
 get_mod(<<"LOCALITY">>, <<"vcard-temp">>) -> xep0054;
-get_mod(<<"redirect">>,
-	<<"http://jabber.org/protocol/pubsub">>) ->
-    xep0060;
 get_mod(<<"inactive">>,
 	<<"http://jabber.org/protocol/chatstates">>) ->
     xep0085;
@@ -1175,6 +1168,9 @@ get_mod(<<"reported">>, <<"jabber:x:data">>) -> xep0004;
 get_mod(<<"subject">>, <<"jabber:client">>) -> rfc6120;
 get_mod(<<"date">>, <<"jabber:iq:register">>) ->
     xep0077;
+get_mod(<<"gateway_info">>,
+	<<"jabber:memo:message">>) ->
+    memo_xep_message;
 get_mod(<<"auth">>,
 	<<"urn:ietf:params:xml:ns:xmpp-sasl">>) ->
     rfc6120;
@@ -1392,6 +1388,13 @@ get_mod(<<"destroy">>,
 	<<"http://jabber.org/protocol/muc#user">>) ->
     xep0045;
 get_mod(<<"id">>, <<"jabber:x:event">>) -> xep0022;
+get_mod(<<"not-acceptable">>,
+	<<"urn:ietf:params:xml:ns:xmpp-stanzas">>) ->
+    rfc6120;
+get_mod(<<"SUFFIX">>, <<"vcard-temp">>) -> xep0054;
+get_mod(<<"redirect">>,
+	<<"http://jabber.org/protocol/pubsub">>) ->
+    xep0060;
 get_mod(Name, XMLNS) ->
     xmpp_codec_external:lookup(Name, XMLNS).
 
@@ -1420,7 +1423,6 @@ get_mod({mam_fin, _, _, _, _, _}) -> xep0313;
 get_mod({legacy_auth, _, _, _, _}) -> xep0078;
 get_mod({stream_features, _}) -> rfc6120;
 get_mod({muc_item, _, _, _, _, _, _, _}) -> xep0045;
-get_mod({memo_info, _, _, _, _, _}) -> memo_xep_message;
 get_mod({block_list, _}) -> xep0191;
 get_mod({carbons_received, _}) -> xep0280;
 get_mod({carbons_sent, _}) -> xep0280;
@@ -1453,6 +1455,8 @@ get_mod({xdata_option, _, _}) -> xep0004;
 get_mod({ps_unsubscribe, _, _, _}) -> xep0060;
 get_mod({sm_resume, _, _, _}) -> xep0198;
 get_mod({push_enable, _, _, _}) -> xep0357;
+get_mod({geteway_subdevice, _, _, _}) ->
+    memo_xep_message;
 get_mod({size, _, _, _}) -> memo_xep_scene;
 get_mod({vcard_geo, _, _}) -> xep0054;
 get_mod({mam_query, _, _, _, _, _, _, _, _}) -> xep0313;
@@ -1494,6 +1498,8 @@ get_mod({mix_leave}) -> xep0369;
 get_mod({request_info, _, _, _, _, _, _}) ->
     memo_xep_group_relation;
 get_mod({receipt_info, _, _, _, _, _, _}) ->
+    memo_xep_message;
+get_mod({memo_info, _, _, _, _, _, _}) ->
     memo_xep_message;
 get_mod({privacy_list, _, _}) -> xep0016;
 get_mod({text, _, _}) -> rfc6120;

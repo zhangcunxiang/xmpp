@@ -4225,11 +4225,21 @@
                  #attr{name = <<"now_user">>,required = false}]
         }).
 
+-xml(gateway_subdevice,
+    #elem{ name = <<"gateway_info">>,
+        xmlns = <<"jabber:memo:message">>,
+        module = 'memo_xep_message',
+        result = { geteway_subdevice, '$gateway_id', '$subdevice_id', '$subdevice_type' },
+        attrs = [ #attr{ name = <<"gateway_id">>, required = true },
+            #attr{ name = <<"subdevice_id">>, required = true },
+            #attr{ name = <<"subdevice_type">>, required = false }]
+            }).
+
 -xml(memo_info,
     #elem{name = <<"memo_info">>,
         xmlns= <<"jabber:memo:message">>,
         module = 'memo_xep_message',
-        result = {memo_info,'$memo_type','$chat_info','$auth_info','$receipt_info','$scene_info'},
+        result = {memo_info,'$memo_type','$chat_info','$auth_info','$receipt_info','$scene_info', '$gateway_subdevice'},
         attrs = [ #attr{name = <<"memo_type">>,
                             required = true,
                             enc = {enc_enum, []},
@@ -4237,7 +4247,8 @@
         refs = [#ref{name = chat_info ,max=1,min =0,label = '$chat_info'},
             #ref{name = auth_info ,max = 1,min = 0, label = '$auth_info'},
             #ref{name = receipt_info ,max = 1,min = 0, label = '$receipt_info'},
-            #ref{name = memo_scene,max=1,min=0 ,label = '$scene_info'}
+            #ref{name = memo_scene,max=1,min=0 ,label = '$scene_info'},
+            #ref{name = gateway_subdevice, max = 1, min = 0, label = '$gateway_subdevice'}
         ]
         }).
 
@@ -4495,7 +4506,8 @@
     #attr{name = <<"watching_server">>,required = false}
     ]}).
 
-
+-xml(memo_subdevice,
+    #elem{ name = <<""
 
 
 %%memo end%%
