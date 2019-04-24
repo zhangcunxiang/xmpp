@@ -4229,7 +4229,7 @@
     #elem{ name = <<"gateway_info">>,
         xmlns = <<"jabber:memo:message">>,
         module = 'memo_xep_message',
-        result = { geteway_subdevice, '$gateway_id', '$subdevice_id', '$subdevice_type' },
+        result = { gateway_subdevice, '$gateway_id', '$subdevice_id', '$subdevice_type' },
         attrs = [ #attr{ name = <<"gateway_id">>, required = true },
             #attr{ name = <<"subdevice_id">>, required = true },
             #attr{ name = <<"subdevice_type">>, required = false }]

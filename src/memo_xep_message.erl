@@ -46,7 +46,7 @@ do_encode({receipt_info, _, _, _, _, _, _} =
 	      Receipt_info,
 	  TopXMLNS) ->
     encode_receipt_info(Receipt_info, TopXMLNS);
-do_encode({geteway_subdevice, _, _, _} = Gateway_info,
+do_encode({gateway_subdevice, _, _, _} = Gateway_info,
 	  TopXMLNS) ->
     encode_gateway_subdevice(Gateway_info, TopXMLNS);
 do_encode({memo_info, _, _, _, _, _, _} = Memo_info,
@@ -58,7 +58,7 @@ do_get_name({auth_info, _, _, _, _, _, _, _, _, _,
     <<"auth_info">>;
 do_get_name({chat_info, _, _, _, _, _, _, _, _}) ->
     <<"chat_info">>;
-do_get_name({geteway_subdevice, _, _, _}) ->
+do_get_name({gateway_subdevice, _, _, _}) ->
     <<"gateway_info">>;
 do_get_name({memo_info, _, _, _, _, _, _}) ->
     <<"memo_info">>;
@@ -69,7 +69,7 @@ do_get_ns({auth_info, _, _, _, _, _, _, _, _, _, _}) ->
     <<"jabber:memo:message">>;
 do_get_ns({chat_info, _, _, _, _, _, _, _, _}) ->
     <<"jabber:memo:message">>;
-do_get_ns({geteway_subdevice, _, _, _}) ->
+do_get_ns({gateway_subdevice, _, _, _}) ->
     <<"jabber:memo:message">>;
 do_get_ns({memo_info, _, _, _, _, _, _}) ->
     <<"jabber:memo:message">>;
@@ -84,7 +84,7 @@ pp(auth_info, 10) ->
      need_resend, operate_user, target_user, nick];
 pp(receipt_info, 6) ->
     [type, msgid, topic_name, topic_id, max_user, now_user];
-pp(geteway_subdevice, 3) ->
+pp(gateway_subdevice, 3) ->
     [gateway_id, subdevice_id, subdevice_type];
 pp(memo_info, 6) ->
     [memo_type, chat_info, auth_info, receipt_info,
@@ -93,7 +93,7 @@ pp(_, _) -> no.
 
 records() ->
     [{chat_info, 8}, {auth_info, 10}, {receipt_info, 6},
-     {geteway_subdevice, 3}, {memo_info, 6}].
+     {gateway_subdevice, 3}, {memo_info, 6}].
 
 dec_enum(Val, Enums) ->
     AtomVal = erlang:binary_to_existing_atom(Val, utf8),
@@ -310,7 +310,7 @@ decode_gateway_subdevice(__TopXMLNS, __Opts,
     {Gateway_id, Subdevice_id, Subdevice_type} =
 	decode_gateway_subdevice_attrs(__TopXMLNS, _attrs,
 				       undefined, undefined, undefined),
-    {geteway_subdevice, Gateway_id, Subdevice_id,
+    {gateway_subdevice, Gateway_id, Subdevice_id,
      Subdevice_type}.
 
 decode_gateway_subdevice_attrs(__TopXMLNS,
@@ -341,7 +341,7 @@ decode_gateway_subdevice_attrs(__TopXMLNS, [],
      decode_gateway_subdevice_attr_subdevice_type(__TopXMLNS,
 						  Subdevice_type)}.
 
-encode_gateway_subdevice({geteway_subdevice, Gateway_id,
+encode_gateway_subdevice({gateway_subdevice, Gateway_id,
 			  Subdevice_id, Subdevice_type},
 			 __TopXMLNS) ->
     __NewTopXMLNS =

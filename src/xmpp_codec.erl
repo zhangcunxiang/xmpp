@@ -1455,7 +1455,7 @@ get_mod({xdata_option, _, _}) -> xep0004;
 get_mod({ps_unsubscribe, _, _, _}) -> xep0060;
 get_mod({sm_resume, _, _, _}) -> xep0198;
 get_mod({push_enable, _, _, _}) -> xep0357;
-get_mod({geteway_subdevice, _, _, _}) ->
+get_mod({gateway_subdevice, _, _, _}) ->
     memo_xep_message;
 get_mod({size, _, _, _}) -> memo_xep_scene;
 get_mod({vcard_geo, _, _}) -> xep0054;
