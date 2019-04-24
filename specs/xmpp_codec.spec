@@ -4225,14 +4225,23 @@
                  #attr{name = <<"now_user">>,required = false}]
         }).
 
+-xml(sub_device,
+    #elem{ name = <<"sub_device">>, xmlns = <<"jabber:memo:message">>,
+    module = 'memo_xep_message',
+    result = { sub_device, '$device_id', '$device_name', '$device_type' },
+    attrs = [ #attr{ name = <<"device_id">>, required = true },
+        #attr{ name = <<"device_name">>, required = false },
+        #attr{ name = <<"device_type">>, required = false }]
+        }).
+
 -xml(gateway_subdevice,
     #elem{ name = <<"gateway_info">>,
         xmlns = <<"jabber:memo:message">>,
         module = 'memo_xep_message',
-        result = { gateway_subdevice, '$gateway_id', '$subdevice_id', '$subdevice_type' },
+        result = { gateway_subdevice, '$gateway_id', '$gateway_name', '$sub_device' },
         attrs = [ #attr{ name = <<"gateway_id">>, required = true },
-            #attr{ name = <<"subdevice_id">>, required = true },
-            #attr{ name = <<"subdevice_type">>, required = false }]
+            #attr{ name = <<"gateway_name">>, required = false }],
+        refs = [#ref{name = sub_device, max = 1, min = 0, label = '$sub_device'}]
             }).
 
 -xml(memo_info,

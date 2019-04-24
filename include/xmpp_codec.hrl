@@ -291,6 +291,11 @@
 -record(client_id, {id = <<>> :: binary()}).
 -type client_id() :: #client_id{}.
 
+-record(sub_device, {device_id = <<>> :: binary(),
+                     device_name = <<>> :: binary(),
+                     device_type = <<>> :: binary()}).
+-type sub_device() :: #sub_device{}.
+
 -record(sasl_challenge, {text = <<>> :: binary()}).
 -type sasl_challenge() :: #sasl_challenge{}.
 
@@ -466,8 +471,8 @@
 -type sasl_response() :: #sasl_response{}.
 
 -record(gateway_subdevice, {gateway_id = <<>> :: binary(),
-                            subdevice_id = <<>> :: binary(),
-                            subdevice_type = <<>> :: binary()}).
+                            gateway_name = <<>> :: binary(),
+                            sub_device :: 'undefined' | #sub_device{}}).
 -type gateway_subdevice() :: #gateway_subdevice{}.
 
 -record(sasl_auth, {mechanism = <<>> :: binary(),
@@ -1195,10 +1200,13 @@
                         addresses() |
                         muc_subscriptions() |
                         block_list() |
+                        search() |
                         mix_leave() |
                         roster_item() |
                         sasl_auth() |
+                        search_user_item() |
                         adhoc_command() |
+                        trans_form() |
                         group_item() |
                         offline_item() |
                         feature_csi() |
@@ -1209,31 +1217,33 @@
                         media_uri() |
                         chatstate() |
                         chat_info() |
-                        memo_change_pass() |
                         handshake() |
+                        text() |
                         xmpp_session() |
                         mix_join() |
                         delegation() |
-                        search_group_item() |
+                        memo_check_account() |
                         ps_retract() |
                         push_enable() |
+                        memo_scene() |
                         private() |
-                        memo_delay_msg() |
                         muc_history() |
                         media() |
                         compressed() |
                         carbons_disable() |
                         upload_slot() |
+                        memo_search() |
+                        memo_owncloud() |
                         query_group_info() |
-                        search() |
                         disco_items() |
                         group_user_item() |
                         stream_start() |
                         offline() |
                         profile() |
-                        memo_send_sms() |
+                        memo_scene_list() |
                         mam_fin() |
                         register() |
+                        memo_delay_msg() |
                         mix_participant() |
                         iq() |
                         muc_subscribe() |
@@ -1246,7 +1256,7 @@
                         identity() |
                         muc_actor() |
                         legacy_auth() |
-                        memo_owncloud() |
+                        memo_check_sms_login_code() |
                         stanza_id() |
                         muc_owner() |
                         carbons_enable() |
@@ -1255,19 +1265,21 @@
                         vcard_photo() |
                         sm_resume() |
                         ps_event() |
-                        group_vcard_photo() |
+                        memo_group_vcard() |
                         vcard_geo() |
                         vcard_adr() |
                         muc_unsubscribe() |
+                        memo_jingle() |
                         version() |
                         bookmark_conference() |
                         gone() |
                         disco_item() |
                         delegation_query() |
-                        memo_device_info() |
+                        memo_invite_info() |
                         vcard_logo() |
                         sasl_failure() |
                         client_id() |
+                        memo_change_pass() |
                         vcard_org() |
                         starttls_proceed() |
                         delay() |
@@ -1275,6 +1287,7 @@
                         memo_group_relation() |
                         muc_admin() |
                         sasl_success() |
+                        group_vcard_photo() |
                         carbons_private() |
                         feature_register() |
                         ps_affiliation() |
@@ -1290,8 +1303,8 @@
                         ps_item() |
                         legacy_auth_feature() |
                         position() |
+                        sub_device() |
                         gateway_subdevice() |
-                        memo_info() |
                         vcard_sound() |
                         muc_destroy() |
                         vcard_key() |
@@ -1301,7 +1314,6 @@
                         mod_topic() |
                         rosterver_feature() |
                         bookmark_url() |
-                        memo_group_vcard() |
                         disco_info() |
                         vcard_temp() |
                         starttls_failure() |
@@ -1323,18 +1335,16 @@
                         privacy_item() |
                         rsm_first() |
                         sm_failed() |
-                        text() |
+                        memo_info() |
                         push_notification() |
                         time() |
-                        search_user_item() |
                         stream_features() |
-                        memo_scene_list() |
-                        memo_invite_info() |
                         sasl_challenge() |
                         vcard_email() |
                         unblock() |
                         carbons_sent() |
                         bytestreams() |
+                        memo_send_sms() |
                         muc_item() |
                         delegated() |
                         mam_result() |
@@ -1342,7 +1352,6 @@
                         vcard_tel() |
                         xevent() |
                         mam_archived() |
-                        trans_form() |
                         sasl_abort() |
                         sm_a() |
                         request_info() |
@@ -1352,8 +1361,6 @@
                         search_item() |
                         streamhost() |
                         presence() |
-                        memo_check_account() |
-                        memo_check_sms_login_code() |
                         sm_resumed() |
                         xdata_field() |
                         receipt_info() |
@@ -1374,17 +1381,16 @@
                         stats() |
                         nick() |
                         pubsub() |
-                        memo_jingle() |
                         rsm_set() |
                         xdata_option() |
                         feature_sm() |
                         muc_user() |
-                        memo_scene() |
                         ps_subscription() |
                         privacy_query() |
                         sic() |
-                        memo_search() |
+                        search_group_item() |
                         ps_unsubscribe() |
                         memo_group() |
                         bob_data() |
-                        db_result().
+                        db_result() |
+                        memo_device_info().

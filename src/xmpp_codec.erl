@@ -1120,6 +1120,8 @@ get_mod(<<"invalid-subid">>,
 get_mod(<<"not-in-roster-group">>,
 	<<"http://jabber.org/protocol/pubsub#errors">>) ->
     xep0060;
+get_mod(<<"sub_device">>, <<"jabber:memo:message">>) ->
+    memo_xep_message;
 get_mod(<<"unsupported-encoding">>,
 	<<"urn:ietf:params:xml:ns:xmpp-streams">>) ->
     rfc6120;
@@ -1594,6 +1596,7 @@ get_mod({address, _, _, _, _, _}) -> xep0033;
 get_mod({thumbnail, _, _, _, _}) -> xep0264;
 get_mod({delegation, _, _}) -> xep0355;
 get_mod({mod_topic, _, _, _, _, _}) -> memo_xep_topic;
+get_mod({sub_device, _, _, _}) -> memo_xep_message;
 get_mod({sm_enabled, _, _, _, _, _}) -> xep0198;
 get_mod({topic_user_item, _, _, _, _}) ->
     memo_xep_topic;

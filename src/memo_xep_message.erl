@@ -12,6 +12,9 @@ do_decode(<<"gateway_info">>, <<"jabber:memo:message">>,
 	  El, Opts) ->
     decode_gateway_subdevice(<<"jabber:memo:message">>,
 			     Opts, El);
+do_decode(<<"sub_device">>, <<"jabber:memo:message">>,
+	  El, Opts) ->
+    decode_sub_device(<<"jabber:memo:message">>, Opts, El);
 do_decode(<<"receipt_info">>, <<"jabber:memo:message">>,
 	  El, Opts) ->
     decode_receipt_info(<<"jabber:memo:message">>, Opts,
@@ -30,6 +33,7 @@ do_decode(Name, XMLNS, _, _) ->
 tags() ->
     [{<<"memo_info">>, <<"jabber:memo:message">>},
      {<<"gateway_info">>, <<"jabber:memo:message">>},
+     {<<"sub_device">>, <<"jabber:memo:message">>},
      {<<"receipt_info">>, <<"jabber:memo:message">>},
      {<<"auth_info">>, <<"jabber:memo:message">>},
      {<<"chat_info">>, <<"jabber:memo:message">>}].
@@ -46,6 +50,9 @@ do_encode({receipt_info, _, _, _, _, _, _} =
 	      Receipt_info,
 	  TopXMLNS) ->
     encode_receipt_info(Receipt_info, TopXMLNS);
+do_encode({sub_device, _, _, _} = Sub_device,
+	  TopXMLNS) ->
+    encode_sub_device(Sub_device, TopXMLNS);
 do_encode({gateway_subdevice, _, _, _} = Gateway_info,
 	  TopXMLNS) ->
     encode_gateway_subdevice(Gateway_info, TopXMLNS);
@@ -63,7 +70,8 @@ do_get_name({gateway_subdevice, _, _, _}) ->
 do_get_name({memo_info, _, _, _, _, _, _}) ->
     <<"memo_info">>;
 do_get_name({receipt_info, _, _, _, _, _, _}) ->
-    <<"receipt_info">>.
+    <<"receipt_info">>;
+do_get_name({sub_device, _, _, _}) -> <<"sub_device">>.
 
 do_get_ns({auth_info, _, _, _, _, _, _, _, _, _, _}) ->
     <<"jabber:memo:message">>;
@@ -74,6 +82,8 @@ do_get_ns({gateway_subdevice, _, _, _}) ->
 do_get_ns({memo_info, _, _, _, _, _, _}) ->
     <<"jabber:memo:message">>;
 do_get_ns({receipt_info, _, _, _, _, _, _}) ->
+    <<"jabber:memo:message">>;
+do_get_ns({sub_device, _, _, _}) ->
     <<"jabber:memo:message">>.
 
 pp(chat_info, 8) ->
@@ -84,8 +94,10 @@ pp(auth_info, 10) ->
      need_resend, operate_user, target_user, nick];
 pp(receipt_info, 6) ->
     [type, msgid, topic_name, topic_id, max_user, now_user];
+pp(sub_device, 3) ->
+    [device_id, device_name, device_type];
 pp(gateway_subdevice, 3) ->
-    [gateway_id, subdevice_id, subdevice_type];
+    [gateway_id, gateway_name, sub_device];
 pp(memo_info, 6) ->
     [memo_type, chat_info, auth_info, receipt_info,
      scene_info, gateway_subdevice];
@@ -93,7 +105,8 @@ pp(_, _) -> no.
 
 records() ->
     [{chat_info, 8}, {auth_info, 10}, {receipt_info, 6},
-     {gateway_subdevice, 3}, {memo_info, 6}].
+     {sub_device, 3}, {gateway_subdevice, 3},
+     {memo_info, 6}].
 
 dec_enum(Val, Enums) ->
     AtomVal = erlang:binary_to_existing_atom(Val, utf8),
@@ -307,54 +320,81 @@ encode_memo_info_attr_memo_type(_val, _acc) ->
 
 decode_gateway_subdevice(__TopXMLNS, __Opts,
 			 {xmlel, <<"gateway_info">>, _attrs, _els}) ->
-    {Gateway_id, Subdevice_id, Subdevice_type} =
+    Sub_device = decode_gateway_subdevice_els(__TopXMLNS,
+					      __Opts, _els, undefined),
+    {Gateway_id, Gateway_name} =
 	decode_gateway_subdevice_attrs(__TopXMLNS, _attrs,
-				       undefined, undefined, undefined),
-    {gateway_subdevice, Gateway_id, Subdevice_id,
-     Subdevice_type}.
+				       undefined, undefined),
+    {gateway_subdevice, Gateway_id, Gateway_name,
+     Sub_device}.
+
+decode_gateway_subdevice_els(__TopXMLNS, __Opts, [],
+			     Sub_device) ->
+    Sub_device;
+decode_gateway_subdevice_els(__TopXMLNS, __Opts,
+			     [{xmlel, <<"sub_device">>, _attrs, _} = _el
+			      | _els],
+			     Sub_device) ->
+    case xmpp_codec:get_attr(<<"xmlns">>, _attrs,
+			     __TopXMLNS)
+	of
+      <<"jabber:memo:message">> ->
+	  decode_gateway_subdevice_els(__TopXMLNS, __Opts, _els,
+				       decode_sub_device(<<"jabber:memo:message">>,
+							 __Opts, _el));
+      _ ->
+	  decode_gateway_subdevice_els(__TopXMLNS, __Opts, _els,
+				       Sub_device)
+    end;
+decode_gateway_subdevice_els(__TopXMLNS, __Opts,
+			     [_ | _els], Sub_device) ->
+    decode_gateway_subdevice_els(__TopXMLNS, __Opts, _els,
+				 Sub_device).
 
 decode_gateway_subdevice_attrs(__TopXMLNS,
 			       [{<<"gateway_id">>, _val} | _attrs], _Gateway_id,
-			       Subdevice_id, Subdevice_type) ->
+			       Gateway_name) ->
     decode_gateway_subdevice_attrs(__TopXMLNS, _attrs, _val,
-				   Subdevice_id, Subdevice_type);
+				   Gateway_name);
 decode_gateway_subdevice_attrs(__TopXMLNS,
-			       [{<<"subdevice_id">>, _val} | _attrs],
-			       Gateway_id, _Subdevice_id, Subdevice_type) ->
+			       [{<<"gateway_name">>, _val} | _attrs],
+			       Gateway_id, _Gateway_name) ->
     decode_gateway_subdevice_attrs(__TopXMLNS, _attrs,
-				   Gateway_id, _val, Subdevice_type);
-decode_gateway_subdevice_attrs(__TopXMLNS,
-			       [{<<"subdevice_type">>, _val} | _attrs],
-			       Gateway_id, Subdevice_id, _Subdevice_type) ->
-    decode_gateway_subdevice_attrs(__TopXMLNS, _attrs,
-				   Gateway_id, Subdevice_id, _val);
+				   Gateway_id, _val);
 decode_gateway_subdevice_attrs(__TopXMLNS, [_ | _attrs],
-			       Gateway_id, Subdevice_id, Subdevice_type) ->
+			       Gateway_id, Gateway_name) ->
     decode_gateway_subdevice_attrs(__TopXMLNS, _attrs,
-				   Gateway_id, Subdevice_id, Subdevice_type);
+				   Gateway_id, Gateway_name);
 decode_gateway_subdevice_attrs(__TopXMLNS, [],
-			       Gateway_id, Subdevice_id, Subdevice_type) ->
+			       Gateway_id, Gateway_name) ->
     {decode_gateway_subdevice_attr_gateway_id(__TopXMLNS,
 					      Gateway_id),
-     decode_gateway_subdevice_attr_subdevice_id(__TopXMLNS,
-						Subdevice_id),
-     decode_gateway_subdevice_attr_subdevice_type(__TopXMLNS,
-						  Subdevice_type)}.
+     decode_gateway_subdevice_attr_gateway_name(__TopXMLNS,
+						Gateway_name)}.
 
 encode_gateway_subdevice({gateway_subdevice, Gateway_id,
-			  Subdevice_id, Subdevice_type},
+			  Gateway_name, Sub_device},
 			 __TopXMLNS) ->
     __NewTopXMLNS =
 	xmpp_codec:choose_top_xmlns(<<"jabber:memo:message">>,
 				    [], __TopXMLNS),
-    _els = [],
+    _els =
+	lists:reverse('encode_gateway_subdevice_$sub_device'(Sub_device,
+							     __NewTopXMLNS,
+							     [])),
     _attrs =
-	encode_gateway_subdevice_attr_subdevice_type(Subdevice_type,
-						     encode_gateway_subdevice_attr_subdevice_id(Subdevice_id,
-												encode_gateway_subdevice_attr_gateway_id(Gateway_id,
-																	 xmpp_codec:enc_xmlns_attrs(__NewTopXMLNS,
-																				    __TopXMLNS)))),
+	encode_gateway_subdevice_attr_gateway_name(Gateway_name,
+						   encode_gateway_subdevice_attr_gateway_id(Gateway_id,
+											    xmpp_codec:enc_xmlns_attrs(__NewTopXMLNS,
+														       __TopXMLNS))),
     {xmlel, <<"gateway_info">>, _attrs, _els}.
+
+'encode_gateway_subdevice_$sub_device'(undefined,
+				       __TopXMLNS, _acc) ->
+    _acc;
+'encode_gateway_subdevice_$sub_device'(Sub_device,
+				       __TopXMLNS, _acc) ->
+    [encode_sub_device(Sub_device, __TopXMLNS) | _acc].
 
 decode_gateway_subdevice_attr_gateway_id(__TopXMLNS,
 					 undefined) ->
@@ -368,32 +408,99 @@ decode_gateway_subdevice_attr_gateway_id(__TopXMLNS,
 encode_gateway_subdevice_attr_gateway_id(_val, _acc) ->
     [{<<"gateway_id">>, _val} | _acc].
 
-decode_gateway_subdevice_attr_subdevice_id(__TopXMLNS,
+decode_gateway_subdevice_attr_gateway_name(__TopXMLNS,
 					   undefined) ->
-    erlang:error({xmpp_codec,
-		  {missing_attr, <<"subdevice_id">>, <<"gateway_info">>,
-		   __TopXMLNS}});
-decode_gateway_subdevice_attr_subdevice_id(__TopXMLNS,
+    <<>>;
+decode_gateway_subdevice_attr_gateway_name(__TopXMLNS,
 					   _val) ->
     _val.
 
-encode_gateway_subdevice_attr_subdevice_id(_val,
+encode_gateway_subdevice_attr_gateway_name(<<>>,
 					   _acc) ->
-    [{<<"subdevice_id">>, _val} | _acc].
+    _acc;
+encode_gateway_subdevice_attr_gateway_name(_val,
+					   _acc) ->
+    [{<<"gateway_name">>, _val} | _acc].
 
-decode_gateway_subdevice_attr_subdevice_type(__TopXMLNS,
-					     undefined) ->
-    <<>>;
-decode_gateway_subdevice_attr_subdevice_type(__TopXMLNS,
-					     _val) ->
+decode_sub_device(__TopXMLNS, __Opts,
+		  {xmlel, <<"sub_device">>, _attrs, _els}) ->
+    {Device_id, Device_name, Device_type} =
+	decode_sub_device_attrs(__TopXMLNS, _attrs, undefined,
+				undefined, undefined),
+    {sub_device, Device_id, Device_name, Device_type}.
+
+decode_sub_device_attrs(__TopXMLNS,
+			[{<<"device_id">>, _val} | _attrs], _Device_id,
+			Device_name, Device_type) ->
+    decode_sub_device_attrs(__TopXMLNS, _attrs, _val,
+			    Device_name, Device_type);
+decode_sub_device_attrs(__TopXMLNS,
+			[{<<"device_name">>, _val} | _attrs], Device_id,
+			_Device_name, Device_type) ->
+    decode_sub_device_attrs(__TopXMLNS, _attrs, Device_id,
+			    _val, Device_type);
+decode_sub_device_attrs(__TopXMLNS,
+			[{<<"device_type">>, _val} | _attrs], Device_id,
+			Device_name, _Device_type) ->
+    decode_sub_device_attrs(__TopXMLNS, _attrs, Device_id,
+			    Device_name, _val);
+decode_sub_device_attrs(__TopXMLNS, [_ | _attrs],
+			Device_id, Device_name, Device_type) ->
+    decode_sub_device_attrs(__TopXMLNS, _attrs, Device_id,
+			    Device_name, Device_type);
+decode_sub_device_attrs(__TopXMLNS, [], Device_id,
+			Device_name, Device_type) ->
+    {decode_sub_device_attr_device_id(__TopXMLNS,
+				      Device_id),
+     decode_sub_device_attr_device_name(__TopXMLNS,
+					Device_name),
+     decode_sub_device_attr_device_type(__TopXMLNS,
+					Device_type)}.
+
+encode_sub_device({sub_device, Device_id, Device_name,
+		   Device_type},
+		  __TopXMLNS) ->
+    __NewTopXMLNS =
+	xmpp_codec:choose_top_xmlns(<<"jabber:memo:message">>,
+				    [], __TopXMLNS),
+    _els = [],
+    _attrs = encode_sub_device_attr_device_type(Device_type,
+						encode_sub_device_attr_device_name(Device_name,
+										   encode_sub_device_attr_device_id(Device_id,
+														    xmpp_codec:enc_xmlns_attrs(__NewTopXMLNS,
+																	       __TopXMLNS)))),
+    {xmlel, <<"sub_device">>, _attrs, _els}.
+
+decode_sub_device_attr_device_id(__TopXMLNS,
+				 undefined) ->
+    erlang:error({xmpp_codec,
+		  {missing_attr, <<"device_id">>, <<"sub_device">>,
+		   __TopXMLNS}});
+decode_sub_device_attr_device_id(__TopXMLNS, _val) ->
     _val.
 
-encode_gateway_subdevice_attr_subdevice_type(<<>>,
-					     _acc) ->
-    _acc;
-encode_gateway_subdevice_attr_subdevice_type(_val,
-					     _acc) ->
-    [{<<"subdevice_type">>, _val} | _acc].
+encode_sub_device_attr_device_id(_val, _acc) ->
+    [{<<"device_id">>, _val} | _acc].
+
+decode_sub_device_attr_device_name(__TopXMLNS,
+				   undefined) ->
+    <<>>;
+decode_sub_device_attr_device_name(__TopXMLNS, _val) ->
+    _val.
+
+encode_sub_device_attr_device_name(<<>>, _acc) -> _acc;
+encode_sub_device_attr_device_name(_val, _acc) ->
+    [{<<"device_name">>, _val} | _acc].
+
+decode_sub_device_attr_device_type(__TopXMLNS,
+				   undefined) ->
+    <<>>;
+decode_sub_device_attr_device_type(__TopXMLNS, _val) ->
+    _val.
+
+encode_sub_device_attr_device_type(<<>>, _acc) -> _acc;
+encode_sub_device_attr_device_type(_val, _acc) ->
+    [{<<"device_type">>, _val} | _acc].
 
 decode_receipt_info(__TopXMLNS, __Opts,
 		    {xmlel, <<"receipt_info">>, _attrs, _els}) ->
