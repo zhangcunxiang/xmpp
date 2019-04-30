@@ -4087,6 +4087,19 @@
                  }).
 
 
+-xml(mod_gateway,
+    #elem { name = <<"query">>,
+        xmlns = <<"jabber:iq:memo:gateway">>,
+        module = 'memo_xep_gateway',
+        result = { mod_gateway, '$device_id', '$device_type', '$device_name', '$property' },
+        attrs = [
+            #attr{ name = <<"device_id">>, required = true },
+            #attr{ name = <<"device_type">>, required = false },
+            #attr{ name = <<"device_name">>, required = false },
+            #attr{ name = <<"property">>, required = false }]
+          }).
+
+
 -xml(group_user_item,
      #elem{name = <<"group_user_item">>,
         xmlns= <<"jabber:memo:group">>,

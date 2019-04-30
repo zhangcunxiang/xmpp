@@ -1000,6 +1000,8 @@ get_mod(<<"query">>,
     xep0030;
 get_mod(<<"last">>, <<"jabber:iq:register">>) ->
     xep0077;
+get_mod(<<"query">>, <<"jabber:iq:memo:gateway">>) ->
+    memo_xep_gateway;
 get_mod(<<"signaling">>, <<"jabber:client">>) ->
     memo_xep_jingle;
 get_mod(<<"thread">>, <<"jabber:client">>) -> rfc6120;
@@ -1428,6 +1430,7 @@ get_mod({muc_item, _, _, _, _, _, _, _}) -> xep0045;
 get_mod({block_list, _}) -> xep0191;
 get_mod({carbons_received, _}) -> xep0280;
 get_mod({carbons_sent, _}) -> xep0280;
+get_mod({mod_gateway, _, _, _, _}) -> memo_xep_gateway;
 get_mod({memo_delay_msg, _, _, _, _, _, _}) ->
     memo_delay_msg;
 get_mod({disco_items, _, _, _}) -> xep0030;
