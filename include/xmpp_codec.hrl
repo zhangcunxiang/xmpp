@@ -559,7 +559,7 @@
                           memo_scene = [] :: [#memo_scene{}]}).
 -type memo_scene_list() :: #memo_scene_list{}.
 
--record(chat_info, {type :: 'group' | 'oto' | 'topic',
+-record(chat_info, {type :: 'gateway' | 'group' | 'oto' | 'topic',
                     dispatched = <<>> :: binary(),
                     content_type = <<>> :: binary(),
                     target_id = <<>> :: binary(),
@@ -1196,7 +1196,7 @@
                utc :: undefined | erlang:timestamp()}).
 -type time() :: #time{}.
 
--type xmpp_element() :: text() |
+-type xmpp_element() :: memo_info() |
                         privacy_list() |
                         privilege() |
                         mam_query() |
@@ -1221,7 +1221,6 @@
                         chatstate() |
                         handshake() |
                         xmpp_session() |
-                        search() |
                         mix_join() |
                         delegation() |
                         ps_retract() |
@@ -1229,9 +1228,9 @@
                         memo_device_info() |
                         private() |
                         muc_history() |
-                        receipt_info() |
                         media() |
                         compressed() |
+                        search() |
                         memo_invite_info() |
                         carbons_disable() |
                         upload_slot() |
@@ -1254,10 +1253,9 @@
                         caps() |
                         memo_group() |
                         identity() |
-                        memo_info() |
                         muc_actor() |
                         legacy_auth() |
-                        gateway_subdevice() |
+                        sub_device() |
                         stanza_id() |
                         muc_owner() |
                         carbons_enable() |
@@ -1304,6 +1302,7 @@
                         xdata() |
                         csi() |
                         group_vcard_photo() |
+                        receipt_info() |
                         x_conference() |
                         sasl_response() |
                         ps_item() |
@@ -1313,7 +1312,6 @@
                         muc_destroy() |
                         vcard_key() |
                         adhoc_actions() |
-                        sub_device() |
                         muc_unique() |
                         stat_error() |
                         mod_topic() |
@@ -1342,8 +1340,9 @@
                         privacy_item() |
                         memo_send_sms() |
                         rsm_first() |
-                        auth_info() |
                         sm_failed() |
+                        text() |
+                        gateway_subdevice() |
                         push_notification() |
                         time() |
                         memo_group_vcard() |
@@ -1371,6 +1370,7 @@
                         streamhost() |
                         memo_delay_msg() |
                         presence() |
+                        auth_info() |
                         sm_resumed() |
                         xdata_field() |
                         stat() |

@@ -4195,7 +4195,7 @@
         attrs = [ #attr{name = <<"type">>,
                             required=true,
                                   enc = {enc_enum, []},
-                                  dec = {dec_enum, [[oto,topic,group, gateway]]} },
+                                  dec = {dec_enum, [[oto,topic,group,gateway]]} },
                   #attr{name = <<"dispatched">> ,required = false},
                  #attr{name = <<"target_id">>,required = false},
                 #attr{name = <<"content_type">> ,required = false},
