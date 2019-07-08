@@ -4528,9 +4528,6 @@
     #attr{name = <<"watching_server">>,required = false}
     ]}).
 
--xml(memo_subdevice,
-    #elem{ name = <<""
-
 
 %%memo end%%
 
