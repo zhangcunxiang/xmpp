@@ -142,7 +142,9 @@
                      port = 1080 :: non_neg_integer()}).
 -type streamhost() :: #streamhost{}.
 
-<<<<<<< HEAD
+-record(x509_challenge_failed, {}).
+-type x509_challenge_failed() :: #x509_challenge_failed{}.
+
 -record(request_info, {sub_type = <<>> :: binary(),
                        ask_msg = <<>> :: binary(),
                        join_user = <<>> :: binary(),
@@ -151,23 +153,11 @@
                        invited_user = <<>> :: binary()}).
 -type request_info() :: #request_info{}.
 
--record(sm_resume, {h :: non_neg_integer(),
-                    previd = <<>> :: binary(),
-                    xmlns = <<>> :: binary()}).
--type sm_resume() :: #sm_resume{}.
-=======
--record(x509_challenge_failed, {}).
--type x509_challenge_failed() :: #x509_challenge_failed{}.
->>>>>>> upstream/master
-
 -record(carbons_enable, {}).
 -type carbons_enable() :: #carbons_enable{}.
 
 -record(mix_create, {channel = <<>> :: binary()}).
 -type mix_create() :: #mix_create{}.
-
--record(carbons_private, {}).
--type carbons_private() :: #carbons_private{}.
 
 -record(receipt_response, {id = <<>> :: binary()}).
 -type receipt_response() :: #receipt_response{}.
@@ -178,6 +168,11 @@
 
 -record(mix_leave, {}).
 -type mix_leave() :: #mix_leave{}.
+
+-record(size, {l = <<>> :: binary(),
+               w = <<>> :: binary(),
+               h = <<>> :: binary()}).
+-type size() :: #size{}.
 
 -record(muc_unsubscribe, {nick = <<>> :: binary(),
                           jid :: undefined | jid:jid()}).
@@ -192,6 +187,9 @@
                     previd = <<>> :: binary(),
                     xmlns = <<>> :: binary()}).
 -type sm_resume() :: #sm_resume{}.
+
+-record(carbons_private, {}).
+-type carbons_private() :: #carbons_private{}.
 
 -record(ping, {}).
 -type ping() :: #ping{}.
@@ -289,6 +287,11 @@
                              name = <<>> :: binary()}).
 -type jingle_ft_received() :: #jingle_ft_received{}.
 
+-record(memo_check_account, {account = <<>> :: binary(),
+                             server = <<>> :: binary(),
+                             exist = <<>> :: binary()}).
+-type memo_check_account() :: #memo_check_account{}.
+
 -record(starttls_proceed, {}).
 -type starttls_proceed() :: #starttls_proceed{}.
 
@@ -346,6 +349,11 @@
                          senders = both :: 'both' | 'initiator' | 'none' | 'responder',
                          sub_els = [] :: [xmpp_element() | fxml:xmlel()]}).
 -type jingle_content() :: #jingle_content{}.
+
+-record(sub_device, {device_id = <<>> :: binary(),
+                     device_name = <<>> :: binary(),
+                     device_type = <<>> :: binary()}).
+-type sub_device() :: #sub_device{}.
 
 -record(sasl_challenge, {text = <<>> :: binary()}).
 -type sasl_challenge() :: #sasl_challenge{}.
@@ -435,6 +443,32 @@
                      items = [] :: [#ps_item{}]}).
 -type ps_publish() :: #ps_publish{}.
 
+-record(search_group_item, {gid = <<>> :: binary(),
+                            gname = <<>> :: binary(),
+                            gphoto = <<>> :: binary(),
+                            gtype = <<>> :: binary()}).
+-type search_group_item() :: #search_group_item{}.
+
+-record(group_item, {gid = <<>> :: binary(),
+                     gname = <<>> :: binary(),
+                     group_type = <<>> :: binary(),
+                     gcreater :: undefined | jid:jid(),
+                     role = <<>> :: binary(),
+                     photo = <<>> :: binary(),
+                     maxuser = <<>> :: binary()}).
+-type group_item() :: #group_item{}.
+
+-record(memo_group_relation, {rtype = <<>> :: binary(),
+                              gid = <<>> :: binary(),
+                              request_info :: 'undefined' | #request_info{},
+                              group_items = [] :: [#group_item{}]}).
+-type memo_group_relation() :: #memo_group_relation{}.
+
+-record(memo_invite_info, {beinviteds = <<>> :: binary(),
+                           invite_num = <<>> :: binary(),
+                           success_num = <<>> :: binary()}).
+-type memo_invite_info() :: #memo_invite_info{}.
+
 -record(avatar_pointer, {bytes :: 'undefined' | non_neg_integer(),
                          id = <<>> :: binary(),
                          type = <<>> :: binary(),
@@ -463,6 +497,21 @@
 -record(addresses, {list = [] :: [#address{}]}).
 -type addresses() :: #addresses{}.
 
+-record(memo_send_sms, {country_code = <<>> :: binary(),
+                        phone_number = <<>> :: binary(),
+                        lang = <<>> :: binary()}).
+-type memo_send_sms() :: #memo_send_sms{}.
+
+-record(memo_change_pass, {account = <<>> :: binary(),
+                           newpass = <<>> :: binary(),
+                           vcode = <<>> :: binary()}).
+-type memo_change_pass() :: #memo_change_pass{}.
+
+-record(memo_owncloud, {rtype = <<>> :: binary(),
+                        watching_user = <<>> :: binary(),
+                        watching_server = <<>> :: binary()}).
+-type memo_owncloud() :: #memo_owncloud{}.
+
 -record(starttls, {required = false :: boolean()}).
 -type starttls() :: #starttls{}.
 
@@ -471,7 +520,6 @@
 -type last() :: #last{}.
 
 -record('see-other-host', {host :: binary() | inet:ip_address() | {binary() | inet:ip_address(),inet:port_number()}}).
-
 -type 'see-other-host'() :: #'see-other-host'{}.
 
 -record(compress, {methods = [] :: [binary()]}).
@@ -486,7 +534,6 @@
                      resume = false :: boolean(),
                      xmlns = <<>> :: binary()}).
 -type sm_enabled() :: #sm_enabled{}.
-
 
 -record(upload_file_too_large, {'max-file-size' :: 'undefined' | integer(),
                                 xmlns = <<>> :: binary()}).
@@ -515,6 +562,10 @@
 -record(sasl_response, {text = <<>> :: binary()}).
 -type sasl_response() :: #sasl_response{}.
 
+-record(gateway_subdevice, {gateway_id = <<>> :: binary(),
+                            gateway_name = <<>> :: binary(),
+                            sub_device :: 'undefined' | #sub_device{}}).
+-type gateway_subdevice() :: #gateway_subdevice{}.
 
 -record(x509_revoke, {cert :: binary(),
                       signature :: binary()}).
@@ -524,21 +575,27 @@
                     text = <<>> :: binary()}).
 -type sasl_auth() :: #sasl_auth{}.
 
+-record(upload_retry, {stamp :: undefined | erlang:timestamp()}).
+-type upload_retry() :: #upload_retry{}.
 
 -record(feature_csi, {}).
 -type feature_csi() :: #feature_csi{}.
 
--record(upload_retry, {stamp :: undefined | erlang:timestamp()}).
--type upload_retry() :: #upload_retry{}.
-
--record(disco_item, {jid :: jid:jid(),
-                     name = <<>> :: binary(),
-                     node = <<>> :: binary()}).
--type disco_item() :: #disco_item{}.
-
 -record(report, {reason :: 'abuse' | 'spam' | 'undefined',
                  text = [] :: [#text{}]}).
 -type report() :: #report{}.
+
+-record(search_user_item, {jid :: undefined | jid:jid(),
+                           nick = <<>> :: binary(),
+                           photo = <<>> :: binary()}).
+-type search_user_item() :: #search_user_item{}.
+
+-record(memo_search, {rtype = <<>> :: binary(),
+                      keywords = <<>> :: binary(),
+                      user_items = [] :: [#search_user_item{}],
+                      group_items = [] :: [#search_group_item{}],
+                      search_account :: 'undefined' | binary()}).
+-type memo_search() :: #memo_search{}.
 
 -record(block_item, {jid :: jid:jid(),
                      spam_report :: 'undefined' | #report{}}).
@@ -549,6 +606,11 @@
 
 -record(block, {items = [] :: [#block_item{}]}).
 -type block() :: #block{}.
+
+-record(disco_item, {jid :: jid:jid(),
+                     name = <<>> :: binary(),
+                     node = <<>> :: binary()}).
+-type disco_item() :: #disco_item{}.
 
 -record(compression, {methods = [] :: [binary()]}).
 -type compression() :: #compression{}.
@@ -573,6 +635,39 @@
                           expiry :: undefined | erlang:timestamp()}).
 -type ps_subscription() :: #ps_subscription{}.
 
+-record(position, {x = <<>> :: binary(),
+                   y = <<>> :: binary(),
+                   z = <<>> :: binary()}).
+-type position() :: #position{}.
+
+-record(trans_form, {position :: 'undefined' | #position{},
+                     size :: 'undefined' | #size{}}).
+-type trans_form() :: #trans_form{}.
+
+-record(profile, {trans_form :: 'undefined' | #trans_form{},
+                  mac_address = <<>> :: binary(),
+                  type = <<>> :: binary(),
+                  name = <<>> :: binary(),
+                  scene_id = <<>> :: binary(),
+                  message = <<>> :: binary()}).
+-type profile() :: #profile{}.
+
+-record(memo_scene, {profiles = [] :: [#profile{}],
+                     name = <<>> :: binary(),
+                     rtype = <<>> :: binary(),
+                     role = <<>> :: binary(),
+                     type = <<>> :: binary(),
+                     height = <<>> :: binary(),
+                     width = <<>> :: binary(),
+                     length = <<>> :: binary(),
+                     scene_id = <<>> :: binary(),
+                     share_user = <<>> :: binary(),
+                     creator = <<>> :: binary()}).
+-type memo_scene() :: #memo_scene{}.
+
+-record(memo_scene_list, {role = <<>> :: binary(),
+                          memo_scene = [] :: [#memo_scene{}]}).
+-type memo_scene_list() :: #memo_scene_list{}.
 
 -record(avatar_info, {bytes :: non_neg_integer(),
                       id = <<>> :: binary(),
@@ -586,6 +681,40 @@
                       pointer :: 'undefined' | #avatar_pointer{}}).
 -type avatar_meta() :: #avatar_meta{}.
 
+-record(chat_info, {type :: 'gateway' | 'group' | 'oto' | 'topic',
+                    dispatched = <<>> :: binary(),
+                    content_type = <<>> :: binary(),
+                    target_id = <<>> :: binary(),
+                    target_name = <<>> :: binary(),
+                    send_user = <<>> :: binary(),
+                    max_user = <<>> :: binary(),
+                    now_user = <<>> :: binary()}).
+-type chat_info() :: #chat_info{}.
+
+-record(memo_info, {memo_type :: 'auth' | 'chat' | 'gateway' | 'in_out' | 'receipt' | 'share' | 'track',
+                    chat_info :: 'undefined' | #chat_info{},
+                    auth_info :: 'undefined' | #auth_info{},
+                    receipt_info :: 'undefined' | #receipt_info{},
+                    scene_info :: 'undefined' | #memo_scene{},
+                    gateway_subdevice :: 'undefined' | #gateway_subdevice{}}).
+-type memo_info() :: #memo_info{}.
+
+-record(query_topic_info, {tid = <<>> :: binary(),
+                           tname = <<>> :: binary(),
+                           tcreater :: undefined | jid:jid(),
+                           tcreate_time = <<>> :: binary(),
+                           topic_type = <<>> :: binary(),
+                           user_item = [] :: [#topic_user_item{}],
+                           tmaxnum = <<>> :: binary()}).
+-type query_topic_info() :: #query_topic_info{}.
+
+-record(mod_topic, {rtype = <<>> :: binary(),
+                    code = <<>> :: binary(),
+                    tuser = <<>> :: binary(),
+                    topic_info :: 'undefined' | #query_topic_info{},
+                    user_topic_list = [] :: [#query_topic_info{}]}).
+-type mod_topic() :: #mod_topic{}.
+
 -record(bob_data, {cid = <<>> :: binary(),
                    'max-age' :: 'undefined' | non_neg_integer(),
                    type = <<>> :: binary(),
@@ -594,6 +723,9 @@
 
 -record(x509_register, {}).
 -type x509_register() :: #x509_register{}.
+
+-record(shim, {headers = [] :: [{binary(),binary()}]}).
+-type shim() :: #shim{}.
 
 -record(muc_item, {actor :: 'undefined' | #muc_actor{},
                    continue :: 'undefined' | binary(),
@@ -606,9 +738,6 @@
 
 -record(muc_admin, {items = [] :: [#muc_item{}]}).
 -type muc_admin() :: #muc_admin{}.
-
--record(shim, {headers = [] :: [{binary(),binary()}]}).
--type shim() :: #shim{}.
 
 -record(caps, {node = <<>> :: binary(),
                version = <<>> :: binary(),
@@ -646,9 +775,6 @@
               xmlns = <<>> :: binary()}).
 -type sic() :: #sic{}.
 
--record(sasl_abort, {}).
--type sasl_abort() :: #sasl_abort{}.
-
 -record(receipt_request, {}).
 -type receipt_request() :: #receipt_request{}.
 
@@ -675,11 +801,6 @@
                      items = [] :: [#ps_item{}]}).
 -type ps_retract() :: #ps_retract{}.
 
--record(upload_slot, {get :: 'undefined' | binary(),
-                      put :: 'undefined' | binary(),
-                      xmlns = <<>> :: binary()}).
--type upload_slot() :: #upload_slot{}.
-
 -record(vcard_geo, {lat :: 'undefined' | binary(),
                     lon :: 'undefined' | binary()}).
 -type vcard_geo() :: #vcard_geo{}.
@@ -690,13 +811,6 @@
 
 -record(hash_used, {algo = <<>> :: binary()}).
 -type hash_used() :: #hash_used{}.
-
--record(xevent, {offline = false :: boolean(),
-                 delivered = false :: boolean(),
-                 displayed = false :: boolean(),
-                 composing = false :: boolean(),
-                 id :: 'undefined' | binary()}).
--type xevent() :: #xevent{}.
 
 -record(mix, {submission_id = <<>> :: binary(),
               jid :: undefined | jid:jid(),
@@ -729,10 +843,23 @@
 -record(block_list, {items = [] :: [#block_item{}]}).
 -type block_list() :: #block_list{}.
 
--record(version, {name :: 'undefined' | binary(),
-                  ver :: 'undefined' | binary(),
-                  os :: 'undefined' | binary()}).
--type version() :: #version{}.
+-record(upload_slot, {get :: 'undefined' | binary(),
+                      put :: 'undefined' | binary(),
+                      xmlns = <<>> :: binary()}).
+-type upload_slot() :: #upload_slot{}.
+
+-record(xevent, {offline = false :: boolean(),
+                 delivered = false :: boolean(),
+                 displayed = false :: boolean(),
+                 composing = false :: boolean(),
+                 id :: 'undefined' | binary()}).
+-type xevent() :: #xevent{}.
+
+-record(sasl_abort, {}).
+-type sasl_abort() :: #sasl_abort{}.
+
+-record(memo_jingle, {}).
+-type memo_jingle() :: #memo_jingle{}.
 
 -record(jingle_ft_file, {date :: undefined | erlang:timestamp(),
                          desc = [] :: [#text{}],
@@ -829,12 +956,23 @@
                                error :: 'candidate-error' | 'proxy-error' | 'undefined'}).
 -type jingle_s5b_transport() :: #jingle_s5b_transport{}.
 
+-record(memo_check_sms_login_code, {user = <<>> :: binary(),
+                                    host = <<>> :: binary(),
+                                    code = <<>> :: binary(),
+                                    pass = <<>> :: binary()}).
+-type memo_check_sms_login_code() :: #memo_check_sms_login_code{}.
+
 -record(delegated, {ns = <<>> :: binary(),
                     attrs = [] :: [binary()]}).
 -type delegated() :: #delegated{}.
 
 -record(carbons_disable, {}).
 -type carbons_disable() :: #carbons_disable{}.
+
+-record(version, {name :: 'undefined' | binary(),
+                  ver :: 'undefined' | binary(),
+                  os :: 'undefined' | binary()}).
+-type version() :: #version{}.
 
 -record(adhoc_actions, {execute :: 'complete' | 'next' | 'prev' | 'undefined',
                         prev = false :: boolean(),
@@ -883,20 +1021,6 @@
                       rsm :: 'undefined' | #rsm_set{}}).
 -type disco_items() :: #disco_items{}.
 
--record(muc_destroy, {xmlns = <<>> :: binary(),
-                      jid :: undefined | jid:jid(),
-                      reason = <<>> :: binary(),
-                      password :: 'undefined' | binary()}).
--type muc_destroy() :: #muc_destroy{}.
-
--record(muc_user, {decline :: 'undefined' | #muc_decline{},
-                   destroy :: 'undefined' | #muc_destroy{},
-                   invites = [] :: [#muc_invite{}],
-                   items = [] :: [#muc_item{}],
-                   status_codes = [] :: [pos_integer()],
-                   password :: 'undefined' | binary()}).
--type muc_user() :: #muc_user{}.
-
 -record(vcard_name, {family :: 'undefined' | binary(),
                      given :: 'undefined' | binary(),
                      middle :: 'undefined' | binary(),
@@ -926,18 +1050,19 @@
                    name = <<>> :: binary()}).
 -type identity() :: #identity{}.
 
--record(media_uri, {type = <<>> :: binary(),
-                    uri = <<>> :: binary()}).
--type media_uri() :: #media_uri{}.
+-record(muc_destroy, {xmlns = <<>> :: binary(),
+                      jid :: undefined | jid:jid(),
+                      reason = <<>> :: binary(),
+                      password :: 'undefined' | binary()}).
+-type muc_destroy() :: #muc_destroy{}.
 
--record(media, {height :: 'undefined' | non_neg_integer(),
-                width :: 'undefined' | non_neg_integer(),
-                uri = [] :: [#media_uri{}]}).
--type media() :: #media{}.
-
--record(vcard_key, {type :: 'undefined' | binary(),
-                    cred :: 'undefined' | binary()}).
--type vcard_key() :: #vcard_key{}.
+-record(muc_user, {decline :: 'undefined' | #muc_decline{},
+                   destroy :: 'undefined' | #muc_destroy{},
+                   invites = [] :: [#muc_invite{}],
+                   items = [] :: [#muc_item{}],
+                   status_codes = [] :: [pos_integer()],
+                   password :: 'undefined' | binary()}).
+-type muc_user() :: #muc_user{}.
 
 -record(bookmark_conference, {name = <<>> :: binary(),
                               jid :: jid:jid(),
@@ -948,6 +1073,13 @@
 
 -record(mix_setnick, {nick :: binary()}).
 -type mix_setnick() :: #mix_setnick{}.
+
+-record(memo_group_vcard, {gid = <<>> :: binary(),
+                           photo_version = <<>> :: binary(),
+                           group_name :: 'undefined' | binary(),
+                           photo :: 'undefined' | #group_vcard_photo{},
+                           photo_url :: 'undefined' | binary()}).
+-type memo_group_vcard() :: #memo_group_vcard{}.
 
 -record(xmpp_session, {optional = false :: boolean()}).
 -type xmpp_session() :: #xmpp_session{}.
@@ -1001,13 +1133,6 @@
                     ctry :: 'undefined' | binary()}).
 -type vcard_adr() :: #vcard_adr{}.
 
--record(search_item, {jid :: jid:jid(),
-                      first :: 'undefined' | binary(),
-                      last :: 'undefined' | binary(),
-                      nick :: 'undefined' | binary(),
-                      email :: 'undefined' | binary()}).
--type search_item() :: #search_item{}.
-
 -record(xdata, {type :: 'cancel' | 'form' | 'result' | 'submit',
                 instructions = [] :: [binary()],
                 title :: 'undefined' | binary(),
@@ -1033,15 +1158,6 @@
                         notes = [] :: [#adhoc_note{}],
                         xdata :: 'undefined' | #xdata{}}).
 -type adhoc_command() :: #adhoc_command{}.
-
--record(search, {instructions :: 'undefined' | binary(),
-                 first :: 'undefined' | binary(),
-                 last :: 'undefined' | binary(),
-                 nick :: 'undefined' | binary(),
-                 email :: 'undefined' | binary(),
-                 items = [] :: [#search_item{}],
-                 xdata :: 'undefined' | #xdata{}}).
--type search() :: #search{}.
 
 -record(mam_query, {xmlns = <<>> :: binary(),
                     id = <<>> :: binary(),
@@ -1123,6 +1239,27 @@
                      xdata = [] :: [#xdata{}]}).
 -type disco_info() :: #disco_info{}.
 
+-record(group_user_item, {user = <<>> :: binary(),
+                          server = <<>> :: binary(),
+                          nick = <<>> :: binary(),
+                          role = <<>> :: binary()}).
+-type group_user_item() :: #group_user_item{}.
+
+-record(query_group_info, {otype = <<>> :: binary(),
+                           targetuser = <<>> :: binary(),
+                           gid = <<>> :: binary(),
+                           gname = <<>> :: binary(),
+                           group_type = <<>> :: binary(),
+                           maxuser = <<>> :: binary(),
+                           gcreater :: undefined | jid:jid(),
+                           user_items = [] :: [#group_user_item{}]}).
+-type query_group_info() :: #query_group_info{}.
+
+-record(memo_group, {rtype = <<>> :: binary(),
+                     group_info :: 'undefined' | #query_group_info{},
+                     group_type = <<>> :: binary()}).
+-type memo_group() :: #memo_group{}.
+
 -record(sasl_mechanisms, {list = [] :: [binary()]}).
 -type sasl_mechanisms() :: #sasl_mechanisms{}.
 
@@ -1139,6 +1276,22 @@
                     config :: 'undefined' | #xdata{},
                     items = [] :: [#muc_item{}]}).
 -type muc_owner() :: #muc_owner{}.
+
+-record(search_item, {jid :: jid:jid(),
+                      first :: 'undefined' | binary(),
+                      last :: 'undefined' | binary(),
+                      nick :: 'undefined' | binary(),
+                      email :: 'undefined' | binary()}).
+-type search_item() :: #search_item{}.
+
+-record(search, {instructions :: 'undefined' | binary(),
+                 first :: 'undefined' | binary(),
+                 last :: 'undefined' | binary(),
+                 nick :: 'undefined' | binary(),
+                 email :: 'undefined' | binary(),
+                 items = [] :: [#search_item{}],
+                 xdata :: 'undefined' | #xdata{}}).
+-type search() :: #search{}.
 
 -record(delegation, {delegated = [] :: [#delegated{}],
                      forwarded :: 'undefined' | #forwarded{}}).
@@ -1166,10 +1319,6 @@
                    nick = <<>> :: binary(),
                    subscribe = [] :: [binary()]}).
 -type mix_join() :: #mix_join{}.
-
--record(mix_client_join, {channel :: undefined | jid:jid(),
-                          join :: #mix_join{}}).
--type mix_client_join() :: #mix_client_join{}.
 
 -record(privacy_item, {order :: non_neg_integer(),
                        action :: 'allow' | 'deny',
@@ -1208,19 +1357,23 @@
                        text = [] :: [#text{}]}).
 -type stream_error() :: #stream_error{}.
 
--record(sm_failed, {reason :: atom() | #gone{} | #redirect{},
-                    text = [] :: [#text{}],
-                    h :: 'undefined' | non_neg_integer(),
-                    xmlns = <<>> :: binary()}).
--type sm_failed() :: #sm_failed{}.
+-record(mix_client_join, {channel :: undefined | jid:jid(),
+                          join :: #mix_join{}}).
+-type mix_client_join() :: #mix_client_join{}.
 
--record(stanza_error, {type :: 'auth' | 'cancel' | 'continue' | 'modify' | 'wait',
-                       code :: 'undefined' | non_neg_integer(),
-                       by = <<>> :: binary(),
-                       reason :: atom() | #gone{} | #redirect{},
-                       text :: 'undefined' | #text{},
-                       sub_els = [] :: [xmpp_element() | fxml:xmlel()]}).
--type stanza_error() :: #stanza_error{}.
+-record(memo_device_info, {user = <<>> :: binary(),
+                           server = <<>> :: binary(),
+                           device_type = <<>> :: binary(),
+                           token = <<>> :: binary(),
+                           language = <<>> :: binary(),
+                           device_number = <<>> :: binary(),
+                           domain_key = <<>> :: binary(),
+                           is_debug = <<>> :: binary()}).
+-type memo_device_info() :: #memo_device_info{}.
+
+-record(time, {tzo :: 'undefined' | {integer(),integer()},
+               utc :: undefined | erlang:timestamp()}).
+-type time() :: #time{}.
 
 -record(vcard_logo, {type :: 'undefined' | binary(),
                      binval :: 'undefined' | binary(),
@@ -1258,231 +1411,253 @@
                      desc :: 'undefined' | binary()}).
 -type vcard_temp() :: #vcard_temp{}.
 
--record(memo_device_info, {user = <<>> :: binary(),
-                           server = <<>> :: binary(),
-                           device_type = <<>> :: binary(),
-                           token = <<>> :: binary(),
-                           language = <<>> :: binary(),
-                           device_number = <<>> :: binary(),
-                           domain_key = <<>> :: binary(),
-                           is_debug = <<>> :: binary()}).
--type memo_device_info() :: #memo_device_info{}.
-
--record(time, {tzo :: any(),
-               utc :: undefined | erlang:timestamp()}).
--type time() :: #time{}.
-
--type xmpp_element() :: vcard_photo() |
-                        jingle_content() |
-                        adhoc_actions() |
-                        jingle_error() |
-                        stream_features() |
-                        x509_ca_list() |
-                        carbons_enable() |
-                        carbons_received() |
-                        version() |
-                        bytestreams() |
-                        roster_query() |
-                        oob_x() |
-                        muc_unique() |
-                        feature_register() |
-                        message_thread() |
-                        mix_client_join() |
-                        compress_failure() |
-                        rsm_set() |
-                        delegation_query() |
-                        adhoc_command() |
-                        forwarded() |
-                        receipt_response() |
-                        xdata_field() |
-                        sm_enable() |
-                        sm_resume() |
-                        disco_item() |
-                        ps_options() |
-                        ping() |
-                        media() |
-                        mix_destroy() |
-                        disco_items() |
-                        upload_request_0() |
-                        sm_resumed() |
-                        avatar_meta() |
-                        rsm_first() |
-                        jingle_ft_received() |
-                        vcard_sound() |
-                        jingle_s5b_transport() |
-                        mam_fin() |
-                        db_feature() |
-                        push_notification() |
-                        muc_user() |
-                        sasl_success() |
-                        nick() |
-                        sm_failed() |
-                        last() |
-                        mix_join() |
-                        report() |
-                        push_disable() |
-                        bind() |
-                        text() |
-                        x_conference() |
-                        roster_item() |
-                        idle() |
-                        jingle_ft_file() |
-                        'see-other-host'() |
-                        jingle_ibb_transport() |
-                        jingle_ft_error() |
-                        muc_history() |
-                        hash() |
-                        muc_subscribe() |
-                        mam_query() |
-                        vcard_label() |
-                        x509_cert_chain() |
-                        ps_items() |
-                        hash_used() |
-                        sasl_challenge() |
-                        csi() |
-                        ibb_close() |
-                        muc_destroy() |
-                        privilege_perm() |
-                        avatar_pointer() |
-                        ps_item() |
-                        jingle_ft_checksum() |
-                        xdata() |
-                        xcaptcha() |
-                        x509_revoke() |
-                        handshake() |
-                        muc_unsubscribe() |
-                        jingle_ft_range() |
-                        block_list() |
-                        muc() |
-                        origin_id() |
-                        thumbnail() |
-                        jingle() |
-                        redirect() |
-                        pubsub() |
-                        private() |
-                        starttls_proceed() |
-                        vcard_name() |
-                        x509_register() |
-                        receipt_request() |
-                        search_item() |
-                        muc_subscriptions() |
-                        rosterver_feature() |
-                        mam_archived() |
-                        carbons_sent() |
-                        ibb_open() |
-                        chatstate() |
-                        stanza_error() |
-                        stream_error() |
-                        disco_info() |
-                        mix_leave() |
-                        privacy_list() |
-                        search() |
-                        ps_error() |
-                        avatar_data() |
-                        starttls_failure() |
-                        sasl_mechanisms() |
-                        delegated() |
-                        jingle_s5b_candidate() |
-                        iq() |
-                        pubsub_owner() |
-                        db_result() |
-                        mix() |
-                        shim() |
-                        jingle_ft_description() |
-                        muc_invite() |
-                        jingle_reason() |
-                        avatar_info() |
-                        message() |
-                        legacy_auth() |
-                        stream_start() |
-                        stats() |
-                        xevent() |
-                        upload_request() |
-                        unblock() |
-                        ibb_data() |
-                        vcard_adr() |
-                        block() |
-                        vcard_tel() |
-                        feature_csi() |
-                        sm_a() |
-                        block_item() |
-                        offline() |
-                        vcard_logo() |
-                        addresses() |
-                        muc_decline() |
-                        muc_subscription() |
-                        register() |
-                        address() |
-                        upload_file_too_large() |
-                        media_uri() |
-                        muc_actor() |
-                        presence() |
-                        bookmark_url() |
-                        sm_enabled() |
-                        mam_prefs() |
-                        sm_r() |
-                        sasl_abort() |
-                        muc_owner() |
-                        ps_event() |
-                        xmpp_session() |
-                        privacy_item() |
-                        compressed() |
-                        ps_retract() |
-                        ps_affiliation() |
-                        upload_slot_0() |
-                        compress() |
-                        stat_error() |
+-type xmpp_element() :: vcard_org() |
                         vcard_temp() |
-                        x509_challenge_failed() |
-                        offline_item() |
-                        carbons_private() |
-                        vcard_org() |
-                        stat() |
-                        sasl_failure() |
-                        ps_publish() |
-                        streamhost() |
-                        sasl_auth() |
-                        vcard_geo() |
-                        db_verify() |
-                        stanza_id() |
-                        delay() |
-                        upload_slot() |
-                        vcard_key() |
-                        delegation() |
-                        bookmark_storage() |
-                        compression() |
-                        mix_client_leave() |
-                        push_enable() |
-                        mam_result() |
-                        xdata_option() |
-                        upload_retry() |
-                        x509_csr() |
-                        bookmark_conference() |
-                        ps_unsubscribe() |
-                        vcard_xupdate() |
-                        ps_subscription() |
-                        muc_admin() |
-                        ps_subscribe() |
-                        adhoc_note() |
-                        muc_item() |
-                        sasl_response() |
-                        carbons_disable() |
-                        x509_request() |
-                        hint() |
-                        identity() |
-                        feature_sm() |
-                        bob_data() |
-                        starttls() |
-                        sic() |
-                        x509_challenge() |
-                        expire() |
-                        gone() |
-                        mix_create() |
-                        time() |
-                        privilege() |
-                        mix_participant() |
-                        legacy_auth_feature() |
-                        caps() |
+                        upload_request_0() |
+                        muc() |
                         mix_setnick() |
+                        compress_failure() |
+                        receipt_request() |
+                        memo_delay_msg() |
+                        xdata_option() |
+                        carbons_received() |
+                        memo_invite_info() |
+                        ibb_open() |
+                        memo_send_sms() |
+                        feature_sm() |
+                        search_item() |
+                        jingle_ft_range() |
+                        sasl_challenge() |
+                        ps_publish() |
+                        ps_subscribe() |
+                        bind() |
+                        rosterver_feature() |
+                        bookmark_conference() |
+                        delegation() |
+                        csi() |
+                        nick() |
+                        adhoc_actions() |
+                        compression() |
+                        ps_options() |
+                        sasl_success() |
+                        jingle() |
+                        vcard_photo() |
+                        vcard_name() |
+                        memo_group_vcard() |
+                        bookmark_storage() |
+                        muc_admin() |
+                        muc_item() |
+                        iq() |
+                        private() |
+                        mix_participant() |
+                        push_notification() |
+                        origin_id() |
+                        compressed() |
+                        db_result() |
+                        media() |
+                        vcard_key() |
+                        query_group_info() |
+                        push_enable() |
+                        memo_search() |
+                        jingle_error() |
+                        muc_owner() |
+                        vcard_adr() |
+                        feature_csi() |
+                        profile() |
+                        auth_info() |
+                        sub_device() |
+                        upload_file_too_large() |
+                        hint() |
+                        jingle_ft_error() |
+                        search_group_item() |
+                        register() |
+                        vcard_geo() |
+                        bob_data() |
+                        shim() |
+                        presence() |
+                        caps() |
+                        jingle_ibb_transport() |
+                        legacy_auth_feature() |
+                        gateway_subdevice() |
+                        ps_error() |
+                        topic_user_item() |
+                        mam_query() |
+                        stat() |
+                        sasl_auth() |
+                        sm_enabled() |
+                        identity() |
+                        size() |
+                        offline() |
+                        muc_destroy() |
+                        mam_archived() |
+                        sasl_failure() |
+                        x509_register() |
+                        group_user_item() |
+                        chatstate() |
+                        sm_resumed() |
+                        message_thread() |
+                        jingle_s5b_candidate() |
+                        oob_x() |
+                        muc_decline() |
+                        x509_request() |
+                        jingle_ft_received() |
+                        request_info() |
+                        sm_failed() |
+                        memo_scene() |
+                        addresses() |
+                        privilege_perm() |
+                        memo_change_pass() |
+                        muc_unique() |
+                        thumbnail() |
+                        vcard_label() |
+                        sm_a() |
+                        db_feature() |
+                        vcard_sound() |
+                        redirect() |
+                        stream_start() |
+                        muc_user() |
+                        memo_group_relation() |
+                        memo_device_info() |
+                        version() |
+                        privacy_list() |
+                        trans_form() |
+                        memo_info() |
+                        memo_jingle() |
+                        avatar_meta() |
+                        x509_ca_list() |
+                        memo_owncloud() |
+                        sasl_abort() |
+                        ibb_data() |
+                        mix() |
+                        chat_info() |
+                        memo_check_sms_login_code() |
+                        vcard_xupdate() |
+                        x509_challenge_failed() |
+                        delegation_query() |
+                        avatar_data() |
+                        x509_csr() |
+                        adhoc_command() |
+                        starttls() |
+                        disco_info() |
+                        jingle_ft_file() |
+                        block_list() |
+                        stanza_error() |
+                        rsm_set() |
+                        receipt_info() |
+                        position() |
+                        vcard_logo() |
+                        x_conference() |
+                        sm_resume() |
+                        stream_features() |
+                        bookmark_url() |
+                        gone() |
+                        streamhost() |
+                        xdata() |
+                        sm_r() |
+                        carbons_private() |
+                        vcard_email() |
+                        mod_gateway() |
+                        push_disable() |
+                        report() |
+                        x509_revoke() |
+                        memo_scene_list() |
+                        upload_retry() |
+                        mix_client_leave() |
+                        muc_subscriptions() |
+                        upload_slot_0() |
+                        starttls_proceed() |
+                        search() |
+                        ping() |
+                        mix_leave() |
+                        block() |
+                        compress() |
+                        rsm_first() |
+                        hash() |
+                        message() |
+                        muc_subscription() |
+                        expire() |
+                        muc_history() |
+                        privacy_item() |
+                        upload_slot() |
+                        roster_query() |
+                        group_item() |
+                        xcaptcha() |
+                        time() |
+                        jingle_content() |
+                        mix_destroy() |
+                        feature_register() |
+                        privilege() |
+                        stat_error() |
+                        unblock() |
+                        mam_result() |
+                        sasl_mechanisms() |
+                        search_user_item() |
+                        upload_request() |
+                        group_vcard_photo() |
+                        roster_item() |
+                        offline_item() |
+                        carbons_enable() |
+                        ps_affiliation() |
+                        text() |
+                        ps_subscription() |
+                        receipt_response() |
+                        ps_event() |
+                        muc_unsubscribe() |
+                        db_verify() |
+                        carbons_disable() |
+                        xmpp_session() |
+                        carbons_sent() |
                         privacy_query() |
-                        vcard_email().
+                        idle() |
+                        address() |
+                        forwarded() |
+                        block_item() |
+                        ibb_close() |
+                        legacy_auth() |
+                        avatar_pointer() |
+                        mam_fin() |
+                        delegated() |
+                        x509_challenge() |
+                        mod_topic() |
+                        jingle_reason() |
+                        bytestreams() |
+                        disco_items() |
+                        disco_item() |
+                        delay() |
+                        ps_unsubscribe() |
+                        mix_join() |
+                        stream_error() |
+                        handshake() |
+                        avatar_info() |
+                        'see-other-host'() |
+                        last() |
+                        stanza_id() |
+                        jingle_ft_description() |
+                        media_uri() |
+                        muc_subscribe() |
+                        hash_used() |
+                        memo_group() |
+                        mix_create() |
+                        sasl_response() |
+                        sm_enable() |
+                        pubsub_owner() |
+                        stats() |
+                        mix_client_join() |
+                        jingle_s5b_transport() |
+                        muc_invite() |
+                        memo_check_account() |
+                        x509_cert_chain() |
+                        mam_prefs() |
+                        sic() |
+                        adhoc_note() |
+                        ps_retract() |
+                        query_topic_info() |
+                        xdata_field() |
+                        starttls_failure() |
+                        pubsub() |
+                        muc_actor() |
+                        vcard_tel() |
+                        ps_items() |
+                        xevent() |
+                        jingle_ft_checksum() |
+                        ps_item().
