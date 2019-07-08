@@ -1423,6 +1423,7 @@
                         carbons_received() |
                         memo_invite_info() |
                         ibb_open() |
+                        text() |
                         memo_send_sms() |
                         feature_sm() |
                         search_item() |
@@ -1541,6 +1542,7 @@
                         disco_info() |
                         jingle_ft_file() |
                         block_list() |
+                        search() |
                         stanza_error() |
                         rsm_set() |
                         receipt_info() |
@@ -1566,7 +1568,6 @@
                         muc_subscriptions() |
                         upload_slot_0() |
                         starttls_proceed() |
-                        search() |
                         ping() |
                         mix_leave() |
                         block() |
@@ -1598,7 +1599,6 @@
                         offline_item() |
                         carbons_enable() |
                         ps_affiliation() |
-                        text() |
                         ps_subscription() |
                         receipt_response() |
                         ps_event() |
