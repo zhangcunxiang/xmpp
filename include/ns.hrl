@@ -1,6 +1,6 @@
 %%%----------------------------------------------------------------------
 %%%
-%%% Copyright (C) 2002-2017 ProcessOne, SARL. All Rights Reserved.
+%%% Copyright (C) 2002-2019 ProcessOne, SARL. All Rights Reserved.
 %%%
 %%% Licensed under the Apache License, Version 2.0 (the "License");
 %%% you may not use this file except in compliance with the License.
@@ -78,7 +78,7 @@
 -define(NS_PUBSUB_SUBSCRIBE_OPTIONS,
 	<<"http://jabber.org/protocol/pubsub#subscribe_options">>).
 -define(NS_PUBSUB_PUBLISH_OPTIONS,
-	<<"http://jabber.org/protocol/pubsub#publish_options">>).
+	<<"http://jabber.org/protocol/pubsub#publish-options">>).
 -define(NS_PUBSUB_SUB_AUTH,
 	<<"http://jabber.org/protocol/pubsub#subscribe_authorization">>).
 -define(NS_PUBSUB_GET_PENDING,
@@ -133,6 +133,8 @@
 -define(NS_FEATURE_COMPRESS,
 	<<"http://jabber.org/features/compress">>).
 -define(NS_FEATURE_MSGOFFLINE, <<"msgoffline">>).
+-define(NS_FEATURE_PRESENCE, <<"presence">>).
+-define(NS_FEATURE_IQ, <<"iq">>).
 -define(NS_FLEX_OFFLINE, <<"http://jabber.org/protocol/offline">>).
 -define(NS_COMPRESS,
 	<<"http://jabber.org/protocol/compress">>).
@@ -147,8 +149,10 @@
 -define(NS_MAM_TMP, <<"urn:xmpp:mam:tmp">>).
 -define(NS_MAM_0, <<"urn:xmpp:mam:0">>).
 -define(NS_MAM_1, <<"urn:xmpp:mam:1">>).
+-define(NS_MAM_2, <<"urn:xmpp:mam:2">>).
 -define(NS_SID_0, <<"urn:xmpp:sid:0">>).
 -define(NS_PING, <<"urn:xmpp:ping">>).
+-define(NS_PUSH_0, <<"urn:xmpp:push:0">>).
 -define(NS_CARBONS_2, <<"urn:xmpp:carbons:2">>).
 -define(NS_CARBONS_1, <<"urn:xmpp:carbons:1">>).
 -define(NS_FORWARD, <<"urn:xmpp:forward:0">>).
@@ -160,15 +164,22 @@
 -define(NS_HTTP_UPLOAD_OLD, <<"eu:siacs:conversations:http:upload">>).
 -define(NS_THUMBS_1, <<"urn:xmpp:thumbs:1">>).
 -define(NS_NICK,  <<"http://jabber.org/protocol/nick">>).
+-define(NS_RECEIPTS, <<"urn:xmpp:receipts">>).
+-define(NS_REPORTING_0, <<"urn:xmpp:reporting:0">>).
+-define(NS_REPORTING_REASON_ABUSE_0, <<"urn:xmpp:reporting:reason:abuse:0">>).
+-define(NS_REPORTING_REASON_SPAM_0, <<"urn:xmpp:reporting:reason:spam:0">>).
 -define(NS_SIC_0, <<"urn:xmpp:sic:0">>).
 -define(NS_SIC_1, <<"urn:xmpp:sic:1">>).
--define(NS_MIX_0, <<"urn:xmpp:mix:0">>).
--define(NS_MIX_SERVICEINFO_0, <<"urn:xmpp:mix:0#serviceinfo">>).
+-define(NS_MIX_CORE_0, <<"urn:xmpp:mix:core:0">>).
+-define(NS_MIX_CORE_SEARCHABLE_0, <<"urn:xmpp:mix:core:0#searchable">>).
+-define(NS_MIX_CORE_CREATE_CHANNEL_0, <<"urn:xmpp:mix:core:0#create-channel">>).
+-define(NS_MIX_PAM_0, <<"urn:xmpp:mix:pam:0">>).
+-define(NS_MIX_ROSTER_0, <<"urn:xmpp:mix:roster:0">>).
 -define(NS_MIX_NODES_MESSAGES, <<"urn:xmpp:mix:nodes:messages">>).
 -define(NS_MIX_NODES_PRESENCE, <<"urn:xmpp:mix:nodes:presence">>).
 -define(NS_MIX_NODES_PARTICIPANTS, <<"urn:xmpp:mix:nodes:participants">>).
--define(NS_MIX_NODES_SUBJECT, <<"urn:xmpp:mix:nodes:subject">>).
 -define(NS_MIX_NODES_CONFIG, <<"urn:xmpp:mix:nodes:config">>).
+-define(NS_MIX_NODES_INFO, <<"urn:xmpp:mix:nodes:info">>).
 -define(NS_PRIVILEGE, <<"urn:xmpp:privilege:1">>).
 -define(NS_DELEGATION, <<"urn:xmpp:delegation:1">>).
 -define(NS_MUCSUB, <<"urn:xmpp:mucsub:0">>).
@@ -179,3 +190,10 @@
 -define(NS_MUCSUB_NODES_SUBJECT, <<"urn:xmpp:mucsub:nodes:subject">>).
 -define(NS_MUCSUB_NODES_CONFIG, <<"urn:xmpp:mucsub:nodes:config">>).
 -define(NS_MUCSUB_NODES_SYSTEM, <<"urn:xmpp:mucsub:nodes:system">>).
+-define(NS_MUCSUB_NODES_SUBSCRIBERS, <<"urn:xmpp:mucsub:nodes:subscribers">>).
+-define(NS_AVATAR_DATA, <<"urn:xmpp:avatar:data">>).
+-define(NS_AVATAR_METADATA, <<"urn:xmpp:avatar:metadata">>).
+-define(NS_PEP_VCARD_CONVERSION_0, <<"urn:xmpp:pep-vcard-conversion:0">>).
+-define(NS_BOOKMARKS_CONVERSION_0, <<"urn:xmpp:bookmarks-conversion:0">>).
+-define(NS_STORAGE_BOOKMARKS, <<"storage:bookmarks">>).
+-define(NS_X509_0, <<"urn:xmpp:x509:0">>).

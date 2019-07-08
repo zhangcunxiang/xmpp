@@ -153,8 +153,9 @@ to work with them:
 - `sub_els`: [get_els/1](doc/API.md#get_els1) and [set_els/2](doc/API.md#set_els2) can be used;
   additional functions to work with subtags directly are:
   [set_subtag/2](doc/API.md#set_subtag2), [get_subtag/2](doc/API.md#get_subtag2),
-  [remove_subtag/2](doc/API.md#remove_subtag2), [has_subtag/2](doc/API.md#has_subtag2) and
-  [append_subtags/2](doc/API.md#append_subtags2).
+  [get_subtags/2](doc/API.md#get_subtags2), [try_subtag/2](doc/API.md#try_subtag2),
+  [try_subtags/2](doc/API.md#try_subtags2), [remove_subtag/2](doc/API.md#remove_subtag2),
+  [has_subtag/2](doc/API.md#has_subtag2), and [append_subtags/2](doc/API.md#append_subtags2).
 - `meta`: this field is intended for attaching arbitrary Erlang terms to
   stanzas; the field is represented by a `map()` and can be manipulated
   using standard [maps](http://erlang.org/doc/man/maps.html) module, but
@@ -251,6 +252,7 @@ XMPP elements from the following documents are supported:
 - [XEP-0033](https://xmpp.org/extensions/xep-0033.html):  Extended Stanza Addressing
 - [XEP-0039](https://xmpp.org/extensions/xep-0039.html):  Statistics Gathering
 - [XEP-0045](https://xmpp.org/extensions/xep-0045.html):  Multi-User Chat
+- [XEP-0047](https://xmpp.org/extensions/xep-0047.html):  In-Band Bytestreams
 - [XEP-0048](https://xmpp.org/extensions/xep-0048.html):  Bookmarks
 - [XEP-0049](https://xmpp.org/extensions/xep-0049.html):  Private XML Storage
 - [XEP-0050](https://xmpp.org/extensions/xep-0050.html):  Ad-Hoc Commands
@@ -262,6 +264,7 @@ XMPP elements from the following documents are supported:
 - [XEP-0066](https://xmpp.org/extensions/xep-0066.html):  Out of Band Data
 - [XEP-0077](https://xmpp.org/extensions/xep-0077.html):  In-Band Registration
 - [XEP-0078](https://xmpp.org/extensions/xep-0078.html):  Non-SASL Authentication
+- [XEP-0084](https://xmpp.org/extensions/xep-0084.html):  User Avatar
 - [XEP-0085](https://xmpp.org/extensions/xep-0085.html):  Chat State Notifications
 - [XEP-0092](https://xmpp.org/extensions/xep-0092.html):  Software Version
 - [XEP-0114](https://xmpp.org/extensions/xep-0114.html):  Jabber Component Protocol
@@ -270,7 +273,9 @@ XMPP elements from the following documents are supported:
 - [XEP-0138](https://xmpp.org/extensions/xep-0138.html):  Stream Compression
 - [XEP-0153](https://xmpp.org/extensions/xep-0153.html):  vCard-Based Avatars
 - [XEP-0158](https://xmpp.org/extensions/xep-0158.html):  CAPTCHA Forms
+- [XEP-0166](https://xmpp.org/extensions/xep-0166.html):  Jingle
 - [XEP-0172](https://xmpp.org/extensions/xep-0172.html):  User Nickname
+- [XEP-0184](https://xmpp.org/extensions/xep-0184.html):  Message Delivery Receipts
 - [XEP-0191](https://xmpp.org/extensions/xep-0191.html):  Blocking Command
 - [XEP-0198](https://xmpp.org/extensions/xep-0198.html):  Stream Management
 - [XEP-0199](https://xmpp.org/extensions/xep-0199.html):  XMPP Ping
@@ -279,19 +284,28 @@ XMPP elements from the following documents are supported:
 - [XEP-0220](https://xmpp.org/extensions/xep-0220.html):  Server Dialback
 - [XEP-0221](https://xmpp.org/extensions/xep-0221.html):  Data Forms Media Element
 - [XEP-0231](https://xmpp.org/extensions/xep-0231.html):  Bits of Binary
+- [XEP-0234](https://xmpp.org/extensions/xep-0234.html):  Jingle File Transfer
 - [XEP-0249](https://xmpp.org/extensions/xep-0249.html):  Direct MUC Invitations
+- [XEP-0260](https://xmpp.org/extensions/xep-0260.html):  Jingle SOCKS5 Bytestreams Transport Method
+- [XEP-0261](https://xmpp.org/extensions/xep-0261.html):  Jingle In-Band Bytestreams Transport Method
 - [XEP-0264](https://xmpp.org/extensions/xep-0264.html):  Jingle Content Thumbnails
 - [XEP-0279](https://xmpp.org/extensions/xep-0279.html):  Server IP Check
 - [XEP-0280](https://xmpp.org/extensions/xep-0280.html):  Message Carbons
 - [XEP-0297](https://xmpp.org/extensions/xep-0297.html):  Stanza Forwarding
+- [XEP-0300](https://xmpp.org/extensions/xep-0300.html):  Use of Cryptographic Hash Functions in XMPP
 - [XEP-0313](https://xmpp.org/extensions/xep-0313.html):  Message Archive Management
+- [XEP-0319](https://xmpp.org/extensions/xep-0319.html):  Last User Interaction in Presence
 - [XEP-0334](https://xmpp.org/extensions/xep-0334.html):  Message Processing Hints
 - [XEP-0352](https://xmpp.org/extensions/xep-0352.html):  Client State Indication
 - [XEP-0355](https://xmpp.org/extensions/xep-0355.html):  Namespace Delegation
 - [XEP-0356](https://xmpp.org/extensions/xep-0356.html):  Privileged Entity
+- [XEP-0357](https://xmpp.org/extensions/xep-0357.html):  Push Notifications
 - [XEP-0359](https://xmpp.org/extensions/xep-0359.html):  Unique and Stable Stanza IDs
 - [XEP-0363](https://xmpp.org/extensions/xep-0363.html):  HTTP File Upload
 - [XEP-0369](https://xmpp.org/extensions/xep-0369.html):  Mediated Information eXchange (MIX)
+- [XEP-0377](https://xmpp.org/extensions/xep-0377.html):  Spam Reporting
+- [XEP-0405](https://xmpp.org/extensions/xep-0405.html):  MIX: Participant Server Requirements
+- [XEP-0417](https://xmpp.org/extensions/xep-0417.html):  E2E Authentication in XMPP: Certificate Issuance and Revocation
 - [draft-cridland-xmpp-session-01](https://tools.ietf.org/html/draft-cridland-xmpp-session-01): XMPP Session Establishment
 
 As well as some proprietary extensions from [ProcessOne](https://www.process-one.net)

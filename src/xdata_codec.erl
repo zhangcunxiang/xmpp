@@ -1,12 +1,11 @@
 %%%-------------------------------------------------------------------
 %%% @author Evgeny Khramtsov <ekhramtsov@process-one.net>
-%%% @copyright (C) 2016-2017, Evgeny Khramtsov
 %%% @doc
 %%%
 %%% @end
 %%%
 %%%
-%%% Copyright (C) 2002-2017 ProcessOne, SARL. All Rights Reserved.
+%%% Copyright (C) 2002-2019 ProcessOne, SARL. All Rights Reserved.
 %%%
 %%% Licensed under the Apache License, Version 2.0 (the "License");
 %%% you may not use this file except in compliance with the License.
@@ -37,7 +36,7 @@
 		erl = "" :: string(),
 		hrl = "" :: string(),
 		dir = "" :: string(),
-		ns = <<>> :: binary(),
+		xmlns = [] :: [string()],
 		doc = <<>> :: binary(),
 		erl_dir = "" :: string(),
 		hrl_dir = "" :: string(),
@@ -45,6 +44,7 @@
 		dec_mfas = [] :: [{binary(), mfargs()}],
 		enc_mfas = [] :: [{binary(), mfargs()}],
 		specs = [] :: [{binary(), string()}],
+		ignore_unknown = false :: boolean(),
 		required = [] :: [{binary(), boolean()} | binary()],
 		defaults = [] :: [{binary(), any()}]}).
 
@@ -76,7 +76,7 @@ compile(Path, Opts) ->
 
 compile_file(Path, Opts) ->
     try
-	ok = application:ensure_started(fast_xml),
+	{ok, _} = application:ensure_all_started(fast_xml),
 	DirName = filename:dirname(Path),
 	FileName = filename:basename(Path),
 	RootName = filename:rootname(FileName),
@@ -98,6 +98,7 @@ compile_file(Path, Opts) ->
 		       dec_mfas = proplists:get_value(decode, Config, []),
 		       enc_mfas = proplists:get_value(encode, Config, []),
 		       specs = proplists:get_value(specs, Config, []),
+		       ignore_unknown = proplists:get_bool(ignore_unknown, Config),
 		       required = proplists:get_value(required, Config, []),
 		       defaults = proplists:get_value(defaults, Config, [])},
 	#xmlel{} = El = fxml_stream:parse_element(Data),
@@ -122,7 +123,7 @@ dec_int(Val) ->
     dec_int(Val, infinity, infinity).
 
 dec_int(Val, Min, Max) ->
-    case list_to_integer(binary_to_list(Val)) of
+    case erlang:binary_to_integer(Val) of
         Int when Int =< Max, Min == infinity ->
             Int;
         Int when Int =< Max, Int >= Min ->
@@ -201,13 +202,20 @@ compile_element(#xmlel{name = <<"form_type">>, children = Els} = Form,
 		#state{erl = OutErl, erl_dir = ErlDir,
 		       hrl = OutHrl, hrl_dir = HrlDir} = State0) ->
     try
-	Name = fxml:get_subtag_cdata(Form, <<"name">>),
+	Names = lists:flatmap(
+		  fun(#xmlel{name = <<"name">>} = Tag) ->
+			  case fxml:get_tag_cdata(Tag) of
+			      <<"">> -> [];
+			      N -> [binary_to_list(N)]
+			  end;
+		     (_) -> []
+		  end, Els),
 	Doc = fxml:get_subtag_cdata(Form, <<"doc">>),
 	X = #xmlel{name = <<"x">>,
 		   attrs = [{<<"type">>, <<"form">>},
 			    {<<"xmlns">>, <<"jabber:x:data">>}],
 		   children = Els},
-	State = State0#state{ns = Name, doc = Doc},
+	State = State0#state{xmlns = Names, doc = Doc},
 	#xdata{fields = Fs} = xmpp_codec:decode(X),
 	put(outbuf, []),
 	mk_header(State),
@@ -268,21 +276,35 @@ get_abstract_code_from_myself() ->
             error
     end.
 
-mk_comment_header(#state{file_name = Source, ns = NS, doc = Doc}) ->
+mk_comment_header(#state{file_name = Source, xmlns = NS, doc = Doc}) ->
     emit("%% Created automatically by xdata generator (xdata_codec.erl)~n"
 	 "%% Source: ~s~n"
-	 "%% Form type: ~s~n", [Source, NS]),
+	 "%% Form type: ~s~n",
+	 [Source, string:join(NS, ", ")]),
     if Doc /= <<>> -> emit("%% Document: ~s~n~n", [Doc]);
        true -> emit("~n")
     end.
 
-mk_header(#state{mod_name = Mod, hrl = Include} = State) ->
+mk_header(#state{mod_name = Mod, hrl = Include, xmlns = NS} = State) ->
     mk_comment_header(State),
     emit("~n-module(~s).~n", [Mod]),
-    emit("-export([decode/1, decode/2, encode/1, encode/2, format_error/1, io_format_error/1]).~n"),
+    case NS of
+	[_] -> emit("-export([encode/1, encode/2]).~n");
+	_ -> emit("-export([encode/2, encode/3]).~n")
+    end,
+    emit("-export([decode/1, decode/2, format_error/1, io_format_error/1]).~n"),
     emit("-include(\"xmpp_codec.hrl\").~n"),
     emit("-include(\"~s\").~n", [Include]),
-    emit("-export_type([property/0, result/0, form/0]).~n").
+    emit("-export_type([property/0, result/0, form/0]).~n"),
+    case lists:any(
+	   fun({_, {dec_int, _}}) -> true;
+	      (_) -> false
+	   end, State#state.dec_mfas) of
+	true ->
+	    emit("-dialyzer({nowarn_function, dec_int/3}).~n");
+	false ->
+	    ok
+    end.
 
 mk_type_definitions(Fs, State) ->
     mk_comment_header(State),
@@ -336,17 +358,19 @@ mk_type_definitions(Fs, State) ->
 
 mk_top_decoder(Fs, State) ->
     Required = [Var || #xdata_field{var = Var} <- Fs, is_required(Var, State)],
+    Guard = string:join(["XMLNS == <<\"" ++ NS ++ "\">>" || NS <- State#state.xmlns], "; "),
     emit("decode(Fs) -> decode(Fs, []).~n"),
     emit("decode(Fs, Acc) ->"
 	 "  case lists:keyfind(<<\"FORM_TYPE\">>, #xdata_field.var, Fs) of"
 	 "    false ->"
-	 "      decode(Fs, Acc, ~p);"
-	 "    #xdata_field{values = [~p]} ->"
-	 "      decode(Fs, Acc, ~p);"
+	 "      decode(Fs, Acc, <<~p>>, ~p);"
+	 "    #xdata_field{values = [XMLNS]} when ~s ->"
+	 "      decode(Fs, Acc, XMLNS, ~p);"
 	 "    _ ->"
-	 "      erlang:error({?MODULE, {form_type_mismatch, ~p}})~n"
+	 "      erlang:error({?MODULE, {form_type_mismatch, <<~p>>}})~n"
 	 "  end.~n",
-	 [Required, State#state.ns, Required, State#state.ns]).
+	 [hd(State#state.xmlns), Required, Guard, Required,
+	  hd(State#state.xmlns)]).
 
 mk_top_encoder(Fs, State) ->
     Clauses = string:join(
@@ -365,13 +389,23 @@ mk_top_encoder(Fs, State) ->
 			    [Field, Field, Field])
 		  end, Fs) ++ ["#xdata_field{} -> [Opt]; _ -> []"],
 		";"),
-    emit("encode(Cfg) -> encode(Cfg, <<\"en\">>).~n"),
-    emit("encode(List, Lang) when is_list(List) ->"
-	 "  Fs = [case Opt of ~s end || Opt <- List],"
+    case State#state.xmlns of
+	[_] ->
+	    emit("encode(Cfg) -> encode(Cfg, <<\"en\">>).~n"),
+	    emit("encode(List, Lang) when is_list(List) ->");
+	_ ->
+	    emit("encode(Cfg, XMLNS) -> encode(Cfg, XMLNS, <<\"en\">>).~n"),
+	    emit("encode(List, XMLNS, Lang) when is_list(List) ->")
+    end,
+    XMLNS = case State#state.xmlns of
+		[NS] -> io_lib:format("<<~p>>", [NS]);
+		_ -> "XMLNS"
+	    end,
+    emit("  Fs = [case Opt of ~s end || Opt <- List],"
 	 "  FormType = #xdata_field{var = <<\"FORM_TYPE\">>, type = hidden,"
-	 "                          values = [~p]},"
+	 "                          values = [~s]},"
 	 "  [FormType|lists:flatten(Fs)].~n",
-	 [Clauses, State#state.ns]).
+	 [Clauses, XMLNS]).
 
 mk_decoder([#xdata_field{var = Var, type = Type} = F|Fs], State) ->
     ValVar = if ?is_multi_type(Type) -> "Values";
@@ -391,51 +425,54 @@ mk_decoder([#xdata_field{var = Var, type = Type} = F|Fs], State) ->
     if Type == 'jid-multi' ->
 	    %% Psi work-around
 	    emit("decode([#xdata_field{var = ~p, values = [<<>>]} = F|Fs],"
-		 "       Acc, Required) ->~n"
+		 "       Acc, XMLNS, Required) ->~n"
 		 "    %% Psi work-around~n"
 		 "  decode([F#xdata_field{var = ~p, values = []}|Fs],"
-		 "         Acc, Required);",
+		 "         Acc, XMLNS, Required);",
 		 [Var, Var]);
        true ->
 	    ok
     end,
-    emit("decode([#xdata_field{var = ~p, values = ~s}|Fs], Acc, Required) ->"
+    emit("decode([#xdata_field{var = ~p, values = ~s}|Fs], Acc, XMLNS, Required) ->"
 	 "  try ~s of"
-	 "    Result -> decode(Fs, [{'~s', Result}|Acc], ~s)"
+	 "    Result -> decode(Fs, [{'~s', Result}|Acc], XMLNS, ~s)"
 	 "  catch _:_ ->"
-	 "    erlang:error({?MODULE, {bad_var_value, ~p, ~p}})"
+	 "    erlang:error({?MODULE, {bad_var_value, ~p, XMLNS}})"
 	 "  end;",
 	 [Var, ValVar, DecFun, var_to_rec_field(Var, State),
-	  DelRequired, Var, State#state.ns]),
+	  DelRequired, Var]),
     if not ?is_multi_type(Type) ->
 	    emit("decode([#xdata_field{var = ~p, values = []} = F|Fs],"
-		 "       Acc, Required) ->"
+		 "       Acc, XMLNS, Required) ->"
 		 "  decode([F#xdata_field{var = ~p, values = [<<>>]}|Fs],"
-		 "         Acc, Required);",
+		 "         Acc, XMLNS, Required);",
 		 [Var, Var]),
-	    emit("decode([#xdata_field{var = ~p}|_], _, _) ->"
-		 "  erlang:error({?MODULE, {too_many_values, ~p, ~p}});",
-		 [Var, Var, State#state.ns]);
+	    emit("decode([#xdata_field{var = ~p}|_], _, XMLNS, _) ->"
+		 "  erlang:error({?MODULE, {too_many_values, ~p, XMLNS}});",
+		 [Var, Var]);
        true ->
 	    ok
     end,
     mk_decoder(Fs, State);
 mk_decoder([], State) ->
-    emit("decode([#xdata_field{var = Var}|Fs], Acc, Required) ->"
-	 "  if Var /= <<\"FORM_TYPE\">> ->"
-	 "    erlang:error({?MODULE, {unknown_var, Var, ~p}});"
-	 "  true ->"
-	 "    decode(Fs, Acc, Required)"
-	 "  end;",
-	 [State#state.ns]),
+    if State#state.ignore_unknown ->
+	    emit("decode([_|Fs], Acc, XMLNS, Required) ->"
+		 "  decode(Fs, Acc, XMLNS, Required);");
+       true ->
+	    emit("decode([#xdata_field{var = Var}|Fs], Acc, XMLNS, Required) ->"
+		 "  if Var /= <<\"FORM_TYPE\">> ->"
+		 "    erlang:error({?MODULE, {unknown_var, Var, XMLNS}});"
+		 "  true ->"
+		 "    decode(Fs, Acc, XMLNS, Required)"
+		 "  end;")
+    end,
     if State#state.required /= [] ->
-	    emit("decode([], _, [Var|_]) ->"
-		 "  erlang:error({?MODULE, {missing_required_var, Var, ~p}});~n",
-		 [State#state.ns]);
+	    emit("decode([], _, XMLNS, [Var|_]) ->"
+		 "  erlang:error({?MODULE, {missing_required_var, Var, XMLNS}});~n");
        true ->
 	    ok
     end,
-    emit("decode([], Acc, []) -> Acc.~n").
+    emit("decode([], Acc, _, []) -> Acc.~n").
 
 mk_encoders(Fs, State) ->
     lists:foreach(
