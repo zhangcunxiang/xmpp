@@ -182,14 +182,11 @@
      #elem{name = <<"item">>,
            xmlns = <<"urn:xmpp:blocking">>,
 	   module = 'xep0191',
-           result = {block_item, '$jid', '$spam_report'},
+           result = '$jid',
            attrs = [#attr{name = <<"jid">>,
                           required = true,
                           dec = {jid, decode, []},
-                          enc = {jid, encode, []}}],
-           refs = [#ref{name = report,
-                        label = '$spam_report',
-                        min = 0, max = 1}]}).
+                          enc = {jid, encode, []}}]}).
 
 -xml(block,
      #elem{name = <<"block">>,
@@ -215,42 +212,6 @@
 	   refs = [#ref{name = block_item,
                         label = '$items'}]}).
 
--xml(report_reason_abuse,
-     #elem{name = <<"abuse">>,
-	   xmlns = <<"urn:xmpp:reporting:0">>,
-	   module = 'xep0377',
-	   result = 'abuse'}).
-
--xml(report_reason_spam,
-     #elem{name = <<"spam">>,
-	   xmlns = <<"urn:xmpp:reporting:0">>,
-	   module = 'xep0377',
-	   result = 'spam'}).
-
--xml(report_text,
-     #elem{name = <<"text">>,
-	   xmlns = <<"urn:xmpp:reporting:0">>,
-	   module = 'xep0377',
-	   result = {text, '$lang', '$data'},
-	   cdata = #cdata{label = '$data'},
-	   attrs = [#attr{name = <<"xml:lang">>,
-			  dec = {xmpp_lang, check, []},
-			  label = '$lang'}]}).
-
--xml(report,
-     #elem{name = <<"report">>,
-	   xmlns = <<"urn:xmpp:reporting:0">>,
-	   module = 'xep0377',
-	   result = {report, '$reason', '$text'},
-	   refs = [#ref{name = report_reason_abuse,
-			label = '$reason',
-			min = 0, max = 1},
-		   #ref{name = report_reason_spam,
-			label = '$reason',
-			min = 0, max = 1},
-		   #ref{name = report_text,
-			label = '$text'}]}).
-
 -xml(disco_identity,
      #elem{name = <<"identity">>,
            xmlns = <<"http://jabber.org/protocol/disco#info">>,
@@ -261,7 +222,6 @@
                     #attr{name = <<"type">>,
                           required = true},
                     #attr{name = <<"xml:lang">>,
-			  dec = {xmpp_lang, check, []},
                           label = '$lang'},
                     #attr{name = <<"name">>}]}).
 
@@ -312,8 +272,7 @@
      #elem{name = <<"query">>,
            xmlns = <<"jabber:iq:private">>,
 	   module = 'xep0049',
-	   ignore_els = true,
-           result = {private, '$_els'}}).
+           result = {private, '$_xmls'}}).
 
 -xml(conference_nick,
      #elem{name = <<"nick">>,
@@ -435,7 +394,6 @@
                           dec = {jid, decode, []},
                           enc = {jid, encode, []}},
                     #attr{name = <<"xml:lang">>,
-			  dec = {xmpp_lang, check, []},
                           label = '$lang'}]}).
 
 -xml(message_subject,
@@ -445,9 +403,7 @@
 	   module = rfc6120,
            result = {text, '$lang', '$data'},
            cdata = #cdata{label = '$data'},
-           attrs = [#attr{name = <<"xml:lang">>,
-			  dec = {xmpp_lang, check, []},
-			  label = '$lang'}]}).
+           attrs = [#attr{name = <<"xml:lang">>, label = '$lang'}]}).
 
 -xml(message_body,
      #elem{name = <<"body">>,
@@ -456,18 +412,14 @@
 	   module = rfc6120,
            result = {text, '$lang', '$data'},
            cdata = #cdata{label = '$data'},
-           attrs = [#attr{name = <<"xml:lang">>,
-			  dec = {xmpp_lang, check, []},
-			  label = '$lang'}]}).
+           attrs = [#attr{name = <<"xml:lang">>, label = '$lang'}]}).
 
 -xml(message_thread,
      #elem{name = <<"thread">>,
            xmlns = [<<"jabber:client">>, <<"jabber:server">>,
 		    <<"jabber:component:accept">>],
 	   module = rfc6120,
-           result = {message_thread, '$parent', '$data'},
-	   attrs = [#attr{name = <<"parent">>}],
-	   cdata = #cdata{label = '$data'}}).
+           result = '$cdata'}).
 
 -record(message, {id = <<>> :: binary(),
                   type = normal :: message_type(),
@@ -476,7 +428,7 @@
                   to :: undefined | jid:jid(),
                   subject = [] :: [#text{}],
                   body = [] :: [#text{}],
-                  thread :: undefined | message_thread(),
+                  thread :: undefined | binary(),
                   sub_els = [] :: [xmpp_element() | fxml:xmlel()],
 		  meta = #{} :: map()}).
 -type message() :: #message{}.
@@ -500,7 +452,6 @@
                           dec = {jid, decode, []},
                           enc = {jid, encode, []}},
                     #attr{name = <<"xml:lang">>,
-			  dec = {xmpp_lang, check, []},
                           label = '$lang'}],
            refs = [#ref{name = message_subject, label = '$subject'},
                    #ref{name = message_thread, min = 0, max = 1, label = '$thread'},
@@ -523,7 +474,6 @@
            result = {text, '$lang', '$data'},
            cdata = #cdata{label = '$data'},
            attrs = [#attr{name = <<"xml:lang">>,
-			  dec = {xmpp_lang, check, []},
                           label = '$lang'}]}).
 
 -xml(presence_priority,
@@ -568,7 +518,6 @@
                           dec = {jid, decode, []},
                           enc = {jid, encode, []}},
                     #attr{name = <<"xml:lang">>,
-			  dec = {xmpp_lang, check, []},
                           label = '$lang'}],
            refs = [#ref{name = presence_show, min = 0, max = 1, label = '$show'},
                    #ref{name = presence_status, label = '$status'},
@@ -700,7 +649,6 @@
            xmlns = <<"urn:ietf:params:xml:ns:xmpp-stanzas">>,
 	   module = rfc6120,
            attrs = [#attr{name = <<"xml:lang">>,
-			  dec = {xmpp_lang, check, []},
                           label = '$lang'}]}).
 
 -xml(error,
@@ -719,11 +667,9 @@
 			  label = '$code',
 			  enc = {enc_int, []},
                           dec = {dec_int, [0, infinity]}},
-                    #attr{name = <<"by">>,
-			  label = '$by',
-			  enc = {jid, encode, []},
-			  dec = {jid, decode, []}}],
-           refs = [#ref{name = error_text, label = '$text'},
+                    #attr{name = <<"by">>}],
+           refs = [#ref{name = error_text,
+                        min = 0, max = 1, label = '$text'},
                    #ref{name = error_bad_request,
                         min = 0, max = 1, label = '$reason'},
                    #ref{name = error_conflict,
@@ -892,7 +838,6 @@
            result = {text, '$lang', '$data'},
            cdata = #cdata{label = '$data'},
            attrs = [#attr{name = <<"xml:lang">>,
-			  dec = {xmpp_lang, check, []},
                           label = '$lang'}]}).
 
 -xml(sasl_failure_aborted,
@@ -1327,7 +1272,6 @@
            xmlns = <<"urn:ietf:params:xml:ns:xmpp-streams">>,
 	   module = rfc6120,
            attrs = [#attr{name = <<"xml:lang">>,
-			  dec = {xmpp_lang, check, []},
                           label = '$lang'}]}).
 
 -xml(stream_error_bad_format,
@@ -1470,7 +1414,9 @@
 		    <<"jabber:component:accept">>],
 	   module = rfc6120,
            result = {stream_error, '$reason', '$text'},
-           refs = [#ref{name = stream_error_text, label = '$text'},
+           refs = [#ref{name = stream_error_text,
+                        label = '$text',
+                        min = 0, max = 1},
                    #ref{name = stream_error_bad_format,
                         min = 0, max = 1, label = '$reason'},
                    #ref{name = stream_error_bad_namespace_prefix,
@@ -1846,13 +1792,6 @@
                    #ref{name = vcard_PRIVATE, min = 0, max = 1, label = '$class'},
                    #ref{name = vcard_CONFIDENTIAL, min = 0, max = 1, label = '$class'}]}).
 
-%% {vcard_AGENT,
-%%  #elem{name = <<"AGENT">>,
-%%        xmlns = <<"vcard-temp">>,
-%%        module = 'xep0054',
-%%        result = {vcard_agent, '$vcard', '$extval'},
-%%        refs = [#ref{name = vcard, min = 0, max = 1, label = '$vcard'},
-%%                #ref{name = vcard_EXTVAL, min = 0, max = 1, label = '$extval'}]}).
 
 -xml(vcard_temp,
      #elem{name = <<"vCard">>,
@@ -1903,11 +1842,15 @@
 	   module = 'xep0153',
 	   result = '$cdata'}).
 
+-record(vcard_xupdate, {us = {<<>>, <<>>} :: {binary(), binary()},
+			hash :: undefined | binary()}).
+-type vcard_xupdate() :: #vcard_xupdate{}.
+
 -xml(vcard_xupdate,
      #elem{name = <<"x">>,
 	   xmlns = <<"vcard-temp:x:update">>,
 	   module = 'xep0153',
-	   result = {vcard_xupdate, '$hash'},
+	   result = {vcard_xupdate, '$_', '$hash'},
 	   refs = [#ref{name = vcard_xupdate_photo, min = 0, max = 1,
 			label = '$hash'}]}).
 
@@ -2096,8 +2039,7 @@
            xmlns = [<<"http://jabber.org/protocol/pubsub">>,
 		    <<"http://jabber.org/protocol/pubsub#event">>],
 	   module = 'xep0060',
-	   ignore_els = true,
-           result = {ps_item, '$xmlns', '$id', '$_els', '$node', '$publisher'},
+           result = {ps_item, '$xmlns', '$id', '$_xmls', '$node', '$publisher'},
            attrs = [#attr{name = <<"id">>},
 		    #attr{name = <<"xmlns">>},
                     #attr{name = <<"node">>},
@@ -2205,6 +2147,7 @@
            attrs = [#attr{name = <<"node">>},
                     #attr{name = <<"subid">>},
                     #attr{name = <<"jid">>,
+                          required = true,
                           dec = {jid, decode, []},
                           enc = {jid, encode, []}}],
            refs = [#ref{name = xdata, min = 0, max = 1,
@@ -2353,7 +2296,6 @@
 			 'nodeid-required' | 'not-in-roster-group' |
 			 'not-subscribed' | 'payload-too-big' |
 			 'payload-required' | 'pending-subscription' |
-			 'precondition-not-met' |
 			 'presence-subscription-required' | 'subid-required' |
 			 'too-many-subscriptions' | 'unsupported' |
 			 'unsupported-access-model'.
@@ -2376,8 +2318,7 @@
 		      'retract-items' | 'retrieve-affiliations' |
 		      'retrieve-default' | 'retrieve-items' |
 		      'retrieve-subscriptions' | 'subscribe' |
-		      'subscription-options' | 'subscription-notifications' |
-		      'multi-items' | undefined.
+		      'subscription-options' | 'subscription-notifications'.
 -record(ps_error, {type :: ps_error_type(), feature :: ps_feature()}).
 -type ps_error() :: #ps_error{}.
 
@@ -2466,11 +2407,6 @@
            xmlns = <<"http://jabber.org/protocol/pubsub#errors">>,
 	   module = 'xep0060',
            result = {ps_error, 'pending-subscription', '$_'}}).
--xml(pubsub_error_precondition_not_met,
-     #elem{name = <<"precondition-not-met">>,
-           xmlns = <<"http://jabber.org/protocol/pubsub#errors">>,
-	   module = 'xep0060',
-           result = {ps_error, 'precondition-not-met', '$_'}}).
 -xml(pubsub_error_presence_subscription_required,
      #elem{name = <<"presence-subscription-required">>,
            xmlns = <<"http://jabber.org/protocol/pubsub#errors">>,
@@ -2516,7 +2452,6 @@
                                              'meta-data',
                                              'modify-affiliations',
                                              'multi-collection',
-					     'multi-items',
                                              'multi-subscribe',
                                              'outcast-affiliation',
                                              'persistent-items',
@@ -2928,12 +2863,11 @@
      #elem{name = <<"subscription">>,
 	   xmlns = <<"urn:xmpp:mucsub:0">>,
 	   module = p1_mucsub,
-	   result = {muc_subscription, '$jid', '$nick', '$events'},
-	   attrs = [#attr{name = <<"jid">>,
+	   result = '$jid',
+           attrs = [#attr{name = <<"jid">>,
+                          required = true,
                           dec = {jid, decode, []},
-                          enc = {jid, encode, []}},
-		    #attr{name = <<"nick">>}],
-	   refs = [#ref{name = muc_subscribe_event, label = '$events'}]}).
+                          enc = {jid, encode, []}}]}).
 
 -xml(muc_subscriptions,
      #elem{name = <<"subscriptions">>,
@@ -2964,11 +2898,10 @@
      #elem{name = <<"unsubscribe">>,
 	   xmlns = <<"urn:xmpp:mucsub:0">>,
 	   module = p1_mucsub,
-	   attrs = [#attr{name = <<"nick">>},
-	        #attr{name = <<"jid">>,
+	   attrs = [#attr{name = <<"jid">>,
 			  dec = {jid, decode, []},
 			  enc = {jid, encode, []}}],
-	   result = {muc_unsubscribe, '$nick', '$jid'}}).
+	   result = {muc_unsubscribe, '$jid'}}).
 
 -xml(rsm_after,
      #elem{name = <<"after">>,
@@ -3071,8 +3004,7 @@
 
 -xml(mam_query,
      #elem{name = <<"query">>,
-           xmlns = [<<"urn:xmpp:mam:0">>, <<"urn:xmpp:mam:1">>,
-		    <<"urn:xmpp:mam:2">>, <<"urn:xmpp:mam:tmp">>],
+           xmlns = [<<"urn:xmpp:mam:0">>, <<"urn:xmpp:mam:1">>, <<"urn:xmpp:mam:tmp">>],
 	   module = 'xep0313',
            result = {mam_query, '$xmlns', '$id', '$start', '$end', '$with',
 		     '$withtext', '$rsm', '$xdata'},
@@ -3098,8 +3030,7 @@
 
 -xml(mam_result,
      #elem{name = <<"result">>,
-           xmlns = [<<"urn:xmpp:mam:0">>, <<"urn:xmpp:mam:1">>,
-		    <<"urn:xmpp:mam:2">>, <<"urn:xmpp:mam:tmp">>],
+           xmlns = [<<"urn:xmpp:mam:0">>, <<"urn:xmpp:mam:1">>, <<"urn:xmpp:mam:tmp">>],
 	   module = 'xep0313',
            result = {mam_result, '$xmlns', '$queryid', '$id', '$_els'},
            attrs = [#attr{name = <<"queryid">>},
@@ -3108,8 +3039,7 @@
 
 -xml(mam_jid,
      #elem{name = <<"jid">>,
-           xmlns = [<<"urn:xmpp:mam:0">>, <<"urn:xmpp:mam:1">>,
-		    <<"urn:xmpp:mam:2">>, <<"urn:xmpp:mam:tmp">>],
+           xmlns = [<<"urn:xmpp:mam:0">>, <<"urn:xmpp:mam:1">>, <<"urn:xmpp:mam:tmp">>],
 	   module = 'xep0313',
            result = '$cdata',
            cdata = #cdata{required = true,
@@ -3118,24 +3048,21 @@
 
 -xml(mam_never,
      #elem{name = <<"never">>,
-           xmlns = [<<"urn:xmpp:mam:0">>, <<"urn:xmpp:mam:1">>,
-		    <<"urn:xmpp:mam:2">>, <<"urn:xmpp:mam:tmp">>],
+           xmlns = [<<"urn:xmpp:mam:0">>, <<"urn:xmpp:mam:1">>, <<"urn:xmpp:mam:tmp">>],
 	   module = 'xep0313',
            result = '$jids',
            refs = [#ref{name = mam_jid, label = '$jids'}]}).
 
 -xml(mam_always,
      #elem{name = <<"always">>,
-           xmlns = [<<"urn:xmpp:mam:0">>, <<"urn:xmpp:mam:1">>,
-		    <<"urn:xmpp:mam:2">>, <<"urn:xmpp:mam:tmp">>],
+           xmlns = [<<"urn:xmpp:mam:0">>, <<"urn:xmpp:mam:1">>, <<"urn:xmpp:mam:tmp">>],
 	   module = 'xep0313',
            result = '$jids',
            refs = [#ref{name = mam_jid, label = '$jids'}]}).
 
 -xml(mam_prefs,
      #elem{name = <<"prefs">>,
-           xmlns = [<<"urn:xmpp:mam:0">>, <<"urn:xmpp:mam:1">>,
-		    <<"urn:xmpp:mam:2">>, <<"urn:xmpp:mam:tmp">>],
+           xmlns = [<<"urn:xmpp:mam:0">>, <<"urn:xmpp:mam:1">>, <<"urn:xmpp:mam:tmp">>],
 	   module = 'xep0313',
            result = {mam_prefs, '$xmlns', '$default', '$always', '$never'},
            attrs = [#attr{name = <<"default">>,
@@ -3149,7 +3076,7 @@
 
 -xml(mam_fin,
      #elem{name = <<"fin">>,
-	   xmlns = [<<"urn:xmpp:mam:0">>, <<"urn:xmpp:mam:1">>, <<"urn:xmpp:mam:2">>],
+	   xmlns = [<<"urn:xmpp:mam:0">>, <<"urn:xmpp:mam:1">>],
 	   module = 'xep0313',
 	   result = {mam_fin, '$xmlns', '$id', '$rsm', '$stable', '$complete'},
 	   attrs = [#attr{name = <<"queryid">>, label = '$id'},
@@ -3166,8 +3093,7 @@
      #elem{name = <<"forwarded">>,
            xmlns = <<"urn:xmpp:forward:0">>,
 	   module = 'xep0297',
-	   ignore_els = true,
-           result = {forwarded, '$delay', '$_els'},
+           result = {forwarded, '$delay', '$_xmls'},
            refs = [#ref{name = delay, min = 0,
                         max = 1, label = '$delay'}]}).
 
@@ -3209,7 +3135,8 @@
      #elem{name = <<"csi">>,
 	   xmlns = <<"urn:xmpp:csi:0">>,
 	   module = 'xep0352',
-	   result = {feature_csi}}).
+	   result = {feature_csi, '$xmlns'},
+	   attrs = [#attr{name = <<"xmlns">>}]}).
 
 -record(csi, {type :: active | inactive}).
 -type csi() :: #csi{}.
@@ -3397,89 +3324,33 @@
 
 -xml(mix_subscribe,
      #elem{name = <<"subscribe">>,
-	   xmlns = <<"urn:xmpp:mix:core:0">>,
+	   xmlns = <<"urn:xmpp:mix:0">>,
 	   module = 'xep0369',
 	   result = '$node',
 	   attrs = [#attr{name = <<"node">>,
 			  required = true,
 			  label = '$node'}]}).
 
--xml(mix_nick,
-     #elem{name = <<"nick">>,
-	   xmlns = <<"urn:xmpp:mix:core:0">>,
-	   module = 'xep0369',
-	   result = '$cdata',
-	   cdata = #cdata{required = true}}).
-
--xml(mix_jid,
-     #elem{name = <<"jid">>,
-	   xmlns = <<"urn:xmpp:mix:core:0">>,
-	   module = 'xep0369',
-	   result = '$cdata',
-	   cdata = #cdata{required = true,
-			  dec = {jid, decode, []},
-			  enc = {jid, encode, []}}}).
-
--xml(mix_submission_id,
-     #elem{name = <<"submission-id">>,
-	   xmlns = <<"urn:xmpp:mix:core:0">>,
-	   module = 'xep0369',
-	   result = '$cdata',
-	   cdata = #cdata{required = true}}).
-
--xml(mix_setnick,
-     #elem{name = <<"setnick">>,
-	   xmlns = <<"urn:xmpp:mix:core:0">>,
-	   module = 'xep0369',
-	   result = {mix_setnick, '$nick'},
-	   refs = [#ref{name = mix_nick, min = 1, max = 1,
-			label = '$nick'}]}).
-
 -xml(mix_join,
      #elem{name = <<"join">>,
-	   xmlns = <<"urn:xmpp:mix:core:0">>,
+	   xmlns = <<"urn:xmpp:mix:0">>,
 	   module = 'xep0369',
-	   result = {mix_join, '$id', '$jid', '$nick', '$subscribe'},
-	   attrs = [#attr{name = <<"id">>},
-		    #attr{name = <<"jid">>,
+	   result = {mix_join, '$jid', '$subscribe'},
+	   attrs = [#attr{name = <<"jid">>,
 			  label = '$jid',
 			  dec = {jid, decode, []},
                           enc = {jid, encode, []}}],
-	   refs = [#ref{name = mix_subscribe, min = 0, label = '$subscribe'},
-		   #ref{name = mix_nick,
-			default = <<"">>,
-			min = 0, max = 1,
-			label = '$nick'}]}).
-
--xml(mix_client_join,
-     #elem{name = <<"client-join">>,
-	   xmlns = <<"urn:xmpp:mix:pam:0">>,
-	   module = 'xep0405',
-	   result = {mix_client_join, '$channel', '$join'},
-	   attrs = [#attr{name = <<"channel">>,
-			  dec = {jid, decode, []},
-			  enc = {jid, encode, []}}],
-	   refs = [#ref{name = mix_join, min = 1, max = 1, label = '$join'}]}).
+	   refs = [#ref{name = mix_subscribe, min = 0, label = '$subscribe'}]}).
 
 -xml(mix_leave,
      #elem{name = <<"leave">>,
-	   xmlns = <<"urn:xmpp:mix:core:0">>,
+	   xmlns = <<"urn:xmpp:mix:0">>,
 	   module = 'xep0369',
 	   result = {mix_leave}}).
 
--xml(mix_client_leave,
-     #elem{name = <<"client-leave">>,
-	   xmlns = <<"urn:xmpp:mix:pam:0">>,
-	   module = 'xep0405',
-	   result = {mix_client_leave, '$channel', '$leave'},
-	   attrs = [#attr{name = <<"channel">>,
-			  dec = {jid, decode, []},
-			  enc = {jid, encode, []}}],
-	   refs = [#ref{name = mix_leave, min = 1, max = 1, label = '$leave'}]}).
-
 -xml(mix_participant,
      #elem{name = <<"participant">>,
-	   xmlns = <<"urn:xmpp:mix:core:0">>,
+	   xmlns = <<"urn:xmpp:mix:0">>,
 	   module = 'xep0369',
 	   result = {mix_participant, '$jid', '$nick'},
 	   attrs = [#attr{name = <<"jid">>,
@@ -3489,35 +3360,6 @@
                           enc = {jid, encode, []}},
 		    #attr{name = <<"nick">>,
 			  label = '$nick'}]}).
-
--xml(mix_create,
-     #elem{name = <<"create">>,
-	   xmlns = <<"urn:xmpp:mix:core:0">>,
-	   module = 'xep0369',
-	   result = {mix_create, '$channel'},
-	   attrs = [#attr{name = <<"channel">>,
-			  default = <<"">>,
-			  dec = {nodeprep, []}}]}).
-
--xml(mix_destroy,
-     #elem{name = <<"destroy">>,
-	   xmlns = <<"urn:xmpp:mix:core:0">>,
-	   module = 'xep0369',
-	   result = {mix_destroy, '$channel'},
-	   attrs = [#attr{name = <<"channel">>,
-			  dec = {jid, nodeprep, []},
-			  required = true}]}).
-
--xml(mix,
-     #elem{name = <<"mix">>,
-	   xmlns = <<"urn:xmpp:mix:core:0">>,
-	   module = 'xep0369',
-	   result = {mix, '$submission_id', '$jid', '$nick'},
-	   refs = [#ref{name = mix_submission_id, default = <<"">>,
-			min = 0, max = 1, label = '$submission_id'},
-		   #ref{name = mix_jid,	min = 0, max = 1, label = '$jid'},
-		   #ref{name = mix_nick, min = 0, max = 1,
-			label = '$nick', default = <<"">>}]}).
 
 -record(hint, {type :: 'no-copy' | 'no-store' | 'no-storage' | 'store' |
 		       'no-permanent-store' | 'no-permanent-storage'}).
@@ -3730,11 +3572,11 @@
 			  enc = {jid, encode, []},
 			  dec = {jid, decode, []}}]}).
 
--xml(origin_id,
-     #elem{name = <<"origin-id">>,
+-xml(client_id,
+     #elem{name = <<"client-id">>,
 	   xmlns = <<"urn:xmpp:sid:0">>,
 	   module = 'xep0359',
-	   result = {origin_id, '$id'},
+	   result = {client_id, '$id'},
 	   attrs = [#attr{name = <<"id">>, required = true}]}).
 
 -xml(adhoc_command_prev,
@@ -3785,8 +3627,7 @@
 	   result = {adhoc_command, '$node', '$action', '$sid',
 		     '$status', '$lang', '$actions', '$notes', '$xdata'},
 	   attrs = [#attr{name = <<"node">>, required = true},
-		    #attr{name = <<"xml:lang">>,
-			  dec = {xmpp_lang, check, []}, label = '$lang'},
+		    #attr{name = <<"xml:lang">>, label = '$lang'},
 		    #attr{name = <<"sessionid">>, label = '$sid'},
 		    #attr{name = <<"status">>,
 			  dec = {dec_enum, [[canceled, completed, executing]]},
@@ -3871,9 +3712,7 @@
 		    #attr{name = <<"xmlns:db">>,
 			  label = '$db_xmlns',
 			  default = <<"">>},
-		    #attr{name = <<"xml:lang">>,
-			  dec = {xmpp_lang, check, []},
-			  label = '$lang',
+		    #attr{name = <<"xml:lang">>, label = '$lang',
 			  default = <<"">>},
 		    #attr{name = <<"version">>,
 			  dec = {dec_version, []},
@@ -3946,19 +3785,6 @@
 			label = '$url'},
 		   #ref{name = oob_desc, default = <<"">>,
 			min = 0, max = 1, label = '$desc'}]}).
-
--xml(receipt_request,
-     #elem{name = <<"request">>,
-	   xmlns = <<"urn:xmpp:receipts">>,
-	   module = 'xep0184',
-	   result = {receipt_request}}).
-
--xml(receipt_response,
-     #elem{name = <<"received">>,
-	   xmlns = <<"urn:xmpp:receipts">>,
-	   module = 'xep0184',
-	   result = {receipt_response, '$id'},
-	   attrs = [#attr{name = <<"id">>}]}).
 
 -xml(sic_ip,
      #elem{name = <<"ip">>,
@@ -4095,38 +3921,6 @@
 		   #ref{name = upload_put_0, label = '$put',
 			min = 1, max = 1}]}).
 
--xml(upload_max_file_size,
-     #elem{name = <<"max-file-size">>,
-	   xmlns = [<<"urn:xmpp:http:upload:0">>,
-		    <<"urn:xmpp:http:upload">>,
-		    <<"eu:siacs:conversations:http:upload">>],
-	   module = 'xep0363',
-	   result = '$cdata',
-	   cdata = #cdata{required = true,
-			  enc = {enc_int, []},
-			  dec = {dec_int, []}}}).
-
--xml(upload_file_too_large,
-     #elem{name = <<"file-too-large">>,
-	   xmlns = [<<"urn:xmpp:http:upload:0">>,
-		    <<"urn:xmpp:http:upload">>,
-		    <<"eu:siacs:conversations:http:upload">>],
-	   module = 'xep0363',
-	   result = {upload_file_too_large, '$max-file-size', '$xmlns'},
-	   attrs = [#attr{name = <<"xmlns">>}],
-	   refs = [#ref{name = upload_max_file_size,
-			label = '$max-file-size',
-			min = 0, max = 1}]}).
-
--xml(upload_retry,
-     #elem{name = <<"retry">>,
-	   xmlns = <<"urn:xmpp:http:upload:0">>,
-	   module = 'xep0363',
-	   result = {upload_retry, '$stamp'},
-	   attrs = [#attr{name = <<"stamp">>,
-			  dec = {dec_utc, []},
-			  enc = {enc_utc, []}}]}).
-
 -xml(push_enable,
      #elem{name = <<"enable">>,
 	   xmlns = <<"urn:xmpp:push:0">>,
@@ -4243,785 +4037,6 @@
 			  enc = {jid, encode, []}}],
 	   refs = [#ref{name = delegate, label = '$delegate'}]}).
 
--xml(avatar_data,
-     #elem{name = <<"data">>,
-	   xmlns = <<"urn:xmpp:avatar:data">>,
-	   module = 'xep0084',
-	   result = {avatar_data, '$data'},
-	   cdata = #cdata{label = '$data',
-			  required = true,
-			  dec = {base64, decode, []},
-			  enc = {base64, encode, []}}}).
-
--xml(avatar_info,
-     #elem{name = <<"info">>,
-	   xmlns = <<"urn:xmpp:avatar:metadata">>,
-	   module = 'xep0084',
-	   result = {avatar_info, '$bytes', '$id', '$type',
-		     '$height', '$width', '$url'},
-	   attrs = [#attr{name = <<"bytes">>,
-			  required = true,
-			  dec = {dec_int, [0, infinity]},
-			  enc = {enc_int, []}},
-		    #attr{name = <<"id">>, required = true},
-		    #attr{name = <<"type">>, required = true},
-		    #attr{name = <<"url">>},
-		    #attr{name = <<"height">>,
-			  dec = {dec_int, [0, infinity]},
-			  enc = {enc_int, []}},
-		    #attr{name = <<"width">>,
-			  dec = {dec_int, [0, infinity]},
-			  enc = {enc_int, []}}]}).
-
--xml(avatar_pointer,
-     #elem{name = <<"pointer">>,
-	   xmlns = <<"urn:xmpp:avatar:metadata">>,
-	   module = 'xep0084',
-	   ignore_els = true,
-	   result = {avatar_pointer, '$bytes', '$id', '$type',
-		     '$height', '$width', '$_els'},
-	   attrs = [#attr{name = <<"bytes">>,
-			  dec = {dec_int, [0, infinity]},
-			  enc = {enc_int, []}},
-		    #attr{name = <<"id">>},
-		    #attr{name = <<"type">>},
-		    #attr{name = <<"height">>,
-			  dec = {dec_int, [0, infinity]},
-			  enc = {enc_int, []}},
-		    #attr{name = <<"width">>,
-			  dec = {dec_int, [0, infinity]},
-			  enc = {enc_int, []}}]}).
-
--xml(avatar_meta,
-     #elem{name = <<"metadata">>,
-	   xmlns = <<"urn:xmpp:avatar:metadata">>,
-	   module = 'xep0084',
-	   result = {avatar_meta, '$info', '$pointer'},
-	   refs = [#ref{name = avatar_info, label = '$info'},
-		   #ref{name = avatar_pointer, label = '$pointer',
-			min = 0, max = 1}]}).
-
--xml(hash,
-     #elem{name = <<"hash">>,
-	   xmlns = <<"urn:xmpp:hashes:2">>,
-	   module = 'xep0300',
-	   result = {hash, '$algo', '$data'},
-	   attrs = [#attr{name = <<"algo">>,
-			  required = true}],
-	   cdata = #cdata{label = '$data',
-			  enc = {base64, encode, []},
-			  dec = {base64, decode, []}}}).
-
--xml(hash_used,
-     #elem{name = <<"hash-used">>,
-	   xmlns = <<"urn:xmpp:hashes:2">>,
-	   module = 'xep0300',
-	   result = {hash_used, '$algo'},
-	   attrs = [#attr{name = <<"algo">>,
-			  required = true}]}).
-
--xml(ibb_open,
-     #elem{name = <<"open">>,
-	   xmlns = <<"http://jabber.org/protocol/ibb">>,
-	   module = 'xep0047',
-	   result = {ibb_open, '$sid', '$block-size', '$stanza'},
-	   attrs = [#attr{name = <<"sid">>, required = true},
-		    #attr{name = <<"block-size">>, required = true,
-			  enc = {enc_int, []},
-			  dec = {dec_int, [0, infinity]}},
-		    #attr{name = <<"stanza">>,
-			  default = iq,
-			  enc = {enc_enum, []},
-			  dec = {dec_enum, [[iq, message]]}}]}).
-
--xml(ibb_data,
-     #elem{name = <<"data">>,
-	   xmlns = <<"http://jabber.org/protocol/ibb">>,
-	   module = 'xep0047',
-	   result = {ibb_data, '$sid', '$seq', '$data'},
-	   attrs = [#attr{name = <<"sid">>, required = true},
-		    #attr{name = <<"seq">>, required = true,
-			  enc = {enc_int, []},
-			  dec = {dec_int, [0, infinity]}}],
-	   cdata = #cdata{label = '$data',
-			  enc = {base64, encode, []},
-			  dec = {base64, decode, []}}}).
-
--xml(ibb_close,
-     #elem{name = <<"close">>,
-	   xmlns = <<"http://jabber.org/protocol/ibb">>,
-	   module = 'xep0047',
-	   result = {ibb_close, '$sid'},
-	   attrs = [#attr{name = <<"sid">>, required = true}]}).
-
--xml(idle,
-     #elem{name = <<"idle">>,
-	   xmlns = <<"urn:xmpp:idle:1">>,
-	   module = 'xep0319',
-	   result = {idle, '$since'},
-	   attrs = [#attr{name = <<"since">>, required = true,
-			  enc = {enc_utc, []}, dec = {dec_utc, []}}]}).
-
--record(jingle_error, {reason :: 'out-of-order' | 'tie-break' |
-				 'unknown-session' | 'unsupported-info' |
-				 'security-required'}).
--type jingle_error() :: #jingle_error{}.
-
--xml(jingle_error_out_of_order,
-     #elem{name = <<"out-of-order">>,
-	   xmlns = <<"urn:xmpp:jingle:errors:1">>,
-	   module = 'xep0166',
-	   result = {jingle_error, 'out-of-order'}}).
--xml(jingle_error_tie_break,
-     #elem{name = <<"tie-break">>,
-	   xmlns = <<"urn:xmpp:jingle:errors:1">>,
-	   module = 'xep0166',
-	   result = {jingle_error, 'tie-break'}}).
--xml(jingle_error_unknown_session,
-     #elem{name = <<"unknown-session">>,
-	   xmlns = <<"urn:xmpp:jingle:errors:1">>,
-	   module = 'xep0166',
-	   result = {jingle_error, 'unknown-session'}}).
--xml(jingle_error_unsupported_info,
-     #elem{name = <<"unsupported-info">>,
-	   xmlns = <<"urn:xmpp:jingle:errors:1">>,
-	   module = 'xep0166',
-	   result = {jingle_error, 'unsupported-info'}}).
--xml(jingle_error_security_required,
-     #elem{name = <<"security-required">>,
-	   xmlns = <<"urn:xmpp:jingle:errors:1">>,
-	   module = 'xep0166',
-	   result = {jingle_error, 'security-required'}}).
-
--xml(jingle_reason_alternative_session,
-     #elem{name = <<"alternative-session">>,
-           xmlns = <<"urn:xmpp:jingle:1">>,
-           module = 'xep0166',
-           result = 'alternative-session'}).
--xml(jingle_reason_busy,
-     #elem{name = <<"busy">>,
-           xmlns = <<"urn:xmpp:jingle:1">>,
-           module = 'xep0166',
-           result = 'busy'}).
--xml(jingle_reason_cancel,
-     #elem{name = <<"cancel">>,
-           xmlns = <<"urn:xmpp:jingle:1">>,
-           module = 'xep0166',
-           result = 'cancel'}).
--xml(jingle_reason_connectivity_error,
-     #elem{name = <<"connectivity-error">>,
-           xmlns = <<"urn:xmpp:jingle:1">>,
-           module = 'xep0166',
-           result = 'connectivity-error'}).
--xml(jingle_reason_decline,
-     #elem{name = <<"decline">>,
-           xmlns = <<"urn:xmpp:jingle:1">>,
-           module = 'xep0166',
-           result = 'decline'}).
--xml(jingle_reason_expired,
-     #elem{name = <<"expired">>,
-           xmlns = <<"urn:xmpp:jingle:1">>,
-           module = 'xep0166',
-           result = 'expired'}).
--xml(jingle_reason_failed_application,
-     #elem{name = <<"failed-application">>,
-           xmlns = <<"urn:xmpp:jingle:1">>,
-           module = 'xep0166',
-           result = 'failed-application'}).
--xml(jingle_reason_failed_transport,
-     #elem{name = <<"failed-transport">>,
-           xmlns = <<"urn:xmpp:jingle:1">>,
-           module = 'xep0166',
-           result = 'failed-transport'}).
--xml(jingle_reason_general_error,
-     #elem{name = <<"general-error">>,
-           xmlns = <<"urn:xmpp:jingle:1">>,
-           module = 'xep0166',
-           result = 'general-error'}).
--xml(jingle_reason_gone,
-     #elem{name = <<"gone">>,
-           xmlns = <<"urn:xmpp:jingle:1">>,
-           module = 'xep0166',
-           result = 'gone'}).
--xml(jingle_reason_incompatible_parameters,
-     #elem{name = <<"incompatible-parameters">>,
-           xmlns = <<"urn:xmpp:jingle:1">>,
-           module = 'xep0166',
-           result = 'incompatible-parameters'}).
--xml(jingle_reason_media_error,
-     #elem{name = <<"media-error">>,
-           xmlns = <<"urn:xmpp:jingle:1">>,
-           module = 'xep0166',
-           result = 'media-error'}).
--xml(jingle_reason_security_error,
-     #elem{name = <<"security-error">>,
-           xmlns = <<"urn:xmpp:jingle:1">>,
-           module = 'xep0166',
-           result = 'security-error'}).
--xml(jingle_reason_success,
-     #elem{name = <<"success">>,
-           xmlns = <<"urn:xmpp:jingle:1">>,
-           module = 'xep0166',
-           result = 'success'}).
--xml(jingle_reason_timeout,
-     #elem{name = <<"timeout">>,
-           xmlns = <<"urn:xmpp:jingle:1">>,
-           module = 'xep0166',
-           result = 'timeout'}).
--xml(jingle_reason_unsupported_applications,
-     #elem{name = <<"unsupported-applications">>,
-           xmlns = <<"urn:xmpp:jingle:1">>,
-           module = 'xep0166',
-           result = 'unsupported-applications'}).
--xml(jingle_reason_unsupported_transports,
-     #elem{name = <<"unsupported-transports">>,
-           xmlns = <<"urn:xmpp:jingle:1">>,
-           module = 'xep0166',
-           result = 'unsupported-transports'}).
-
--xml(jingle_reason_text,
-     #elem{name = <<"text">>,
-	   xmlns = <<"urn:xmpp:jingle:1">>,
-	   module = 'xep0166',
-	   result = {text, '$lang', '$data'},
-           cdata = #cdata{label = '$data'},
-           attrs = [#attr{name = <<"xml:lang">>,
-			  dec = {xmpp_lang, check, []},
-                          label = '$lang'}]}).
-
--xml(jingle_reason,
-     #elem{name = <<"reason">>,
-	   xmlns = <<"urn:xmpp:jingle:1">>,
-	   module = 'xep0166',
-	   result = {jingle_reason, '$reason', '$text', '$_els'},
-           refs = [#ref{name = jingle_reason_text, label = '$text'},
-                   #ref{name = jingle_reason_alternative_session,
-                        min = 0, max = 1, label = '$reason'},
-                   #ref{name = jingle_reason_busy,
-                        min = 0, max = 1, label = '$reason'},
-		   #ref{name = jingle_reason_cancel,
-                        min = 0, max = 1, label = '$reason'},
-		   #ref{name = jingle_reason_connectivity_error,
-                        min = 0, max = 1, label = '$reason'},
-		   #ref{name = jingle_reason_decline,
-                        min = 0, max = 1, label = '$reason'},
-		   #ref{name = jingle_reason_expired,
-                        min = 0, max = 1, label = '$reason'},
-		   #ref{name = jingle_reason_failed_application,
-                        min = 0, max = 1, label = '$reason'},
-		   #ref{name = jingle_reason_failed_transport,
-                        min = 0, max = 1, label = '$reason'},
-		   #ref{name = jingle_reason_general_error,
-                        min = 0, max = 1, label = '$reason'},
-		   #ref{name = jingle_reason_gone,
-                        min = 0, max = 1, label = '$reason'},
-		   #ref{name = jingle_reason_incompatible_parameters,
-                        min = 0, max = 1, label = '$reason'},
-		   #ref{name = jingle_reason_media_error,
-                        min = 0, max = 1, label = '$reason'},
-		   #ref{name = jingle_reason_security_error,
-                        min = 0, max = 1, label = '$reason'},
-		   #ref{name = jingle_reason_success,
-                        min = 0, max = 1, label = '$reason'},
-		   #ref{name = jingle_reason_timeout,
-                        min = 0, max = 1, label = '$reason'},
-		   #ref{name = jingle_reason_unsupported_applications,
-                        min = 0, max = 1, label = '$reason'},
-		   #ref{name = jingle_reason_unsupported_transports,
-                        min = 0, max = 1, label = '$reason'}]}).
-
--xml(jingle_content,
-     #elem{name = <<"content">>,
-	   xmlns = <<"urn:xmpp:jingle:1">>,
-           module = 'xep0166',
-	   result = {jingle_content, '$creator', '$disposition',
-		     '$name', '$senders', '$_els'},
-	   attrs = [#attr{name = <<"creator">>,
-			  required = true,
-			  enc = {enc_enum, []},
-			  dec = {dec_enum, [[initiator, responder]]}},
-		    #attr{name = <<"disposition">>},
-		    #attr{name = <<"name">>,
-			  required = true},
-		    #attr{name = <<"senders">>,
-			  enc = {enc_enum, []},
-			  dec = {dec_enum, [[both, initiator,
-					     none, responder]]},
-			  default = both}]}).
-
--xml(jingle,
-     #elem{name = <<"jingle">>,
-	   xmlns = <<"urn:xmpp:jingle:1">>,
-	   module = 'xep0166',
-	   result = {jingle, '$action', '$sid', '$initiator', '$responder',
-		     '$content', '$reason', '$_els'},
-	   attrs = [#attr{name = <<"action">>,
-			  required = true,
-			  enc = {enc_enum, []},
-			  dec = {dec_enum,
-				 [['content-accept',
-				   'content-add',
-				   'content-modify',
-				   'content-reject',
-				   'content-remove',
-				   'description-info',
-				   'security-info',
-				   'session-accept',
-				   'session-info',
-				   'session-initiate',
-				   'session-terminate',
-				   'transport-accept',
-				   'transport-info',
-				   'transport-reject',
-				   'transport-replace']]}},
-		    #attr{name = <<"sid">>,
-			  required = true},
-		    #attr{name = <<"initiator">>,
-			  enc = {jid, encode, []},
-			  dec = {jid, decode, []}},
-		    #attr{name = <<"responder">>,
-			  enc = {jid, encode, []},
-			  dec = {jid, decode, []}}],
-	   refs = [#ref{name = jingle_content, label = '$content'},
-		   #ref{name = jingle_reason, label = '$reason',
-			min = 0, max = 1}]}).
-
--xml(jingle_ft_date,
-     #elem{name = <<"date">>,
-	   xmlns = <<"urn:xmpp:jingle:apps:file-transfer:5">>,
-	   module = 'xep0234',
-	   cdata = #cdata{required = true,
-			  enc = {enc_utc, []},
-			  dec = {dec_utc, []}},
-	   result = '$cdata'}).
-
--xml(jingle_ft_desc,
-     #elem{name = <<"desc">>,
-	   xmlns = <<"urn:xmpp:jingle:apps:file-transfer:5">>,
-	   module = 'xep0234',
-	   result = {text, '$lang', '$data'},
-           cdata = #cdata{label = '$data'},
-           attrs = [#attr{name = <<"xml:lang">>,
-			  dec = {xmpp_lang, check, []},
-                          label = '$lang'}]}).
-
--xml(jingle_ft_media_type,
-     #elem{name = <<"media-type">>,
-	   xmlns = <<"urn:xmpp:jingle:apps:file-transfer:5">>,
-	   module = 'xep0234',
-	   cdata = #cdata{required = true},
-	   result = '$cdata'}).
-
--xml(jingle_ft_name,
-     #elem{name = <<"name">>,
-	   xmlns = <<"urn:xmpp:jingle:apps:file-transfer:5">>,
-	   module = 'xep0234',
-	   cdata = #cdata{required = true},
-	   result = '$cdata'}).
-
--xml(jingle_ft_size,
-     #elem{name = <<"size">>,
-	   xmlns = <<"urn:xmpp:jingle:apps:file-transfer:5">>,
-	   module = 'xep0234',
-	   cdata = #cdata{required = true,
-			  dec = {dec_int, [0, infinity]},
-			  enc = {enc_int, []}},
-	   result = '$cdata'}).
-
--xml(jingle_ft_range,
-     #elem{name = <<"range">>,
-	   xmlns = <<"urn:xmpp:jingle:apps:file-transfer:5">>,
-	   module = 'xep0234',
-	   result = {jingle_ft_range, '$offset', '$length', '$hash'},
-	   attrs = [#attr{name = <<"offset">>,
-			  default = 0,
-			  dec = {dec_int, [0, infinity]},
-			  enc = {enc_int, []}},
-		    #attr{name = <<"length">>,
-			  dec = {dec_int, [0, infinity]},
-			  enc = {enc_int, []}}],
-	   refs = [#ref{name = hash, label = '$hash'}]}).
-
--xml(jingle_ft_file,
-     #elem{name = <<"file">>,
-	   xmlns = <<"urn:xmpp:jingle:apps:file-transfer:5">>,
-	   module = 'xep0234',
-	   result = {jingle_ft_file, '$date', '$desc', '$hash', '$hash-used',
-		     '$media-type', '$name', '$size', '$range'},
-	   refs = [#ref{name = jingle_ft_date, label = '$date', max = 1},
-		   #ref{name = jingle_ft_desc, label = '$desc'},
-		   #ref{name = hash, label = '$hash'},
-		   #ref{name = hash_used, label = '$hash-used', max = 1},
-		   #ref{name = jingle_ft_media_type, label = '$media-type', max = 1},
-		   #ref{name = jingle_ft_name, label = '$name', max = 1},
-		   #ref{name = jingle_ft_size, label = '$size', max = 1},
-		   #ref{name = jingle_ft_range, label = '$range', max = 1}]}).
-
--xml(jingle_ft_description,
-     #elem{name = <<"description">>,
-	   xmlns = <<"urn:xmpp:jingle:apps:file-transfer:5">>,
-	   module = 'xep0234',
-	   result = {jingle_ft_description, '$file'},
-	   refs = [#ref{name = jingle_ft_file, label = '$file',
-			min = 0, max = 1}]}).
-
--xml(jingle_ft_received,
-     #elem{name = <<"received">>,
-	   xmlns = <<"urn:xmpp:jingle:apps:file-transfer:5">>,
-	   module = 'xep0234',
-	   result = {jingle_ft_received, '$creator', '$name'},
-	   attrs = [#attr{name = <<"creator">>,
-			  enc = {enc_enum, []},
-			  dec = {dec_enum, [[initiator, responder]]}},
-		    #attr{name = <<"name">>}]}).
-
--xml(jingle_ft_checksum,
-     #elem{name = <<"checksum">>,
-	   xmlns = <<"urn:xmpp:jingle:apps:file-transfer:5">>,
-	   module = 'xep0234',
-	   result = {jingle_ft_checksum, '$creator', '$name', '$file'},
-	   attrs = [#attr{name = <<"creator">>,
-			  enc = {enc_enum, []},
-			  dec = {dec_enum, [[initiator, responder]]}},
-		    #attr{name = <<"name">>}],
-	   refs = [#ref{name = jingle_ft_file, label = '$file',
-			min = 1, max = 1}]}).
-
--record(jingle_ft_error, {reason :: 'file-not-available' | 'file-too-large'}).
--type jingle_ft_error() :: #jingle_ft_error{}.
-
--xml(jingle_ft_error_file_not_available,
-     #elem{name = <<"file-not-available">>,
-	   xmlns = <<"urn:xmpp:jingle:apps:file-transfer:errors:0">>,
-	   module = 'xep0234',
-	   result = {jingle_ft_error, 'file-not-available'}}).
-
--xml(jingle_ft_error_file_too_large,
-     #elem{name = <<"file-too-large">>,
-	   xmlns = <<"urn:xmpp:jingle:apps:file-transfer:errors:0">>,
-	   module = 'xep0234',
-	   result = {jingle_ft_error, 'file-too-large'}}).
-
--xml(jingle_s5b_candidate_used,
-     #elem{name = <<"candidate-used">>,
-	   xmlns = <<"urn:xmpp:jingle:transports:s5b:1">>,
-	   module = 'xep0260',
-	   result = '$cid',
-	   attrs = [#attr{name = <<"cid">>, required = true}]}).
-
--xml(jingle_s5b_candidate,
-     #elem{name = <<"candidate">>,
-	   xmlns = <<"urn:xmpp:jingle:transports:s5b:1">>,
-	   module = 'xep0260',
-	   result = {jingle_s5b_candidate, '$cid', '$host', '$port',
-		     '$jid', '$type', '$priority'},
-	   attrs = [#attr{name = <<"cid">>, required = true},
-		    #attr{name = <<"host">>, required = true,
-			  enc = {enc_ip, []}, dec = {dec_ip, []}},
-		    #attr{name = <<"jid">>, required = true,
-			  enc = {jid, encode, []},
-			  dec = {jid, decode, []}},
-		    #attr{name = <<"port">>,
-			  enc = {enc_int, []},
-			  dec = {dec_int, [0, 65535]}},
-		    #attr{name = <<"priority">>,
-			  required = true,
-			  enc = {enc_int, []},
-			  dec = {dec_int, [0, infinity]}},
-		    #attr{name = <<"type">>,
-			  default = direct,
-			  enc = {enc_enum, []},
-			  dec = {dec_enum, [[assisted, direct, proxy, tunnel]]}}]}).
-
--xml(jingle_s5b_activated,
-     #elem{name = <<"activated">>,
-	   xmlns = <<"urn:xmpp:jingle:transports:s5b:1">>,
-	   module = 'xep0260',
-	   result = '$cid',
-	   attrs = [#attr{name = <<"cid">>, required = true}]}).
-
--xml(jingle_s5b_candidate_error,
-     #elem{name = <<"candidate-error">>,
-	   xmlns = <<"urn:xmpp:jingle:transports:s5b:1">>,
-	   module = 'xep0260',
-	   result = 'candidate-error'}).
-
--xml(jingle_s5b_proxy_error,
-     #elem{name = <<"proxy-error">>,
-	   xmlns = <<"urn:xmpp:jingle:transports:s5b:1">>,
-	   module = 'xep0260',
-	   result = 'proxy-error'}).
-
--xml(jingle_s5b_transport,
-     #elem{name = <<"transport">>,
-	   xmlns = <<"urn:xmpp:jingle:transports:s5b:1">>,
-	   module = 'xep0260',
-	   result = {jingle_s5b_transport, '$sid', '$dstaddr', '$mode',
-		     '$candidates', '$candidate-used', '$activated', '$error'},
-	   attrs = [#attr{name = <<"sid">>, required = true},
-		    #attr{name = <<"dstaddr">>},
-		    #attr{name = <<"mode">>,
-			  default = tcp,
-			  enc = {enc_enum, []},
-			  dec = {dec_enum, [[tcp, udp]]}}],
-	   refs = [#ref{name = jingle_s5b_candidate, label = '$candidates'},
-		   #ref{name = jingle_s5b_candidate_used,
-			label = '$candidate-used', max = 1},
-		   #ref{name = jingle_s5b_activated,
-			label = '$activated', max = 1},
-		   #ref{name = jingle_s5b_candidate_error,
-			label = '$error', max = 1},
-		   #ref{name = jingle_s5b_proxy_error,
-			label = '$error', max = 1}]}).
-
--xml(jingle_ibb_transport,
-     #elem{name = <<"transport">>,
-	   xmlns = <<"urn:xmpp:jingle:transports:ibb:1">>,
-	   module = 'xep0261',
-	   result = {jingle_ibb_transport, '$sid', '$block-size', '$stanza'},
-	   attrs = [#attr{name = <<"sid">>, required = true},
-		    #attr{name = <<"block-size">>, required = true,
-			  enc = {enc_int, []},
-			  dec = {dec_int, [0, infinity]}},
-		    #attr{name = <<"stanza">>,
-			  default = iq,
-			  enc = {enc_enum, []},
-			  dec = {dec_enum, [[iq, message]]}}]}).
-
--xml(x509_cert,
-     #elem{name = <<"x509-cert">>,
-	   xmlns = <<"urn:xmpp:x509:0">>,
-	   module = 'xep0417',
-	   result = '$cdata',
-	   cdata = #cdata{required = true,
-			  enc = {base64, encode, []},
-			  dec = {base64, decode, []}}}).
-
--xml(x509_csr,
-     #elem{name = <<"x509-csr">>,
-	   xmlns = <<"urn:xmpp:x509:0">>,
-	   module = 'xep0417',
-	   result = {x509_csr, '$name', '$der'},
-	   attrs = [#attr{name = <<"name">>}],
-	   cdata = #cdata{required = true,
-			  label = '$der',
-			  enc = {base64, encode, []},
-			  dec = {base64, decode, []}}}).
-
--xml(x509_cert_chain,
-     #elem{name = <<"x509-cert-chain">>,
-	   xmlns = <<"urn:xmpp:x509:0">>,
-	   module = 'xep0417',
-	   result = {x509_cert_chain, '$name', '$certs'},
-	   attrs = [#attr{name = <<"name">>}],
-	   refs = [#ref{name = x509_cert,
-			label = '$certs'}]}).
-
--xml(x509_ca_list,
-     #elem{name = <<"x509-ca-list">>,
-	   xmlns = <<"urn:xmpp:x509:0">>,
-	   module = 'xep0417',
-	   result = {x509_ca_list, '$certs'},
-	   refs = [#ref{name = x509_cert,
-			label = '$certs'}]}).
-
--xml(x509_signature,
-     #elem{name = <<"x509-signature">>,
-	   xmlns = <<"urn:xmpp:x509:0">>,
-	   module = 'xep0417',
-	   result = '$cdata',
-	   cdata = #cdata{required = true,
-			  enc = {base64, encode, []},
-			  dec = {base64, decode, []}}}).
-
--xml(x509_request,
-     #elem{name = <<"x509-request">>,
-	   xmlns = <<"urn:xmpp:x509:0">>,
-	   module = 'xep0417',
-	   result = {x509_request, '$transaction', '$csr', '$cert', '$signature'},
-	   attrs = [#attr{name = <<"transaction">>, required = true}],
-	   refs = [#ref{name = x509_csr, label = '$csr', min = 1, max = 1},
-		   #ref{name = x509_cert, label = '$cert', max = 1},
-		   #ref{name = x509_signature, label = '$signature', max = 1}]}).
-
--xml(x509_revoke,
-     #elem{name = <<"x509-revoke">>,
-	   xmlns = <<"urn:xmpp:x509:0">>,
-	   module = 'xep0417',
-	   result = {x509_revoke, '$cert', '$signature'},
-	   refs = [#ref{name = x509_cert, label = '$cert',
-			min = 1, max = 1},
-		   #ref{name = x509_signature, label = '$signature',
-			min = 1, max = 1}]}).
-
--xml(x509_challenge,
-     #elem{name = <<"x509-challenge">>,
-	   xmlns = <<"urn:xmpp:x509:0">>,
-	   module = 'xep0417',
-	   result = {x509_challenge, '$transaction', '$uri', '$signature'},
-	   attrs = [#attr{name = <<"transaction">>, required = true},
-		    #attr{name = <<"uri">>, required = true}],
-	   refs = [#ref{name = x509_signature,
-			label = '$signature',
-			min = 1, max = 1}]}).
-
--xml(x509_challenge_failed,
-     #elem{name = <<"x509-challenge-failed">>,
-	   xmlns = <<"urn:xmpp:x509:0">>,
-	   module = 'xep0417',
-	   result = {x509_challenge_failed}}).
-
--xml(x509_register,
-     #elem{name = <<"x509-register">>,
-	   xmlns = <<"urn:xmpp:x509:0">>,
-	   module = 'xep0417',
-	   result = {x509_register}}).
-
--spec dec_tzo(_) -> {integer(), integer()}.
-dec_tzo(Val) ->
-    [H1, M1] = binary:split(Val, <<":">>),
-    H = binary_to_integer(H1),
-    M = binary_to_integer(M1),
-    if H >= -12, H =< 12, M >= 0, M < 60  ->
-            {H, M}
-    end.
-
-enc_tzo({H, M}) ->
-    Sign = if H >= 0 ->
-                   <<>>;
-              true ->
-                   <<"-">>
-           end,
-    list_to_binary([Sign, io_lib:format("~2..0w:~2..0w", [abs(H), M])]).
-
--spec dec_utc(_) -> erlang:timestamp().
-dec_utc(Val) ->
-    xmpp_util:decode_timestamp(Val).
-
-enc_utc(Val) ->
-    xmpp_util:encode_timestamp(Val).
-
--spec jid:decode(_) -> jid:jid().
-
--spec check_resource(_) -> binary().
-check_resource(R) ->
-    case jid:resourceprep(R) of
-        error ->
-            erlang:error(badarg);
-        _ ->
-	    R
-    end.
-
--spec nameprep(_) -> binary().
-nameprep(S) ->
-    case jid:nameprep(S) of
-	error ->
-	    erlang:error(badarg);
-	S1 ->
-	    S1
-    end.
-
--spec nodeprep(_) -> binary().
-nodeprep(S) ->
-    case jid:nodeprep(S) of
-	error ->
-	    erlang:error(badarg);
-	S1 ->
-	    S1
-    end.
-
--spec dec_bool(_) -> boolean().
-dec_bool(<<"false">>) -> false;
-dec_bool(<<"0">>) -> false;
-dec_bool(<<"true">>) -> true;
-dec_bool(<<"1">>) -> true.
-
-enc_bool(false) -> <<"false">>;
-enc_bool(true) -> <<"true">>.
-
-join([], _Sep) -> <<>>;
-join([H | T], Sep) ->
-    <<H/binary, (<< <<Sep, X/binary>> || X <- T >>)/binary>>.
-
--spec dec_ip(_) -> inet:ip_address().
-dec_ip(S) ->
-    {ok, Addr} = inet_parse:address(binary_to_list(S)),
-    Addr.
-
-enc_ip({0,0,0,0,0,16#ffff,A,B}) ->
-    enc_ip({(A bsr 8) band 16#ff, A band 16#ff,
-	    (B bsr 8) band 16#ff, B band 16#ff});
-enc_ip(Addr) ->
-    list_to_binary(inet_parse:ntoa(Addr)).
-
--spec re:split(_, _) -> [binary()].
--spec base64:decode(_) -> binary().
--spec base64:mime_decode(_) -> binary().
--spec xmpp_lang:check(_) -> binary().
-
--type xmpp_host() :: binary() | inet:ip_address() |
-		     {binary() | inet:ip_address(), inet:port_number()}.
--spec dec_host_port(_) -> binary() | inet:ip_address() |
-			  {binary() | inet:ip_address(), inet:port_number()}.
-dec_host_port(<<$[, T/binary>>) ->
-    [IP, <<$:, Port/binary>>] = binary:split(T, <<$]>>),
-    {dec_ip(IP), dec_int(Port, 0, 65535)};
-dec_host_port(S) ->
-    case binary:split(S, <<$:>>) of
-	[S] ->
-	    try dec_ip(S) catch _:_ -> S end;
-	[S, P] ->
-	    {try dec_ip(S) catch _:_ -> S end, dec_int(P, 0, 65535)}
-    end.
-
-enc_host_port(Host) when is_binary(Host) ->
-    Host;
-enc_host_port({Addr, Port}) when is_tuple(Addr) ->
-    enc_host_port({enc_host_port(Addr), Port});
-enc_host_port({Host, Port}) ->
-    <<Host/binary, $:, (integer_to_binary(Port))/binary>>;
-enc_host_port({_,_,_,_} = IPv4) ->
-    enc_ip(IPv4);
-enc_host_port({0,0,0,0,0,16#ffff,_,_} = IP) ->
-    enc_ip(IP);
-enc_host_port({_,_,_,_,_,_,_,_} = IPv6) ->
-    <<$[, (enc_ip(IPv6))/binary, $]>>.
-
--spec dec_version(_) -> {non_neg_integer(), non_neg_integer()}.
-dec_version(S) ->
-    [Major, Minor] = binary:split(S, <<$.>>),
-    {binary_to_integer(Major), binary_to_integer(Minor)}.
-
-enc_version({Maj, Min}) ->
-    <<(integer_to_binary(Maj))/binary, $., (integer_to_binary(Min))/binary>>.
-
--spec dec_ps_aff(_) -> member | none | outcast |
-		       owner | publisher | publish_only.
-dec_ps_aff(<<"member">>) -> member;
-dec_ps_aff(<<"none">>) -> none;
-dec_ps_aff(<<"outcast">>) -> outcast;
-dec_ps_aff(<<"owner">>) -> owner;
-dec_ps_aff(<<"publisher">>) -> publisher;
-dec_ps_aff(<<"publish-only">>) -> publish_only.
-
-enc_ps_aff(member) -> <<"member">>;
-enc_ps_aff(none) -> <<"none">>;
-enc_ps_aff(outcast) -> <<"outcast">>;
-enc_ps_aff(owner) -> <<"owner">>;
-enc_ps_aff(publisher) -> <<"publisher">>;
-enc_ps_aff(publish_only) -> <<"publish-only">>.
-
--spec dec_message_type(_) -> chat | groupchat | headline | error | normal.
-dec_message_type(<<"chat">>) -> chat;
-dec_message_type(<<"groupchat">>) -> groupchat;
-dec_message_type(<<"headline">>) -> headline;
-dec_message_type(<<"error">>) -> error;
-dec_message_type(_) -> normal.
-
-%% Local Variables:
-%% mode: erlang
-%% End:
-%% vim: set filetype=erlang tabstop=8:
 %%memo start%%
 
 -xml(topic_user_item,
@@ -5173,7 +4188,7 @@ dec_message_type(_) -> normal.
         attrs = [ #attr{name = <<"type">>,
                             required=true,
                                   enc = {enc_enum, []},
-                                  dec = {dec_enum, [[oto,topic,group,gateway]]} },
+                                  dec = {dec_enum, [[oto,topic,group]]} },
                   #attr{name = <<"dispatched">> ,required = false},
                  #attr{name = <<"target_id">>,required = false},
                 #attr{name = <<"content_type">> ,required = false},
@@ -5508,3 +4523,136 @@ dec_message_type(_) -> normal.
 
 
 %%memo end%%
+
+
+-spec dec_tzo(_) -> {integer(), integer()}.
+dec_tzo(Val) ->
+    [H1, M1] = binary:split(Val, <<":">>),
+    H = binary_to_integer(H1),
+    M = binary_to_integer(M1),
+    if H >= -12, H =< 12, M >= 0, M < 60  ->
+            {H, M}
+    end.
+
+enc_tzo({H, M}) ->
+    Sign = if H >= 0 ->
+                   <<>>;
+              true ->
+                   <<"-">>
+           end,
+    list_to_binary([Sign, io_lib:format("~2..0w:~2..0w", [H, M])]).
+
+-spec dec_utc(_) -> erlang:timestamp().
+dec_utc(Val) ->
+    xmpp_util:decode_timestamp(Val).
+
+enc_utc(Val) ->
+    xmpp_util:encode_timestamp(Val).
+
+-spec jid:decode(_) -> jid:jid().
+
+-spec check_resource(_) -> binary().
+check_resource(R) ->
+    case jid:resourceprep(R) of
+        error ->
+            erlang:error(badarg);
+        _ ->
+	    R
+    end.
+
+-spec nameprep(_) -> binary().
+nameprep(S) ->
+    case jid:nameprep(S) of
+	error ->
+	    erlang:error(badarg);
+	S1 ->
+	    S1
+    end.
+
+-spec dec_bool(_) -> boolean().
+dec_bool(<<"false">>) -> false;
+dec_bool(<<"0">>) -> false;
+dec_bool(<<"true">>) -> true;
+dec_bool(<<"1">>) -> true.
+
+enc_bool(false) -> <<"false">>;
+enc_bool(true) -> <<"true">>.
+
+join([], _Sep) -> <<>>;
+join([H | T], Sep) ->
+    <<H/binary, (<< <<Sep, X/binary>> || X <- T >>)/binary>>.
+
+-spec dec_ip(_) -> inet:ip_address().
+dec_ip(S) ->
+    {ok, Addr} = inet_parse:address(binary_to_list(S)),
+    Addr.
+
+enc_ip({0,0,0,0,0,16#ffff,A,B}) ->
+    enc_ip({(A bsr 8) band 16#ff, A band 16#ff,
+	    (B bsr 8) band 16#ff, B band 16#ff});
+enc_ip(Addr) ->
+    list_to_binary(inet_parse:ntoa(Addr)).
+
+-spec re:split(_, _) -> [binary()].
+-spec base64:decode(_) -> binary().
+-spec base64:mime_decode(_) -> binary().
+
+-spec dec_host_port(_) -> binary() | inet:ip_address() |
+			  {binary() | inet:ip_address(), non_neg_integer()}.
+dec_host_port(<<$[, T/binary>>) ->
+    [IP, <<$:, Port/binary>>] = binary:split(T, <<$]>>),
+    {dec_ip(IP), dec_int(Port, 0, 65535)};
+dec_host_port(S) ->
+    case binary:split(S, <<$:>>) of
+	[S] ->
+	    try dec_ip(S) catch _:_ -> S end;
+	[S, P] ->
+	    {try dec_ip(S) catch _:_ -> S end, dec_int(P, 0, 65535)}
+    end.
+
+enc_host_port(Host) when is_binary(Host) ->
+    Host;
+enc_host_port({{_,_,_,_,_,_,_,_} = IPv6, Port}) ->
+    enc_host_port({<<$[, (enc_ip(IPv6))/binary, $]>>, Port});
+enc_host_port({{_,_,_,_} = IPv4, Port}) ->
+    enc_host_port({enc_ip(IPv4), Port});
+enc_host_port({Host, Port}) ->
+    <<Host/binary, $:, (integer_to_binary(Port))/binary>>;
+enc_host_port(Addr) ->
+    enc_ip(Addr).
+
+-spec dec_version(_) -> {non_neg_integer(), non_neg_integer()}.
+dec_version(S) ->
+    [Major, Minor] = binary:split(S, <<$.>>),
+    {binary_to_integer(Major), binary_to_integer(Minor)}.
+
+enc_version({Maj, Min}) ->
+    <<(integer_to_binary(Maj))/binary, $., (integer_to_binary(Min))/binary>>.
+
+-spec dec_ps_aff(_) -> member | none | outcast |
+		       owner | publisher | publish_only.
+dec_ps_aff(<<"member">>) -> member;
+dec_ps_aff(<<"none">>) -> none;
+dec_ps_aff(<<"outcast">>) -> outcast;
+dec_ps_aff(<<"owner">>) -> owner;
+dec_ps_aff(<<"publisher">>) -> publisher;
+dec_ps_aff(<<"publish-only">>) -> publish_only.
+
+enc_ps_aff(member) -> <<"member">>;
+enc_ps_aff(none) -> <<"none">>;
+enc_ps_aff(outcast) -> <<"outcast">>;
+enc_ps_aff(owner) -> <<"owner">>;
+enc_ps_aff(publisher) -> <<"publisher">>;
+enc_ps_aff(publish_only) -> <<"publish-only">>.
+
+-spec dec_message_type(_) -> chat | groupchat | headline | error | normal.
+dec_message_type(<<"chat">>) -> chat;
+dec_message_type(<<"groupchat">>) -> groupchat;
+dec_message_type(<<"headline">>) -> headline;
+dec_message_type(<<"error">>) -> error;
+dec_message_type(_) -> normal.
+
+%% Local Variables:
+%% mode: erlang
+%% End:
+%% vim: set filetype=erlang tabstop=8:

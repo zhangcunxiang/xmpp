@@ -5,10 +5,8 @@
 
 -module(flex_offline).
 
--export([encode/1, encode/2]).
-
--export([decode/1, decode/2, format_error/1,
-	 io_format_error/1]).
+-export([decode/1, decode/2, encode/1, encode/2,
+	 format_error/1, io_format_error/1]).
 
 -include("xmpp_codec.hrl").
 
@@ -16,10 +14,8 @@
 
 -export_type([property/0, result/0, form/0]).
 
--dialyzer({nowarn_function, {dec_int, 3}}).
-
 dec_int(Val, Min, Max) ->
-    case erlang:binary_to_integer(Val) of
+    case list_to_integer(binary_to_list(Val)) of
       Int when Int =< Max, Min == infinity -> Int;
       Int when Int =< Max, Int >= Min -> Int
     end.
@@ -70,13 +66,10 @@ decode(Fs, Acc) ->
     case lists:keyfind(<<"FORM_TYPE">>, #xdata_field.var,
 		       Fs)
 	of
-      false ->
-	  decode(Fs, Acc,
-		 <<"http://jabber.org/protocol/offline">>, []);
-      #xdata_field{values = [XMLNS]}
-	  when XMLNS ==
-		 <<"http://jabber.org/protocol/offline">> ->
-	  decode(Fs, Acc, XMLNS, []);
+      false -> decode(Fs, Acc, []);
+      #xdata_field{values =
+		       [<<"http://jabber.org/protocol/offline">>]} ->
+	  decode(Fs, Acc, []);
       _ ->
 	  erlang:error({?MODULE,
 			{form_type_mismatch,
@@ -104,37 +97,40 @@ encode(List, Lang) when is_list(List) ->
 decode([#xdata_field{var = <<"number_of_messages">>,
 		     values = [Value]}
 	| Fs],
-       Acc, XMLNS, Required) ->
+       Acc, Required) ->
     try dec_int(Value, 0, infinity) of
       Result ->
-	  decode(Fs, [{number_of_messages, Result} | Acc], XMLNS,
+	  decode(Fs, [{number_of_messages, Result} | Acc],
 		 Required)
     catch
       _:_ ->
 	  erlang:error({?MODULE,
-			{bad_var_value, <<"number_of_messages">>, XMLNS}})
+			{bad_var_value, <<"number_of_messages">>,
+			 <<"http://jabber.org/protocol/offline">>}})
     end;
 decode([#xdata_field{var = <<"number_of_messages">>,
 		     values = []} =
 	    F
 	| Fs],
-       Acc, XMLNS, Required) ->
+       Acc, Required) ->
     decode([F#xdata_field{var = <<"number_of_messages">>,
 			  values = [<<>>]}
 	    | Fs],
-	   Acc, XMLNS, Required);
+	   Acc, Required);
 decode([#xdata_field{var = <<"number_of_messages">>}
 	| _],
-       _, XMLNS, _) ->
+       _, _) ->
     erlang:error({?MODULE,
-		  {too_many_values, <<"number_of_messages">>, XMLNS}});
-decode([#xdata_field{var = Var} | Fs], Acc, XMLNS,
-       Required) ->
+		  {too_many_values, <<"number_of_messages">>,
+		   <<"http://jabber.org/protocol/offline">>}});
+decode([#xdata_field{var = Var} | Fs], Acc, Required) ->
     if Var /= <<"FORM_TYPE">> ->
-	   erlang:error({?MODULE, {unknown_var, Var, XMLNS}});
-       true -> decode(Fs, Acc, XMLNS, Required)
+	   erlang:error({?MODULE,
+			 {unknown_var, Var,
+			  <<"http://jabber.org/protocol/offline">>}});
+       true -> decode(Fs, Acc, Required)
     end;
-decode([], Acc, _, []) -> Acc.
+decode([], Acc, []) -> Acc.
 
 encode_number_of_messages(Value, Lang) ->
     Values = case Value of

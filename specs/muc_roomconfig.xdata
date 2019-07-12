@@ -12,20 +12,7 @@
   <field
       var='muc#roomconfig_allowpm'
       type='list-single'
-      label='Roles that May Send Private Messages'>
-    <option label='Anyone'>
-      <value>anyone</value>
-    </option>
-    <option label='Anyone with Voice'>
-      <value>participants</value>
-    </option>
-    <option label='Moderators Only'>
-      <value>moderators</value>
-    </option>
-    <option label='Nobody'>
-      <value>none</value>
-    </option>
-  </field>
+      label='Roles that May Send Private Messages'/>
   <field
       var='allow_private_messages'
       type='boolean'
@@ -34,13 +21,13 @@
       var='allow_private_messages_from_visitors'
       type='list-single'
       label='Allow visitors to send private messages to'>
-    <option label='Nobody'>
+    <option label='nobody'>
       <value>nobody</value>
     </option>
-    <option label='Moderators Only'>
+    <option label='moderators only'>
       <value>moderators</value>
     </option>
-    <option label='Anyone'>
+    <option label='anyone'>
       <value>anyone</value>
     </option>
   </field>
@@ -185,10 +172,10 @@
       var='muc#roomconfig_whois'
       type='list-single'
       label='Present real Jabber IDs to'>
-    <option label='Moderators Only'>
+    <option label='moderators only'>
       <value>moderators</value>
     </option>
-    <option label='Anyone'>
+    <option label='anyone'>
       <value>anyone</value>
     </option>
   </field>

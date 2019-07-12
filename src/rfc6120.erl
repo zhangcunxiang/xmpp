@@ -626,8 +626,6 @@ tags() ->
 
 do_encode({iq, _, _, _, _, _, _, _} = Iq, TopXMLNS) ->
     encode_iq(Iq, TopXMLNS);
-do_encode({message_thread, _, _} = Thread, TopXMLNS) ->
-    encode_message_thread(Thread, TopXMLNS);
 do_encode({message, _, _, _, _, _, _, _, _, _, _} =
 	      Message,
 	  TopXMLNS) ->
@@ -688,7 +686,6 @@ do_get_name({gone, _}) -> <<"gone">>;
 do_get_name({iq, _, _, _, _, _, _, _}) -> <<"iq">>;
 do_get_name({message, _, _, _, _, _, _, _, _, _, _}) ->
     <<"message">>;
-do_get_name({message_thread, _, _}) -> <<"thread">>;
 do_get_name({presence, _, _, _, _, _, _, _, _, _, _}) ->
     <<"presence">>;
 do_get_name({redirect, _}) -> <<"redirect">>;
@@ -720,8 +717,6 @@ do_get_ns({gone, _}) ->
 do_get_ns({iq, _, _, _, _, _, _, _}) ->
     <<"jabber:client">>;
 do_get_ns({message, _, _, _, _, _, _, _, _, _, _}) ->
-    <<"jabber:client">>;
-do_get_ns({message_thread, _, _}) ->
     <<"jabber:client">>;
 do_get_ns({presence, _, _, _, _, _, _, _, _, _, _}) ->
     <<"jabber:client">>;
@@ -756,43 +751,7 @@ do_get_ns({stream_features, _}) -> <<"jabber:client">>;
 do_get_ns({stream_start, _, _, _, _, Xmlns, _, _, _}) ->
     Xmlns.
 
-get_els({iq, _id, _type, _lang, _from, _to, _sub_els,
-	 _meta}) ->
-    _sub_els;
-get_els({message, _id, _type, _lang, _from, _to,
-	 _subject, _body, _thread, _sub_els, _meta}) ->
-    _sub_els;
-get_els({presence, _id, _type, _lang, _from, _to, _show,
-	 _status, _priority, _sub_els, _meta}) ->
-    _sub_els;
-get_els({stanza_error, _type, _code, _by, _reason,
-	 _text, _sub_els}) ->
-    _sub_els;
-get_els({stream_features, _sub_els}) -> _sub_els.
-
-set_els({iq, _id, _type, _lang, _from, _to, _, _meta},
-	_sub_els) ->
-    {iq, _id, _type, _lang, _from, _to, _sub_els, _meta};
-set_els({message, _id, _type, _lang, _from, _to,
-	 _subject, _body, _thread, _, _meta},
-	_sub_els) ->
-    {message, _id, _type, _lang, _from, _to, _subject,
-     _body, _thread, _sub_els, _meta};
-set_els({presence, _id, _type, _lang, _from, _to, _show,
-	 _status, _priority, _, _meta},
-	_sub_els) ->
-    {presence, _id, _type, _lang, _from, _to, _show,
-     _status, _priority, _sub_els, _meta};
-set_els({stanza_error, _type, _code, _by, _reason,
-	 _text, _},
-	_sub_els) ->
-    {stanza_error, _type, _code, _by, _reason, _text,
-     _sub_els};
-set_els({stream_features, _}, _sub_els) ->
-    {stream_features, _sub_els}.
-
 pp(iq, 7) -> [id, type, lang, from, to, sub_els, meta];
-pp(message_thread, 2) -> [parent, data];
 pp(message, 10) ->
     [id, type, lang, from, to, subject, body, thread,
      sub_els, meta];
@@ -824,10 +783,9 @@ pp(stream_start, 8) ->
 pp(_, _) -> no.
 
 records() ->
-    [{iq, 7}, {message_thread, 2}, {message, 10},
-     {presence, 10}, {gone, 1}, {redirect, 1},
-     {stanza_error, 6}, {bind, 2}, {sasl_auth, 2},
-     {sasl_abort, 0}, {sasl_challenge, 1},
+    [{iq, 7}, {message, 10}, {presence, 10}, {gone, 1},
+     {redirect, 1}, {stanza_error, 6}, {bind, 2},
+     {sasl_auth, 2}, {sasl_abort, 0}, {sasl_challenge, 1},
      {sasl_response, 1}, {sasl_success, 1},
      {sasl_failure, 2}, {sasl_mechanisms, 1}, {starttls, 1},
      {starttls_proceed, 0}, {starttls_failure, 0},
@@ -881,15 +839,15 @@ dec_version(S) ->
 enc_enum(Atom) -> erlang:atom_to_binary(Atom, utf8).
 
 enc_host_port(Host) when is_binary(Host) -> Host;
-enc_host_port({Addr, Port}) when is_tuple(Addr) ->
-    enc_host_port({enc_host_port(Addr), Port});
+enc_host_port({{_, _, _, _, _, _, _, _} = IPv6,
+	       Port}) ->
+    enc_host_port({<<$[, (enc_ip(IPv6))/binary, $]>>,
+		   Port});
+enc_host_port({{_, _, _, _} = IPv4, Port}) ->
+    enc_host_port({enc_ip(IPv4), Port});
 enc_host_port({Host, Port}) ->
     <<Host/binary, $:, (integer_to_binary(Port))/binary>>;
-enc_host_port({_, _, _, _} = IPv4) -> enc_ip(IPv4);
-enc_host_port({0, 0, 0, 0, 0, 65535, _, _} = IP) ->
-    enc_ip(IP);
-enc_host_port({_, _, _, _, _, _, _, _} = IPv6) ->
-    <<$[, (enc_ip(IPv6))/binary, $]>>.
+enc_host_port(Addr) -> enc_ip(Addr).
 
 enc_int(Int) -> erlang:integer_to_binary(Int).
 
@@ -1053,13 +1011,7 @@ decode_stream_start_attr_xmlns(__TopXMLNS, _val) ->
 				    undefined) ->
     <<>>;
 'decode_stream_start_attr_xml:lang'(__TopXMLNS, _val) ->
-    case catch xmpp_lang:check(_val) of
-      {'EXIT', _} ->
-	  erlang:error({xmpp_codec,
-			{bad_attr_value, <<"xml:lang">>, <<"stream:stream">>,
-			 __TopXMLNS}});
-      _res -> _res
-    end.
+    _val.
 
 'encode_stream_start_attr_xml:lang'(<<>>, _acc) -> _acc;
 'encode_stream_start_attr_xml:lang'(_val, _acc) ->
@@ -1093,12 +1045,13 @@ encode_stream_start_attr_id(_val, _acc) ->
 decode_stream_error(__TopXMLNS, __Opts,
 		    {xmlel, <<"stream:error">>, _attrs, _els}) ->
     {Text, Reason} = decode_stream_error_els(__TopXMLNS,
-					     __Opts, _els, [], undefined),
+					     __Opts, _els, undefined,
+					     undefined),
     {stream_error, Reason, Text}.
 
 decode_stream_error_els(__TopXMLNS, __Opts, [], Text,
 			Reason) ->
-    {lists:reverse(Text), Reason};
+    {Text, Reason};
 decode_stream_error_els(__TopXMLNS, __Opts,
 			[{xmlel, <<"text">>, _attrs, _} = _el | _els], Text,
 			Reason) ->
@@ -1107,9 +1060,8 @@ decode_stream_error_els(__TopXMLNS, __Opts,
 	of
       <<"urn:ietf:params:xml:ns:xmpp-streams">> ->
 	  decode_stream_error_els(__TopXMLNS, __Opts, _els,
-				  [decode_stream_error_text(<<"urn:ietf:params:xml:ns:xmpp-streams">>,
-							    __Opts, _el)
-				   | Text],
+				  decode_stream_error_text(<<"urn:ietf:params:xml:ns:xmpp-streams">>,
+							   __Opts, _el),
 				  Reason);
       _ ->
 	  decode_stream_error_els(__TopXMLNS, __Opts, _els, Text,
@@ -1536,13 +1488,11 @@ encode_stream_error({stream_error, Reason, Text},
 					__TopXMLNS),
     {xmlel, <<"stream:error">>, _attrs, _els}.
 
-'encode_stream_error_$text'([], __TopXMLNS, _acc) ->
-    _acc;
-'encode_stream_error_$text'([Text | _els], __TopXMLNS,
+'encode_stream_error_$text'(undefined, __TopXMLNS,
 			    _acc) ->
-    'encode_stream_error_$text'(_els, __TopXMLNS,
-				[encode_stream_error_text(Text, __TopXMLNS)
-				 | _acc]).
+    _acc;
+'encode_stream_error_$text'(Text, __TopXMLNS, _acc) ->
+    [encode_stream_error_text(Text, __TopXMLNS) | _acc].
 
 'encode_stream_error_$reason'(undefined, __TopXMLNS,
 			      _acc) ->
@@ -2160,13 +2110,7 @@ encode_stream_error_text({text, Lang, Data},
     <<>>;
 'decode_stream_error_text_attr_xml:lang'(__TopXMLNS,
 					 _val) ->
-    case catch xmpp_lang:check(_val) of
-      {'EXIT', _} ->
-	  erlang:error({xmpp_codec,
-			{bad_attr_value, <<"xml:lang">>, <<"text">>,
-			 __TopXMLNS}});
-      _res -> _res
-    end.
+    _val.
 
 'encode_stream_error_text_attr_xml:lang'(<<>>, _acc) ->
     _acc;
@@ -2203,7 +2147,7 @@ decode_stream_features_els(__TopXMLNS, __Opts,
 	  case xmpp_codec:get_mod(_name, __XMLNS) of
 	    undefined ->
 		decode_stream_features_els(__TopXMLNS, __Opts, _els,
-					   [_el | __Els]);
+					   __Els);
 	    Mod ->
 		decode_stream_features_els(__TopXMLNS, __Opts, _els,
 					   [Mod:do_decode(_name, __XMLNS, _el,
@@ -2935,13 +2879,7 @@ encode_sasl_failure_text({text, Lang, Data},
     <<>>;
 'decode_sasl_failure_text_attr_xml:lang'(__TopXMLNS,
 					 _val) ->
-    case catch xmpp_lang:check(_val) of
-      {'EXIT', _} ->
-	  erlang:error({xmpp_codec,
-			{bad_attr_value, <<"xml:lang">>, <<"text">>,
-			 __TopXMLNS}});
-      _res -> _res
-    end.
+    _val.
 
 'encode_sasl_failure_text_attr_xml:lang'(<<>>, _acc) ->
     _acc;
@@ -3295,7 +3233,8 @@ encode_bind_jid_cdata(_val, _acc) ->
 decode_error(__TopXMLNS, __Opts,
 	     {xmlel, <<"error">>, _attrs, _els}) ->
     {Text, Reason, __Els} = decode_error_els(__TopXMLNS,
-					     __Opts, _els, [], undefined, []),
+					     __Opts, _els, undefined, undefined,
+					     []),
     {Type, Code, By} = decode_error_attrs(__TopXMLNS,
 					  _attrs, undefined, undefined,
 					  undefined),
@@ -3303,7 +3242,7 @@ decode_error(__TopXMLNS, __Opts,
 
 decode_error_els(__TopXMLNS, __Opts, [], Text, Reason,
 		 __Els) ->
-    {lists:reverse(Text), Reason, lists:reverse(__Els)};
+    {Text, Reason, lists:reverse(__Els)};
 decode_error_els(__TopXMLNS, __Opts,
 		 [{xmlel, <<"text">>, _attrs, _} = _el | _els], Text,
 		 Reason, __Els) ->
@@ -3312,13 +3251,12 @@ decode_error_els(__TopXMLNS, __Opts,
 	of
       <<"urn:ietf:params:xml:ns:xmpp-stanzas">> ->
 	  decode_error_els(__TopXMLNS, __Opts, _els,
-			   [decode_error_text(<<"urn:ietf:params:xml:ns:xmpp-stanzas">>,
-					      __Opts, _el)
-			    | Text],
+			   decode_error_text(<<"urn:ietf:params:xml:ns:xmpp-stanzas">>,
+					     __Opts, _el),
 			   Reason, __Els);
       _ ->
 	  decode_error_els(__TopXMLNS, __Opts, _els, Text, Reason,
-			   [_el | __Els])
+			   __Els)
     end;
 decode_error_els(__TopXMLNS, __Opts,
 		 [{xmlel, <<"bad-request">>, _attrs, _} = _el | _els],
@@ -3333,7 +3271,7 @@ decode_error_els(__TopXMLNS, __Opts,
 			   __Els);
       _ ->
 	  decode_error_els(__TopXMLNS, __Opts, _els, Text, Reason,
-			   [_el | __Els])
+			   __Els)
     end;
 decode_error_els(__TopXMLNS, __Opts,
 		 [{xmlel, <<"conflict">>, _attrs, _} = _el | _els], Text,
@@ -3348,7 +3286,7 @@ decode_error_els(__TopXMLNS, __Opts,
 			   __Els);
       _ ->
 	  decode_error_els(__TopXMLNS, __Opts, _els, Text, Reason,
-			   [_el | __Els])
+			   __Els)
     end;
 decode_error_els(__TopXMLNS, __Opts,
 		 [{xmlel, <<"feature-not-implemented">>, _attrs, _} = _el
@@ -3364,7 +3302,7 @@ decode_error_els(__TopXMLNS, __Opts,
 			   __Els);
       _ ->
 	  decode_error_els(__TopXMLNS, __Opts, _els, Text, Reason,
-			   [_el | __Els])
+			   __Els)
     end;
 decode_error_els(__TopXMLNS, __Opts,
 		 [{xmlel, <<"forbidden">>, _attrs, _} = _el | _els],
@@ -3379,7 +3317,7 @@ decode_error_els(__TopXMLNS, __Opts,
 			   __Els);
       _ ->
 	  decode_error_els(__TopXMLNS, __Opts, _els, Text, Reason,
-			   [_el | __Els])
+			   __Els)
     end;
 decode_error_els(__TopXMLNS, __Opts,
 		 [{xmlel, <<"gone">>, _attrs, _} = _el | _els], Text,
@@ -3394,7 +3332,7 @@ decode_error_els(__TopXMLNS, __Opts,
 			   __Els);
       _ ->
 	  decode_error_els(__TopXMLNS, __Opts, _els, Text, Reason,
-			   [_el | __Els])
+			   __Els)
     end;
 decode_error_els(__TopXMLNS, __Opts,
 		 [{xmlel, <<"internal-server-error">>, _attrs, _} = _el
@@ -3410,7 +3348,7 @@ decode_error_els(__TopXMLNS, __Opts,
 			   __Els);
       _ ->
 	  decode_error_els(__TopXMLNS, __Opts, _els, Text, Reason,
-			   [_el | __Els])
+			   __Els)
     end;
 decode_error_els(__TopXMLNS, __Opts,
 		 [{xmlel, <<"item-not-found">>, _attrs, _} = _el | _els],
@@ -3425,7 +3363,7 @@ decode_error_els(__TopXMLNS, __Opts,
 			   __Els);
       _ ->
 	  decode_error_els(__TopXMLNS, __Opts, _els, Text, Reason,
-			   [_el | __Els])
+			   __Els)
     end;
 decode_error_els(__TopXMLNS, __Opts,
 		 [{xmlel, <<"jid-malformed">>, _attrs, _} = _el | _els],
@@ -3440,7 +3378,7 @@ decode_error_els(__TopXMLNS, __Opts,
 			   __Els);
       _ ->
 	  decode_error_els(__TopXMLNS, __Opts, _els, Text, Reason,
-			   [_el | __Els])
+			   __Els)
     end;
 decode_error_els(__TopXMLNS, __Opts,
 		 [{xmlel, <<"not-acceptable">>, _attrs, _} = _el | _els],
@@ -3455,7 +3393,7 @@ decode_error_els(__TopXMLNS, __Opts,
 			   __Els);
       _ ->
 	  decode_error_els(__TopXMLNS, __Opts, _els, Text, Reason,
-			   [_el | __Els])
+			   __Els)
     end;
 decode_error_els(__TopXMLNS, __Opts,
 		 [{xmlel, <<"not-allowed">>, _attrs, _} = _el | _els],
@@ -3470,7 +3408,7 @@ decode_error_els(__TopXMLNS, __Opts,
 			   __Els);
       _ ->
 	  decode_error_els(__TopXMLNS, __Opts, _els, Text, Reason,
-			   [_el | __Els])
+			   __Els)
     end;
 decode_error_els(__TopXMLNS, __Opts,
 		 [{xmlel, <<"not-authorized">>, _attrs, _} = _el | _els],
@@ -3485,7 +3423,7 @@ decode_error_els(__TopXMLNS, __Opts,
 			   __Els);
       _ ->
 	  decode_error_els(__TopXMLNS, __Opts, _els, Text, Reason,
-			   [_el | __Els])
+			   __Els)
     end;
 decode_error_els(__TopXMLNS, __Opts,
 		 [{xmlel, <<"payment-required">>, _attrs, _} = _el
@@ -3501,7 +3439,7 @@ decode_error_els(__TopXMLNS, __Opts,
 			   __Els);
       _ ->
 	  decode_error_els(__TopXMLNS, __Opts, _els, Text, Reason,
-			   [_el | __Els])
+			   __Els)
     end;
 decode_error_els(__TopXMLNS, __Opts,
 		 [{xmlel, <<"policy-violation">>, _attrs, _} = _el
@@ -3517,7 +3455,7 @@ decode_error_els(__TopXMLNS, __Opts,
 			   __Els);
       _ ->
 	  decode_error_els(__TopXMLNS, __Opts, _els, Text, Reason,
-			   [_el | __Els])
+			   __Els)
     end;
 decode_error_els(__TopXMLNS, __Opts,
 		 [{xmlel, <<"recipient-unavailable">>, _attrs, _} = _el
@@ -3533,7 +3471,7 @@ decode_error_els(__TopXMLNS, __Opts,
 			   __Els);
       _ ->
 	  decode_error_els(__TopXMLNS, __Opts, _els, Text, Reason,
-			   [_el | __Els])
+			   __Els)
     end;
 decode_error_els(__TopXMLNS, __Opts,
 		 [{xmlel, <<"redirect">>, _attrs, _} = _el | _els], Text,
@@ -3548,7 +3486,7 @@ decode_error_els(__TopXMLNS, __Opts,
 			   __Els);
       _ ->
 	  decode_error_els(__TopXMLNS, __Opts, _els, Text, Reason,
-			   [_el | __Els])
+			   __Els)
     end;
 decode_error_els(__TopXMLNS, __Opts,
 		 [{xmlel, <<"registration-required">>, _attrs, _} = _el
@@ -3564,7 +3502,7 @@ decode_error_els(__TopXMLNS, __Opts,
 			   __Els);
       _ ->
 	  decode_error_els(__TopXMLNS, __Opts, _els, Text, Reason,
-			   [_el | __Els])
+			   __Els)
     end;
 decode_error_els(__TopXMLNS, __Opts,
 		 [{xmlel, <<"remote-server-not-found">>, _attrs, _} = _el
@@ -3580,7 +3518,7 @@ decode_error_els(__TopXMLNS, __Opts,
 			   __Els);
       _ ->
 	  decode_error_els(__TopXMLNS, __Opts, _els, Text, Reason,
-			   [_el | __Els])
+			   __Els)
     end;
 decode_error_els(__TopXMLNS, __Opts,
 		 [{xmlel, <<"remote-server-timeout">>, _attrs, _} = _el
@@ -3596,7 +3534,7 @@ decode_error_els(__TopXMLNS, __Opts,
 			   __Els);
       _ ->
 	  decode_error_els(__TopXMLNS, __Opts, _els, Text, Reason,
-			   [_el | __Els])
+			   __Els)
     end;
 decode_error_els(__TopXMLNS, __Opts,
 		 [{xmlel, <<"resource-constraint">>, _attrs, _} = _el
@@ -3612,7 +3550,7 @@ decode_error_els(__TopXMLNS, __Opts,
 			   __Els);
       _ ->
 	  decode_error_els(__TopXMLNS, __Opts, _els, Text, Reason,
-			   [_el | __Els])
+			   __Els)
     end;
 decode_error_els(__TopXMLNS, __Opts,
 		 [{xmlel, <<"service-unavailable">>, _attrs, _} = _el
@@ -3628,7 +3566,7 @@ decode_error_els(__TopXMLNS, __Opts,
 			   __Els);
       _ ->
 	  decode_error_els(__TopXMLNS, __Opts, _els, Text, Reason,
-			   [_el | __Els])
+			   __Els)
     end;
 decode_error_els(__TopXMLNS, __Opts,
 		 [{xmlel, <<"subscription-required">>, _attrs, _} = _el
@@ -3644,7 +3582,7 @@ decode_error_els(__TopXMLNS, __Opts,
 			   __Els);
       _ ->
 	  decode_error_els(__TopXMLNS, __Opts, _els, Text, Reason,
-			   [_el | __Els])
+			   __Els)
     end;
 decode_error_els(__TopXMLNS, __Opts,
 		 [{xmlel, <<"undefined-condition">>, _attrs, _} = _el
@@ -3660,7 +3598,7 @@ decode_error_els(__TopXMLNS, __Opts,
 			   __Els);
       _ ->
 	  decode_error_els(__TopXMLNS, __Opts, _els, Text, Reason,
-			   [_el | __Els])
+			   __Els)
     end;
 decode_error_els(__TopXMLNS, __Opts,
 		 [{xmlel, <<"unexpected-request">>, _attrs, _} = _el
@@ -3676,7 +3614,7 @@ decode_error_els(__TopXMLNS, __Opts,
 			   __Els);
       _ ->
 	  decode_error_els(__TopXMLNS, __Opts, _els, Text, Reason,
-			   [_el | __Els])
+			   __Els)
     end;
 decode_error_els(__TopXMLNS, __Opts,
 		 [{xmlel, _name, _attrs, _} = _el | _els], Text, Reason,
@@ -3691,7 +3629,7 @@ decode_error_els(__TopXMLNS, __Opts,
 	  case xmpp_codec:get_mod(_name, __XMLNS) of
 	    undefined ->
 		decode_error_els(__TopXMLNS, __Opts, _els, Text, Reason,
-				 [_el | __Els]);
+				 __Els);
 	    Mod ->
 		decode_error_els(__TopXMLNS, __Opts, _els, Text, Reason,
 				 [Mod:do_decode(_name, __XMLNS, _el, __Opts)
@@ -3743,10 +3681,10 @@ encode_error({stanza_error, Type, Code, By, Reason,
 													   __TopXMLNS)))),
     {xmlel, <<"error">>, _attrs, _els}.
 
-'encode_error_$text'([], __TopXMLNS, _acc) -> _acc;
-'encode_error_$text'([Text | _els], __TopXMLNS, _acc) ->
-    'encode_error_$text'(_els, __TopXMLNS,
-			 [encode_error_text(Text, __TopXMLNS) | _acc]).
+'encode_error_$text'(undefined, __TopXMLNS, _acc) ->
+    _acc;
+'encode_error_$text'(Text, __TopXMLNS, _acc) ->
+    [encode_error_text(Text, __TopXMLNS) | _acc].
 
 'encode_error_$reason'(undefined, __TopXMLNS, _acc) ->
     _acc;
@@ -3870,19 +3808,12 @@ encode_error_attr_code(undefined, _acc) -> _acc;
 encode_error_attr_code(_val, _acc) ->
     [{<<"code">>, enc_int(_val)} | _acc].
 
-decode_error_attr_by(__TopXMLNS, undefined) ->
-    undefined;
-decode_error_attr_by(__TopXMLNS, _val) ->
-    case catch jid:decode(_val) of
-      {'EXIT', _} ->
-	  erlang:error({xmpp_codec,
-			{bad_attr_value, <<"by">>, <<"error">>, __TopXMLNS}});
-      _res -> _res
-    end.
+decode_error_attr_by(__TopXMLNS, undefined) -> <<>>;
+decode_error_attr_by(__TopXMLNS, _val) -> _val.
 
-encode_error_attr_by(undefined, _acc) -> _acc;
+encode_error_attr_by(<<>>, _acc) -> _acc;
 encode_error_attr_by(_val, _acc) ->
-    [{<<"by">>, jid:encode(_val)} | _acc].
+    [{<<"by">>, _val} | _acc].
 
 decode_error_text(__TopXMLNS, __Opts,
 		  {xmlel, <<"text">>, _attrs, _els}) ->
@@ -3925,13 +3856,7 @@ encode_error_text({text, Lang, Data}, __TopXMLNS) ->
 				  undefined) ->
     <<>>;
 'decode_error_text_attr_xml:lang'(__TopXMLNS, _val) ->
-    case catch xmpp_lang:check(_val) of
-      {'EXIT', _} ->
-	  erlang:error({xmpp_codec,
-			{bad_attr_value, <<"xml:lang">>, <<"text">>,
-			 __TopXMLNS}});
-      _res -> _res
-    end.
+    _val.
 
 'encode_error_text_attr_xml:lang'(<<>>, _acc) -> _acc;
 'encode_error_text_attr_xml:lang'(_val, _acc) ->
@@ -4349,7 +4274,7 @@ decode_presence_els(__TopXMLNS, __Opts,
 			      Priority, __Els);
       _ ->
 	  decode_presence_els(__TopXMLNS, __Opts, _els, Status,
-			      Show, Priority, [_el | __Els])
+			      Show, Priority, __Els)
     end;
 decode_presence_els(__TopXMLNS, __Opts,
 		    [{xmlel, <<"status">>, _attrs, _} = _el | _els], Status,
@@ -4377,7 +4302,7 @@ decode_presence_els(__TopXMLNS, __Opts,
 			      Show, Priority, __Els);
       _ ->
 	  decode_presence_els(__TopXMLNS, __Opts, _els, Status,
-			      Show, Priority, [_el | __Els])
+			      Show, Priority, __Els)
     end;
 decode_presence_els(__TopXMLNS, __Opts,
 		    [{xmlel, <<"priority">>, _attrs, _} = _el | _els],
@@ -4405,7 +4330,7 @@ decode_presence_els(__TopXMLNS, __Opts,
 			      __Els);
       _ ->
 	  decode_presence_els(__TopXMLNS, __Opts, _els, Status,
-			      Show, Priority, [_el | __Els])
+			      Show, Priority, __Els)
     end;
 decode_presence_els(__TopXMLNS, __Opts,
 		    [{xmlel, _name, _attrs, _} = _el | _els], Status, Show,
@@ -4420,7 +4345,7 @@ decode_presence_els(__TopXMLNS, __Opts,
 	  case xmpp_codec:get_mod(_name, __XMLNS) of
 	    undefined ->
 		decode_presence_els(__TopXMLNS, __Opts, _els, Status,
-				    Show, Priority, [_el | __Els]);
+				    Show, Priority, __Els);
 	    Mod ->
 		decode_presence_els(__TopXMLNS, __Opts, _els, Status,
 				    Show, Priority,
@@ -4575,13 +4500,7 @@ encode_presence_attr_to(_val, _acc) ->
 				undefined) ->
     <<>>;
 'decode_presence_attr_xml:lang'(__TopXMLNS, _val) ->
-    case catch xmpp_lang:check(_val) of
-      {'EXIT', _} ->
-	  erlang:error({xmpp_codec,
-			{bad_attr_value, <<"xml:lang">>, <<"presence">>,
-			 __TopXMLNS}});
-      _res -> _res
-    end.
+    _val.
 
 'encode_presence_attr_xml:lang'(<<>>, _acc) -> _acc;
 'encode_presence_attr_xml:lang'(_val, _acc) ->
@@ -4678,13 +4597,7 @@ encode_presence_status({text, Lang, Data},
     <<>>;
 'decode_presence_status_attr_xml:lang'(__TopXMLNS,
 				       _val) ->
-    case catch xmpp_lang:check(_val) of
-      {'EXIT', _} ->
-	  erlang:error({xmpp_codec,
-			{bad_attr_value, <<"xml:lang">>, <<"status">>,
-			 __TopXMLNS}});
-      _res -> _res
-    end.
+    _val.
 
 'encode_presence_status_attr_xml:lang'(<<>>, _acc) ->
     _acc;
@@ -4782,7 +4695,7 @@ decode_message_els(__TopXMLNS, __Opts,
 			     Body, __Els);
       _ ->
 	  decode_message_els(__TopXMLNS, __Opts, _els, Thread,
-			     Subject, Body, [_el | __Els])
+			     Subject, Body, __Els)
     end;
 decode_message_els(__TopXMLNS, __Opts,
 		   [{xmlel, <<"thread">>, _attrs, _} = _el | _els], Thread,
@@ -4807,7 +4720,7 @@ decode_message_els(__TopXMLNS, __Opts,
 			     Subject, Body, __Els);
       _ ->
 	  decode_message_els(__TopXMLNS, __Opts, _els, Thread,
-			     Subject, Body, [_el | __Els])
+			     Subject, Body, __Els)
     end;
 decode_message_els(__TopXMLNS, __Opts,
 		   [{xmlel, <<"body">>, _attrs, _} = _el | _els], Thread,
@@ -4838,7 +4751,7 @@ decode_message_els(__TopXMLNS, __Opts,
 			     __Els);
       _ ->
 	  decode_message_els(__TopXMLNS, __Opts, _els, Thread,
-			     Subject, Body, [_el | __Els])
+			     Subject, Body, __Els)
     end;
 decode_message_els(__TopXMLNS, __Opts,
 		   [{xmlel, _name, _attrs, _} = _el | _els], Thread,
@@ -4853,7 +4766,7 @@ decode_message_els(__TopXMLNS, __Opts,
 	  case xmpp_codec:get_mod(_name, __XMLNS) of
 	    undefined ->
 		decode_message_els(__TopXMLNS, __Opts, _els, Thread,
-				   Subject, Body, [_el | __Els]);
+				   Subject, Body, __Els);
 	    Mod ->
 		decode_message_els(__TopXMLNS, __Opts, _els, Thread,
 				   Subject, Body,
@@ -5002,13 +4915,7 @@ encode_message_attr_to(_val, _acc) ->
 'decode_message_attr_xml:lang'(__TopXMLNS, undefined) ->
     <<>>;
 'decode_message_attr_xml:lang'(__TopXMLNS, _val) ->
-    case catch xmpp_lang:check(_val) of
-      {'EXIT', _} ->
-	  erlang:error({xmpp_codec,
-			{bad_attr_value, <<"xml:lang">>, <<"message">>,
-			 __TopXMLNS}});
-      _res -> _res
-    end.
+    _val.
 
 'encode_message_attr_xml:lang'(<<>>, _acc) -> _acc;
 'encode_message_attr_xml:lang'(_val, _acc) ->
@@ -5016,55 +4923,32 @@ encode_message_attr_to(_val, _acc) ->
 
 decode_message_thread(__TopXMLNS, __Opts,
 		      {xmlel, <<"thread">>, _attrs, _els}) ->
-    Data = decode_message_thread_els(__TopXMLNS, __Opts,
-				     _els, <<>>),
-    Parent = decode_message_thread_attrs(__TopXMLNS, _attrs,
-					 undefined),
-    {message_thread, Parent, Data}.
+    Cdata = decode_message_thread_els(__TopXMLNS, __Opts,
+				      _els, <<>>),
+    Cdata.
 
 decode_message_thread_els(__TopXMLNS, __Opts, [],
-			  Data) ->
-    decode_message_thread_cdata(__TopXMLNS, Data);
+			  Cdata) ->
+    decode_message_thread_cdata(__TopXMLNS, Cdata);
 decode_message_thread_els(__TopXMLNS, __Opts,
-			  [{xmlcdata, _data} | _els], Data) ->
+			  [{xmlcdata, _data} | _els], Cdata) ->
     decode_message_thread_els(__TopXMLNS, __Opts, _els,
-			      <<Data/binary, _data/binary>>);
+			      <<Cdata/binary, _data/binary>>);
 decode_message_thread_els(__TopXMLNS, __Opts,
-			  [_ | _els], Data) ->
+			  [_ | _els], Cdata) ->
     decode_message_thread_els(__TopXMLNS, __Opts, _els,
-			      Data).
+			      Cdata).
 
-decode_message_thread_attrs(__TopXMLNS,
-			    [{<<"parent">>, _val} | _attrs], _Parent) ->
-    decode_message_thread_attrs(__TopXMLNS, _attrs, _val);
-decode_message_thread_attrs(__TopXMLNS, [_ | _attrs],
-			    Parent) ->
-    decode_message_thread_attrs(__TopXMLNS, _attrs, Parent);
-decode_message_thread_attrs(__TopXMLNS, [], Parent) ->
-    decode_message_thread_attr_parent(__TopXMLNS, Parent).
-
-encode_message_thread({message_thread, Parent, Data},
-		      __TopXMLNS) ->
+encode_message_thread(Cdata, __TopXMLNS) ->
     __NewTopXMLNS = xmpp_codec:choose_top_xmlns(<<>>,
 						[<<"jabber:client">>,
 						 <<"jabber:server">>,
 						 <<"jabber:component:accept">>],
 						__TopXMLNS),
-    _els = encode_message_thread_cdata(Data, []),
-    _attrs = encode_message_thread_attr_parent(Parent,
-					       xmpp_codec:enc_xmlns_attrs(__NewTopXMLNS,
-									  __TopXMLNS)),
+    _els = encode_message_thread_cdata(Cdata, []),
+    _attrs = xmpp_codec:enc_xmlns_attrs(__NewTopXMLNS,
+					__TopXMLNS),
     {xmlel, <<"thread">>, _attrs, _els}.
-
-decode_message_thread_attr_parent(__TopXMLNS,
-				  undefined) ->
-    <<>>;
-decode_message_thread_attr_parent(__TopXMLNS, _val) ->
-    _val.
-
-encode_message_thread_attr_parent(<<>>, _acc) -> _acc;
-encode_message_thread_attr_parent(_val, _acc) ->
-    [{<<"parent">>, _val} | _acc].
 
 decode_message_thread_cdata(__TopXMLNS, <<>>) -> <<>>;
 decode_message_thread_cdata(__TopXMLNS, _val) -> _val.
@@ -5116,13 +5000,7 @@ encode_message_body({text, Lang, Data}, __TopXMLNS) ->
 				    undefined) ->
     <<>>;
 'decode_message_body_attr_xml:lang'(__TopXMLNS, _val) ->
-    case catch xmpp_lang:check(_val) of
-      {'EXIT', _} ->
-	  erlang:error({xmpp_codec,
-			{bad_attr_value, <<"xml:lang">>, <<"body">>,
-			 __TopXMLNS}});
-      _res -> _res
-    end.
+    _val.
 
 'encode_message_body_attr_xml:lang'(<<>>, _acc) -> _acc;
 'encode_message_body_attr_xml:lang'(_val, _acc) ->
@@ -5183,13 +5061,7 @@ encode_message_subject({text, Lang, Data},
     <<>>;
 'decode_message_subject_attr_xml:lang'(__TopXMLNS,
 				       _val) ->
-    case catch xmpp_lang:check(_val) of
-      {'EXIT', _} ->
-	  erlang:error({xmpp_codec,
-			{bad_attr_value, <<"xml:lang">>, <<"subject">>,
-			 __TopXMLNS}});
-      _res -> _res
-    end.
+    _val.
 
 'encode_message_subject_attr_xml:lang'(<<>>, _acc) ->
     _acc;
@@ -5224,7 +5096,7 @@ decode_iq_els(__TopXMLNS, __Opts,
 					__TopXMLNS),
 	  case xmpp_codec:get_mod(_name, __XMLNS) of
 	    undefined ->
-		decode_iq_els(__TopXMLNS, __Opts, _els, [_el | __Els]);
+		decode_iq_els(__TopXMLNS, __Opts, _els, __Els);
 	    Mod ->
 		decode_iq_els(__TopXMLNS, __Opts, _els,
 			      [Mod:do_decode(_name, __XMLNS, _el, __Opts)
@@ -5337,14 +5209,7 @@ encode_iq_attr_to(_val, _acc) ->
 
 'decode_iq_attr_xml:lang'(__TopXMLNS, undefined) ->
     <<>>;
-'decode_iq_attr_xml:lang'(__TopXMLNS, _val) ->
-    case catch xmpp_lang:check(_val) of
-      {'EXIT', _} ->
-	  erlang:error({xmpp_codec,
-			{bad_attr_value, <<"xml:lang">>, <<"iq">>,
-			 __TopXMLNS}});
-      _res -> _res
-    end.
+'decode_iq_attr_xml:lang'(__TopXMLNS, _val) -> _val.
 
 'encode_iq_attr_xml:lang'(<<>>, _acc) -> _acc;
 'encode_iq_attr_xml:lang'(_val, _acc) ->

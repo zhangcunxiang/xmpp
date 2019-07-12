@@ -6,9 +6,6 @@ all: src
 src:
 	$(REBAR) get-deps compile
 
-first:
-	cat ./specs/memo_extend >> ./specs/xmpp_codec.spec
-
 spec: src/xmpp_codec.erl include/xmpp_codec.hrl deps/fast_xml/ebin/fxml_gen.beam
 	$(ERL) -noinput +B -pa ebin -pa deps/*/ebin -eval \
 	'case fxml_gen:compile("specs/xmpp_codec.spec", [{add_type_specs, xmpp_element}, {erl_dir, "src"}, {hrl_dir, "include"}]) of ok -> halt(0); _ -> halt(1) end.'
@@ -30,7 +27,7 @@ deps := $(wildcard deps/*/ebin)
 dialyzer/erlang.plt:
 	@mkdir -p dialyzer
 	@dialyzer --build_plt --output_plt dialyzer/erlang.plt \
-	-o dialyzer/erlang.log --apps kernel stdlib sasl erts syntax_tools compiler asn1 crypto; \
+	-o dialyzer/erlang.log --apps kernel stdlib sasl erts syntax_tools compiler; \
 	status=$$? ; if [ $$status -ne 2 ]; then exit $$status; else exit 0; fi
 
 dialyzer/deps.plt:

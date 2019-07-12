@@ -5,10 +5,8 @@
 
 -module(mam_query).
 
--export([encode/1, encode/2]).
-
--export([decode/1, decode/2, format_error/1,
-	 io_format_error/1]).
+-export([decode/1, decode/2, encode/1, encode/2,
+	 format_error/1, io_format_error/1]).
 
 -include("xmpp_codec.hrl").
 
@@ -60,10 +58,9 @@ decode(Fs, Acc) ->
     case lists:keyfind(<<"FORM_TYPE">>, #xdata_field.var,
 		       Fs)
 	of
-      false -> decode(Fs, Acc, <<"urn:xmpp:mam:1">>, []);
-      #xdata_field{values = [XMLNS]}
-	  when XMLNS == <<"urn:xmpp:mam:1">> ->
-	  decode(Fs, Acc, XMLNS, []);
+      false -> decode(Fs, Acc, []);
+      #xdata_field{values = [<<"urn:xmpp:mam:1">>]} ->
+	  decode(Fs, Acc, []);
       _ ->
 	  erlang:error({?MODULE,
 			{form_type_mismatch, <<"urn:xmpp:mam:1">>}})
@@ -91,101 +88,96 @@ encode(List, Lang) when is_list(List) ->
 
 decode([#xdata_field{var = <<"with">>, values = [Value]}
 	| Fs],
-       Acc, XMLNS, Required) ->
+       Acc, Required) ->
     try jid:decode(Value) of
-      Result ->
-	  decode(Fs, [{with, Result} | Acc], XMLNS, Required)
+      Result -> decode(Fs, [{with, Result} | Acc], Required)
     catch
       _:_ ->
 	  erlang:error({?MODULE,
-			{bad_var_value, <<"with">>, XMLNS}})
+			{bad_var_value, <<"with">>, <<"urn:xmpp:mam:1">>}})
     end;
 decode([#xdata_field{var = <<"with">>, values = []} = F
 	| Fs],
-       Acc, XMLNS, Required) ->
+       Acc, Required) ->
     decode([F#xdata_field{var = <<"with">>, values = [<<>>]}
 	    | Fs],
-	   Acc, XMLNS, Required);
-decode([#xdata_field{var = <<"with">>} | _], _, XMLNS,
-       _) ->
+	   Acc, Required);
+decode([#xdata_field{var = <<"with">>} | _], _, _) ->
     erlang:error({?MODULE,
-		  {too_many_values, <<"with">>, XMLNS}});
+		  {too_many_values, <<"with">>, <<"urn:xmpp:mam:1">>}});
 decode([#xdata_field{var = <<"start">>,
 		     values = [Value]}
 	| Fs],
-       Acc, XMLNS, Required) ->
+       Acc, Required) ->
     try xmpp_util:decode_timestamp(Value) of
-      Result ->
-	  decode(Fs, [{start, Result} | Acc], XMLNS, Required)
+      Result -> decode(Fs, [{start, Result} | Acc], Required)
     catch
       _:_ ->
 	  erlang:error({?MODULE,
-			{bad_var_value, <<"start">>, XMLNS}})
+			{bad_var_value, <<"start">>, <<"urn:xmpp:mam:1">>}})
     end;
 decode([#xdata_field{var = <<"start">>, values = []} = F
 	| Fs],
-       Acc, XMLNS, Required) ->
+       Acc, Required) ->
     decode([F#xdata_field{var = <<"start">>,
 			  values = [<<>>]}
 	    | Fs],
-	   Acc, XMLNS, Required);
-decode([#xdata_field{var = <<"start">>} | _], _, XMLNS,
-       _) ->
+	   Acc, Required);
+decode([#xdata_field{var = <<"start">>} | _], _, _) ->
     erlang:error({?MODULE,
-		  {too_many_values, <<"start">>, XMLNS}});
+		  {too_many_values, <<"start">>, <<"urn:xmpp:mam:1">>}});
 decode([#xdata_field{var = <<"end">>, values = [Value]}
 	| Fs],
-       Acc, XMLNS, Required) ->
+       Acc, Required) ->
     try xmpp_util:decode_timestamp(Value) of
-      Result ->
-	  decode(Fs, [{'end', Result} | Acc], XMLNS, Required)
+      Result -> decode(Fs, [{'end', Result} | Acc], Required)
     catch
       _:_ ->
 	  erlang:error({?MODULE,
-			{bad_var_value, <<"end">>, XMLNS}})
+			{bad_var_value, <<"end">>, <<"urn:xmpp:mam:1">>}})
     end;
 decode([#xdata_field{var = <<"end">>, values = []} = F
 	| Fs],
-       Acc, XMLNS, Required) ->
+       Acc, Required) ->
     decode([F#xdata_field{var = <<"end">>, values = [<<>>]}
 	    | Fs],
-	   Acc, XMLNS, Required);
-decode([#xdata_field{var = <<"end">>} | _], _, XMLNS,
-       _) ->
+	   Acc, Required);
+decode([#xdata_field{var = <<"end">>} | _], _, _) ->
     erlang:error({?MODULE,
-		  {too_many_values, <<"end">>, XMLNS}});
+		  {too_many_values, <<"end">>, <<"urn:xmpp:mam:1">>}});
 decode([#xdata_field{var = <<"withtext">>,
 		     values = [Value]}
 	| Fs],
-       Acc, XMLNS, Required) ->
+       Acc, Required) ->
     try Value of
       Result ->
-	  decode(Fs, [{withtext, Result} | Acc], XMLNS, Required)
+	  decode(Fs, [{withtext, Result} | Acc], Required)
     catch
       _:_ ->
 	  erlang:error({?MODULE,
-			{bad_var_value, <<"withtext">>, XMLNS}})
+			{bad_var_value, <<"withtext">>, <<"urn:xmpp:mam:1">>}})
     end;
 decode([#xdata_field{var = <<"withtext">>,
 		     values = []} =
 	    F
 	| Fs],
-       Acc, XMLNS, Required) ->
+       Acc, Required) ->
     decode([F#xdata_field{var = <<"withtext">>,
 			  values = [<<>>]}
 	    | Fs],
-	   Acc, XMLNS, Required);
+	   Acc, Required);
 decode([#xdata_field{var = <<"withtext">>} | _], _,
-       XMLNS, _) ->
+       _) ->
     erlang:error({?MODULE,
-		  {too_many_values, <<"withtext">>, XMLNS}});
-decode([#xdata_field{var = Var} | Fs], Acc, XMLNS,
-       Required) ->
+		  {too_many_values, <<"withtext">>,
+		   <<"urn:xmpp:mam:1">>}});
+decode([#xdata_field{var = Var} | Fs], Acc, Required) ->
     if Var /= <<"FORM_TYPE">> ->
-	   erlang:error({?MODULE, {unknown_var, Var, XMLNS}});
-       true -> decode(Fs, Acc, XMLNS, Required)
+	   erlang:error({?MODULE,
+			 {unknown_var, Var, <<"urn:xmpp:mam:1">>}});
+       true -> decode(Fs, Acc, Required)
     end;
-decode([], Acc, _, []) -> Acc.
+decode([], Acc, []) -> Acc.
 
 encode_with(Value, Lang) ->
     Values = case Value of

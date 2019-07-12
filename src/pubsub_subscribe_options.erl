@@ -5,10 +5,8 @@
 
 -module(pubsub_subscribe_options).
 
--export([encode/1, encode/2]).
-
--export([decode/1, decode/2, format_error/1,
-	 io_format_error/1]).
+-export([decode/1, decode/2, encode/1, encode/2,
+	 format_error/1, io_format_error/1]).
 
 -include("xmpp_codec.hrl").
 
@@ -76,16 +74,11 @@ decode(Fs, Acc) ->
     case lists:keyfind(<<"FORM_TYPE">>, #xdata_field.var,
 		       Fs)
 	of
-      false ->
-	  decode(Fs, Acc,
-		 <<"http://jabber.org/protocol/pubsub#subscribe_o"
-		   "ptions">>,
-		 []);
-      #xdata_field{values = [XMLNS]}
-	  when XMLNS ==
-		 <<"http://jabber.org/protocol/pubsub#subscribe_o"
-		   "ptions">> ->
-	  decode(Fs, Acc, XMLNS, []);
+      false -> decode(Fs, Acc, []);
+      #xdata_field{values =
+		       [<<"http://jabber.org/protocol/pubsub#subscribe_o"
+			  "ptions">>]} ->
+	  decode(Fs, Acc, []);
       _ ->
 	  erlang:error({?MODULE,
 			{form_type_mismatch,
@@ -134,224 +127,247 @@ encode(List, Lang) when is_list(List) ->
 decode([#xdata_field{var = <<"pubsub#deliver">>,
 		     values = [Value]}
 	| Fs],
-       Acc, XMLNS, Required) ->
+       Acc, Required) ->
     try dec_bool(Value) of
       Result ->
-	  decode(Fs, [{deliver, Result} | Acc], XMLNS, Required)
+	  decode(Fs, [{deliver, Result} | Acc], Required)
     catch
       _:_ ->
 	  erlang:error({?MODULE,
-			{bad_var_value, <<"pubsub#deliver">>, XMLNS}})
+			{bad_var_value, <<"pubsub#deliver">>,
+			 <<"http://jabber.org/protocol/pubsub#subscribe_o"
+			   "ptions">>}})
     end;
 decode([#xdata_field{var = <<"pubsub#deliver">>,
 		     values = []} =
 	    F
 	| Fs],
-       Acc, XMLNS, Required) ->
+       Acc, Required) ->
     decode([F#xdata_field{var = <<"pubsub#deliver">>,
 			  values = [<<>>]}
 	    | Fs],
-	   Acc, XMLNS, Required);
+	   Acc, Required);
 decode([#xdata_field{var = <<"pubsub#deliver">>} | _],
-       _, XMLNS, _) ->
+       _, _) ->
     erlang:error({?MODULE,
-		  {too_many_values, <<"pubsub#deliver">>, XMLNS}});
+		  {too_many_values, <<"pubsub#deliver">>,
+		   <<"http://jabber.org/protocol/pubsub#subscribe_o"
+		     "ptions">>}});
 decode([#xdata_field{var = <<"pubsub#digest">>,
 		     values = [Value]}
 	| Fs],
-       Acc, XMLNS, Required) ->
+       Acc, Required) ->
     try dec_bool(Value) of
-      Result ->
-	  decode(Fs, [{digest, Result} | Acc], XMLNS, Required)
+      Result -> decode(Fs, [{digest, Result} | Acc], Required)
     catch
       _:_ ->
 	  erlang:error({?MODULE,
-			{bad_var_value, <<"pubsub#digest">>, XMLNS}})
+			{bad_var_value, <<"pubsub#digest">>,
+			 <<"http://jabber.org/protocol/pubsub#subscribe_o"
+			   "ptions">>}})
     end;
 decode([#xdata_field{var = <<"pubsub#digest">>,
 		     values = []} =
 	    F
 	| Fs],
-       Acc, XMLNS, Required) ->
+       Acc, Required) ->
     decode([F#xdata_field{var = <<"pubsub#digest">>,
 			  values = [<<>>]}
 	    | Fs],
-	   Acc, XMLNS, Required);
+	   Acc, Required);
 decode([#xdata_field{var = <<"pubsub#digest">>} | _], _,
-       XMLNS, _) ->
+       _) ->
     erlang:error({?MODULE,
-		  {too_many_values, <<"pubsub#digest">>, XMLNS}});
+		  {too_many_values, <<"pubsub#digest">>,
+		   <<"http://jabber.org/protocol/pubsub#subscribe_o"
+		     "ptions">>}});
 decode([#xdata_field{var =
 			 <<"pubsub#digest_frequency">>,
 		     values = [Value]}
 	| Fs],
-       Acc, XMLNS, Required) ->
+       Acc, Required) ->
     try Value of
       Result ->
-	  decode(Fs, [{digest_frequency, Result} | Acc], XMLNS,
-		 Required)
+	  decode(Fs, [{digest_frequency, Result} | Acc], Required)
     catch
       _:_ ->
 	  erlang:error({?MODULE,
-			{bad_var_value, <<"pubsub#digest_frequency">>, XMLNS}})
+			{bad_var_value, <<"pubsub#digest_frequency">>,
+			 <<"http://jabber.org/protocol/pubsub#subscribe_o"
+			   "ptions">>}})
     end;
 decode([#xdata_field{var =
 			 <<"pubsub#digest_frequency">>,
 		     values = []} =
 	    F
 	| Fs],
-       Acc, XMLNS, Required) ->
+       Acc, Required) ->
     decode([F#xdata_field{var =
 			      <<"pubsub#digest_frequency">>,
 			  values = [<<>>]}
 	    | Fs],
-	   Acc, XMLNS, Required);
+	   Acc, Required);
 decode([#xdata_field{var =
 			 <<"pubsub#digest_frequency">>}
 	| _],
-       _, XMLNS, _) ->
+       _, _) ->
     erlang:error({?MODULE,
 		  {too_many_values, <<"pubsub#digest_frequency">>,
-		   XMLNS}});
+		   <<"http://jabber.org/protocol/pubsub#subscribe_o"
+		     "ptions">>}});
 decode([#xdata_field{var = <<"pubsub#expire">>,
 		     values = [Value]}
 	| Fs],
-       Acc, XMLNS, Required) ->
+       Acc, Required) ->
     try Value of
-      Result ->
-	  decode(Fs, [{expire, Result} | Acc], XMLNS, Required)
+      Result -> decode(Fs, [{expire, Result} | Acc], Required)
     catch
       _:_ ->
 	  erlang:error({?MODULE,
-			{bad_var_value, <<"pubsub#expire">>, XMLNS}})
+			{bad_var_value, <<"pubsub#expire">>,
+			 <<"http://jabber.org/protocol/pubsub#subscribe_o"
+			   "ptions">>}})
     end;
 decode([#xdata_field{var = <<"pubsub#expire">>,
 		     values = []} =
 	    F
 	| Fs],
-       Acc, XMLNS, Required) ->
+       Acc, Required) ->
     decode([F#xdata_field{var = <<"pubsub#expire">>,
 			  values = [<<>>]}
 	    | Fs],
-	   Acc, XMLNS, Required);
+	   Acc, Required);
 decode([#xdata_field{var = <<"pubsub#expire">>} | _], _,
-       XMLNS, _) ->
+       _) ->
     erlang:error({?MODULE,
-		  {too_many_values, <<"pubsub#expire">>, XMLNS}});
+		  {too_many_values, <<"pubsub#expire">>,
+		   <<"http://jabber.org/protocol/pubsub#subscribe_o"
+		     "ptions">>}});
 decode([#xdata_field{var = <<"pubsub#include_body">>,
 		     values = [Value]}
 	| Fs],
-       Acc, XMLNS, Required) ->
+       Acc, Required) ->
     try dec_bool(Value) of
       Result ->
-	  decode(Fs, [{include_body, Result} | Acc], XMLNS,
-		 Required)
+	  decode(Fs, [{include_body, Result} | Acc], Required)
     catch
       _:_ ->
 	  erlang:error({?MODULE,
-			{bad_var_value, <<"pubsub#include_body">>, XMLNS}})
+			{bad_var_value, <<"pubsub#include_body">>,
+			 <<"http://jabber.org/protocol/pubsub#subscribe_o"
+			   "ptions">>}})
     end;
 decode([#xdata_field{var = <<"pubsub#include_body">>,
 		     values = []} =
 	    F
 	| Fs],
-       Acc, XMLNS, Required) ->
+       Acc, Required) ->
     decode([F#xdata_field{var = <<"pubsub#include_body">>,
 			  values = [<<>>]}
 	    | Fs],
-	   Acc, XMLNS, Required);
+	   Acc, Required);
 decode([#xdata_field{var = <<"pubsub#include_body">>}
 	| _],
-       _, XMLNS, _) ->
+       _, _) ->
     erlang:error({?MODULE,
-		  {too_many_values, <<"pubsub#include_body">>, XMLNS}});
+		  {too_many_values, <<"pubsub#include_body">>,
+		   <<"http://jabber.org/protocol/pubsub#subscribe_o"
+		     "ptions">>}});
 decode([#xdata_field{var = <<"pubsub#show-values">>,
 		     values = Values}
 	| Fs],
-       Acc, XMLNS, Required) ->
+       Acc, Required) ->
     try [dec_enum(Value, [away, chat, dnd, online, xa])
 	 || Value <- Values]
     of
       Result ->
-	  decode(Fs, [{'show-values', Result} | Acc], XMLNS,
-		 Required)
+	  decode(Fs, [{'show-values', Result} | Acc], Required)
     catch
       _:_ ->
 	  erlang:error({?MODULE,
-			{bad_var_value, <<"pubsub#show-values">>, XMLNS}})
+			{bad_var_value, <<"pubsub#show-values">>,
+			 <<"http://jabber.org/protocol/pubsub#subscribe_o"
+			   "ptions">>}})
     end;
 decode([#xdata_field{var =
 			 <<"pubsub#subscription_type">>,
 		     values = [Value]}
 	| Fs],
-       Acc, XMLNS, Required) ->
+       Acc, Required) ->
     try dec_enum(Value, [items, nodes]) of
       Result ->
-	  decode(Fs, [{subscription_type, Result} | Acc], XMLNS,
+	  decode(Fs, [{subscription_type, Result} | Acc],
 		 Required)
     catch
       _:_ ->
 	  erlang:error({?MODULE,
-			{bad_var_value, <<"pubsub#subscription_type">>, XMLNS}})
+			{bad_var_value, <<"pubsub#subscription_type">>,
+			 <<"http://jabber.org/protocol/pubsub#subscribe_o"
+			   "ptions">>}})
     end;
 decode([#xdata_field{var =
 			 <<"pubsub#subscription_type">>,
 		     values = []} =
 	    F
 	| Fs],
-       Acc, XMLNS, Required) ->
+       Acc, Required) ->
     decode([F#xdata_field{var =
 			      <<"pubsub#subscription_type">>,
 			  values = [<<>>]}
 	    | Fs],
-	   Acc, XMLNS, Required);
+	   Acc, Required);
 decode([#xdata_field{var =
 			 <<"pubsub#subscription_type">>}
 	| _],
-       _, XMLNS, _) ->
+       _, _) ->
     erlang:error({?MODULE,
 		  {too_many_values, <<"pubsub#subscription_type">>,
-		   XMLNS}});
+		   <<"http://jabber.org/protocol/pubsub#subscribe_o"
+		     "ptions">>}});
 decode([#xdata_field{var =
 			 <<"pubsub#subscription_depth">>,
 		     values = [Value]}
 	| Fs],
-       Acc, XMLNS, Required) ->
+       Acc, Required) ->
     try dec_enum(Value, ['1', all]) of
       Result ->
-	  decode(Fs, [{subscription_depth, Result} | Acc], XMLNS,
+	  decode(Fs, [{subscription_depth, Result} | Acc],
 		 Required)
     catch
       _:_ ->
 	  erlang:error({?MODULE,
 			{bad_var_value, <<"pubsub#subscription_depth">>,
-			 XMLNS}})
+			 <<"http://jabber.org/protocol/pubsub#subscribe_o"
+			   "ptions">>}})
     end;
 decode([#xdata_field{var =
 			 <<"pubsub#subscription_depth">>,
 		     values = []} =
 	    F
 	| Fs],
-       Acc, XMLNS, Required) ->
+       Acc, Required) ->
     decode([F#xdata_field{var =
 			      <<"pubsub#subscription_depth">>,
 			  values = [<<>>]}
 	    | Fs],
-	   Acc, XMLNS, Required);
+	   Acc, Required);
 decode([#xdata_field{var =
 			 <<"pubsub#subscription_depth">>}
 	| _],
-       _, XMLNS, _) ->
+       _, _) ->
     erlang:error({?MODULE,
 		  {too_many_values, <<"pubsub#subscription_depth">>,
-		   XMLNS}});
-decode([#xdata_field{var = Var} | Fs], Acc, XMLNS,
-       Required) ->
+		   <<"http://jabber.org/protocol/pubsub#subscribe_o"
+		     "ptions">>}});
+decode([#xdata_field{var = Var} | Fs], Acc, Required) ->
     if Var /= <<"FORM_TYPE">> ->
-	   erlang:error({?MODULE, {unknown_var, Var, XMLNS}});
-       true -> decode(Fs, Acc, XMLNS, Required)
+	   erlang:error({?MODULE,
+			 {unknown_var, Var,
+			  <<"http://jabber.org/protocol/pubsub#subscribe_o"
+			    "ptions">>}});
+       true -> decode(Fs, Acc, Required)
     end;
-decode([], Acc, _, []) -> Acc.
+decode([], Acc, []) -> Acc.
 
 encode_deliver(Value, Lang) ->
     Values = case Value of

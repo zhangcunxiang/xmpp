@@ -5,8 +5,7 @@
 
 -type 'access_model'() :: authorize | open | presence | roster | whitelist.
 
--type property() :: {'persist_items', boolean()} |
-                    {'access_model', 'access_model'()}.
+-type property() :: {'access_model', 'access_model'()}.
 -type result() :: [property()].
 
 -type options(T) :: [{binary(), T}].

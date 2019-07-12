@@ -485,13 +485,7 @@ encode_disco_identity_attr_type(_val, _acc) ->
     <<>>;
 'decode_disco_identity_attr_xml:lang'(__TopXMLNS,
 				      _val) ->
-    case catch xmpp_lang:check(_val) of
-      {'EXIT', _} ->
-	  erlang:error({xmpp_codec,
-			{bad_attr_value, <<"xml:lang">>, <<"identity">>,
-			 __TopXMLNS}});
-      _res -> _res
-    end.
+    _val.
 
 'encode_disco_identity_attr_xml:lang'(<<>>, _acc) ->
     _acc;

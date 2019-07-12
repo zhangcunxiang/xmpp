@@ -252,13 +252,7 @@ encode_adhoc_command_attr_node(_val, _acc) ->
     <<>>;
 'decode_adhoc_command_attr_xml:lang'(__TopXMLNS,
 				     _val) ->
-    case catch xmpp_lang:check(_val) of
-      {'EXIT', _} ->
-	  erlang:error({xmpp_codec,
-			{bad_attr_value, <<"xml:lang">>, <<"command">>,
-			 __TopXMLNS}});
-      _res -> _res
-    end.
+    _val.
 
 'encode_adhoc_command_attr_xml:lang'(<<>>, _acc) ->
     _acc;
