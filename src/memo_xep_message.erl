@@ -973,7 +973,8 @@ decode_chat_info_attr_type(__TopXMLNS, undefined) ->
 		  {missing_attr, <<"type">>, <<"chat_info">>,
 		   __TopXMLNS}});
 decode_chat_info_attr_type(__TopXMLNS, _val) ->
-    case catch dec_enum(_val, [oto, topic, group]) of
+    case catch dec_enum(_val, [oto, topic, group, gateway])
+	of
       {'EXIT', _} ->
 	  erlang:error({xmpp_codec,
 			{bad_attr_value, <<"type">>, <<"chat_info">>,
