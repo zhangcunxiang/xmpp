@@ -5375,9 +5375,11 @@ dec_message_type(_) -> normal.
     #elem{name = <<"query">>,
         xmlns= <<"memo:change:pass">>,
         module= 'memo_change_pass',
-        result = {memo_change_pass,'$account','$newpass','$vcode'},
+        result = {memo_change_pass,'$account','$newpass','$vcode', '$phone_number', '$country_code'},
         attrs = [#attr{name = <<"account">>,required= false},
             #attr{name = <<"newpass">>,required= false},
+            #attr{name = <<"country_code">>,required= false},
+            #attr{name = <<"phone_number">>,required= false},
             #attr{name = <<"vcode">>,required= false}]
             }).
 
