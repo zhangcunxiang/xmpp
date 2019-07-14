@@ -425,7 +425,9 @@
 
 -record(memo_change_pass, {account = <<>> :: binary(),
                            newpass = <<>> :: binary(),
-                           vcode = <<>> :: binary()}).
+                           vcode = <<>> :: binary(),
+                           phone_number = <<>> :: binary(),
+                           country_code = <<>> :: binary()}).
 -type memo_change_pass() :: #memo_change_pass{}.
 
 -record(memo_owncloud, {rtype = <<>> :: binary(),

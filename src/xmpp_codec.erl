@@ -1439,7 +1439,7 @@ get_mod({sasl_challenge, _}) -> rfc6120;
 get_mod({compress_failure, _}) -> xep0138;
 get_mod({db_feature, _}) -> xep0220;
 get_mod({handshake, _}) -> xep0114;
-get_mod({memo_change_pass, _, _, _}) ->
+get_mod({memo_change_pass, _, _, _, _, _}) ->
     memo_change_pass;
 get_mod({memo_send_sms, _, _, _}) -> memo_xep_send_sms;
 get_mod({message, _, _, _, _, _, _, _, _, _, _}) ->
