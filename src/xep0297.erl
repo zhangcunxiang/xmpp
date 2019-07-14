@@ -23,28 +23,23 @@ do_get_name({forwarded, _, _}) -> <<"forwarded">>.
 do_get_ns({forwarded, _, _}) ->
     <<"urn:xmpp:forward:0">>.
 
-get_els({forwarded, _delay, _sub_els}) -> _sub_els.
-
-set_els({forwarded, _delay, _}, _sub_els) ->
-    {forwarded, _delay, _sub_els}.
-
-pp(forwarded, 2) -> [delay, sub_els];
+pp(forwarded, 2) -> [delay, xml_els];
 pp(_, _) -> no.
 
 records() -> [{forwarded, 2}].
 
 decode_forwarded(__TopXMLNS, __Opts,
 		 {xmlel, <<"forwarded">>, _attrs, _els}) ->
-    {Delay, __Els} = decode_forwarded_els(__TopXMLNS,
-					  __Opts, _els, undefined, []),
-    {forwarded, Delay, __Els}.
+    {Delay, __Xmls} = decode_forwarded_els(__TopXMLNS,
+					   __Opts, _els, undefined, []),
+    {forwarded, Delay, __Xmls}.
 
 decode_forwarded_els(__TopXMLNS, __Opts, [], Delay,
-		     __Els) ->
-    {Delay, lists:reverse(__Els)};
+		     __Xmls) ->
+    {Delay, lists:reverse(__Xmls)};
 decode_forwarded_els(__TopXMLNS, __Opts,
 		     [{xmlel, <<"delay">>, _attrs, _} = _el | _els], Delay,
-		     __Els) ->
+		     __Xmls) ->
     case xmpp_codec:get_attr(<<"xmlns">>, _attrs,
 			     __TopXMLNS)
 	of
@@ -52,29 +47,27 @@ decode_forwarded_els(__TopXMLNS, __Opts,
 	  decode_forwarded_els(__TopXMLNS, __Opts, _els,
 			       xep0203:decode_delay(<<"urn:xmpp:delay">>,
 						    __Opts, _el),
-			       __Els);
+			       __Xmls);
       _ ->
 	  decode_forwarded_els(__TopXMLNS, __Opts, _els, Delay,
-			       [_el | __Els])
+			       __Xmls)
     end;
 decode_forwarded_els(__TopXMLNS, __Opts,
 		     [{xmlel, _name, _attrs, _} = _el | _els], Delay,
-		     __Els) ->
+		     __Xmls) ->
     decode_forwarded_els(__TopXMLNS, __Opts, _els, Delay,
-			 [_el | __Els]);
+			 [_el | __Xmls]);
 decode_forwarded_els(__TopXMLNS, __Opts, [_ | _els],
-		     Delay, __Els) ->
+		     Delay, __Xmls) ->
     decode_forwarded_els(__TopXMLNS, __Opts, _els, Delay,
-			 __Els).
+			 __Xmls).
 
-encode_forwarded({forwarded, Delay, __Els},
+encode_forwarded({forwarded, Delay, __Xmls},
 		 __TopXMLNS) ->
     __NewTopXMLNS =
 	xmpp_codec:choose_top_xmlns(<<"urn:xmpp:forward:0">>,
 				    [], __TopXMLNS),
-    _els = [xmpp_codec:encode(_el, __NewTopXMLNS)
-	    || _el <- __Els]
-	     ++
+    _els = __Xmls ++
 	     lists:reverse('encode_forwarded_$delay'(Delay,
 						     __NewTopXMLNS, [])),
     _attrs = xmpp_codec:enc_xmlns_attrs(__NewTopXMLNS,

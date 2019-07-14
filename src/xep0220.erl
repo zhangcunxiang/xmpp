@@ -52,20 +52,6 @@ do_get_ns({db_result, _, _, _, _, _}) ->
 do_get_ns({db_verify, _, _, _, _, _, _}) ->
     <<"jabber:server">>.
 
-get_els({db_result, _from, _to, _type, _key,
-	 _sub_els}) ->
-    _sub_els;
-get_els({db_verify, _from, _to, _id, _type, _key,
-	 _sub_els}) ->
-    _sub_els.
-
-set_els({db_result, _from, _to, _type, _key, _},
-	_sub_els) ->
-    {db_result, _from, _to, _type, _key, _sub_els};
-set_els({db_verify, _from, _to, _id, _type, _key, _},
-	_sub_els) ->
-    {db_verify, _from, _to, _id, _type, _key, _sub_els}.
-
 pp(db_result, 5) -> [from, to, type, key, sub_els];
 pp(db_verify, 6) -> [from, to, id, type, key, sub_els];
 pp(db_feature, 1) -> [errors];
@@ -170,7 +156,7 @@ decode_db_verify_els(__TopXMLNS, __Opts,
 	  case xmpp_codec:get_mod(_name, __XMLNS) of
 	    undefined ->
 		decode_db_verify_els(__TopXMLNS, __Opts, _els, Key,
-				     [_el | __Els]);
+				     __Els);
 	    Mod ->
 		decode_db_verify_els(__TopXMLNS, __Opts, _els, Key,
 				     [Mod:do_decode(_name, __XMLNS, _el, __Opts)
@@ -312,7 +298,7 @@ decode_db_result_els(__TopXMLNS, __Opts,
 	  case xmpp_codec:get_mod(_name, __XMLNS) of
 	    undefined ->
 		decode_db_result_els(__TopXMLNS, __Opts, _els, Key,
-				     [_el | __Els]);
+				     __Els);
 	    Mod ->
 		decode_db_result_els(__TopXMLNS, __Opts, _els, Key,
 				     [Mod:do_decode(_name, __XMLNS, _el, __Opts)

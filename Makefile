@@ -6,9 +6,6 @@ all: src
 src:
 	$(REBAR) get-deps compile
 
-first:
-	cat ./specs/memo_extend >> ./specs/xmpp_codec.spec
-
 spec: src/xmpp_codec.erl include/xmpp_codec.hrl deps/fast_xml/ebin/fxml_gen.beam
 	$(ERL) -noinput +B -pa ebin -pa deps/*/ebin -eval \
 	'case fxml_gen:compile("specs/xmpp_codec.spec", [{add_type_specs, xmpp_element}, {erl_dir, "src"}, {hrl_dir, "include"}]) of ok -> halt(0); _ -> halt(1) end.'
