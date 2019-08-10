@@ -568,6 +568,7 @@
                     target_name = <<>> :: binary(),
                     send_user = <<>> :: binary(),
                     max_user = <<>> :: binary(),
+                    data_type = <<>> :: binary(),
                     now_user = <<>> :: binary()}).
 -type chat_info() :: #chat_info{}.
 
