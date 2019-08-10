@@ -690,7 +690,8 @@
                     target_name = <<>> :: binary(),
                     send_user = <<>> :: binary(),
                     max_user = <<>> :: binary(),
-                    now_user = <<>> :: binary()}).
+                    now_user = <<>> :: binary(),
+                    data_type = <<>> :: binary()}).
 -type chat_info() :: #chat_info{}.
 
 -record(memo_info, {memo_type :: 'auth' | 'chat' | 'gateway' | 'in_out' | 'receipt' | 'share' | 'track',
@@ -1414,13 +1415,11 @@
 -type vcard_temp() :: #vcard_temp{}.
 
 -type xmpp_element() :: carbons_sent() |
-                        memo_change_pass() |
-                        memo_scene() |
                         vcard_temp() |
                         muc_invite() |
                         nick() |
                         feature_sm() |
-                        memo_owncloud() |
+                        search_group_item() |
                         jingle() |
                         sasl_auth() |
                         vcard_photo() |
@@ -1428,8 +1427,10 @@
                         sm_r() |
                         offline_item() |
                         mam_fin() |
+                        search_user_item() |
                         vcard_name() |
                         carbons_disable() |
+                        memo_owncloud() |
                         ps_affiliation() |
                         mam_prefs() |
                         bytestreams() |
@@ -1444,6 +1445,7 @@
                         x509_register() |
                         mix_participant() |
                         receipt_request() |
+                        memo_scene_list() |
                         push_notification() |
                         mix() |
                         x509_challenge_failed() |
@@ -1451,7 +1453,6 @@
                         topic_user_item() |
                         stats() |
                         upload_slot() |
-                        search() |
                         ps_unsubscribe() |
                         sasl_challenge() |
                         report() |
@@ -1470,7 +1471,6 @@
                         upload_request_0() |
                         ibb_close() |
                         upload_slot_0() |
-                        memo_scene_list() |
                         roster_query() |
                         x_conference() |
                         legacy_auth_feature() |
@@ -1479,6 +1479,7 @@
                         vcard_logo() |
                         sm_failed() |
                         version() |
+                        memo_group_vcard() |
                         vcard_org() |
                         sic() |
                         muc_decline() |
@@ -1497,10 +1498,13 @@
                         stream_error() |
                         vcard_tel() |
                         private() |
+                        trans_form() |
+                        memo_invite_info() |
                         xdata_field() |
                         identity() |
                         starttls_failure() |
                         streamhost() |
+                        receipt_info() |
                         unblock() |
                         rosterver_feature() |
                         avatar_data() |
@@ -1515,78 +1519,76 @@
                         adhoc_command() |
                         ps_publish() |
                         xmpp_session() |
-                        memo_group_vcard() |
                         jingle_reason() |
                         compression() |
                         delegation_query() |
                         mix_destroy() |
                         x509_challenge() |
-                        memo_check_account() |
                         register() |
                         xcaptcha() |
                         bind() |
                         sasl_response() |
                         jingle_s5b_candidate() |
                         muc_user() |
+                        memo_change_pass() |
                         muc_subscriptions() |
                         privacy_item() |
                         bob_data() |
                         iq() |
                         jingle_ft_description() |
+                        search() |
                         rsm_set() |
+                        gateway_subdevice() |
                         'see-other-host'() |
+                        group_vcard_photo() |
                         ibb_open() |
                         media_uri() |
-                        receipt_info() |
                         sasl_failure() |
+                        memo_check_account() |
                         carbons_private() |
                         roster_item() |
                         mam_archived() |
+                        memo_jingle() |
                         ps_subscription() |
                         bookmark_url() |
                         stream_start() |
-                        search_user_item() |
                         x509_revoke() |
                         muc_item() |
                         mod_gateway() |
-                        search_group_item() |
                         disco_items() |
                         chatstate() |
                         muc_history() |
-                        memo_device_info() |
                         privilege_perm() |
                         jingle_s5b_transport() |
                         pubsub_owner() |
                         vcard_adr() |
                         hash() |
                         presence() |
-                        memo_jingle() |
                         starttls() |
                         compress() |
                         jingle_ft_received() |
                         memo_group_relation() |
+                        auth_info() |
                         compress_failure() |
                         sasl_abort() |
-                        memo_info() |
                         sm_resumed() |
                         offline() |
                         thumbnail() |
                         xdata() |
-                        auth_info() |
+                        memo_search() |
                         sm_enabled() |
                         mix_leave() |
-                        memo_delay_msg() |
+                        memo_scene() |
                         time() |
                         profile() |
                         vcard_key() |
-                        trans_form() |
                         stream_features() |
                         handshake() |
                         adhoc_note() |
                         ps_item() |
                         idle() |
-                        memo_send_sms() |
                         delegated() |
+                        memo_delay_msg() |
                         db_feature() |
                         adhoc_actions() |
                         size() |
@@ -1599,15 +1601,14 @@
                         x509_request() |
                         disco_item() |
                         x509_ca_list() |
-                        group_vcard_photo() |
                         jingle_ft_error() |
                         address() |
                         sm_resume() |
+                        memo_send_sms() |
                         vcard_email() |
-                        memo_invite_info() |
                         ps_subscribe() |
                         db_verify() |
-                        gateway_subdevice() |
+                        sub_device() |
                         bookmark_conference() |
                         bookmark_storage() |
                         mam_query() |
@@ -1617,6 +1618,7 @@
                         muc() |
                         mam_result() |
                         query_topic_info() |
+                        memo_info() |
                         ps_items() |
                         shim() |
                         jingle_ibb_transport() |
@@ -1630,18 +1632,16 @@
                         search_item() |
                         request_info() |
                         ps_event() |
-                        sub_device() |
                         vcard_geo() |
+                        memo_check_sms_login_code() |
                         mix_create() |
                         legacy_auth() |
                         muc_unique() |
                         block() |
                         message_thread() |
-                        memo_check_sms_login_code() |
                         privilege() |
                         memo_group() |
                         origin_id() |
-                        memo_search() |
                         stanza_id() |
                         stat_error() |
                         vcard_sound() |
@@ -1651,6 +1651,7 @@
                         muc_unsubscribe() |
                         muc_subscription() |
                         vcard_xupdate() |
+                        memo_device_info() |
                         stat() |
                         push_disable() |
                         muc_admin() |
