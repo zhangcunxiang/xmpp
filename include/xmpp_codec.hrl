@@ -568,8 +568,8 @@
                     target_name = <<>> :: binary(),
                     send_user = <<>> :: binary(),
                     max_user = <<>> :: binary(),
-                    data_type = <<>> :: binary(),
-                    now_user = <<>> :: binary()}).
+                    now_user = <<>> :: binary(),
+                    data_type = <<>> :: binary()}).
 -type chat_info() :: #chat_info{}.
 
 -record(memo_info, {memo_type :: 'auth' | 'chat' | 'gateway' | 'in_out' | 'receipt' | 'share' | 'track',

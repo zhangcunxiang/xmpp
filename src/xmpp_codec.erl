@@ -1414,7 +1414,7 @@ get_mod({compression, _}) -> xep0138;
 get_mod({mam_prefs, _, _, _, _}) -> xep0313;
 get_mod({query_group_info, _, _, _, _, _, _, _, _}) ->
     memo_xep_group;
-get_mod({chat_info, _, _, _, _, _, _, _, _}) ->
+get_mod({chat_info, _, _, _, _, _, _, _, _, _}) ->
     memo_xep_message;
 get_mod({muc_user, _, _, _, _, _, _}) -> xep0045;
 get_mod({bytestreams, _, _, _, _, _, _}) -> xep0065;
