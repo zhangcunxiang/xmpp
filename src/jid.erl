@@ -6,7 +6,7 @@
 %%% Created : 24 Nov 2015 by Evgeny Khramtsov <ekhramtsov@process-one.net>
 %%%
 %%%
-%%% Copyright (C) 2002-2017 ProcessOne, SARL. All Rights Reserved.
+%%% Copyright (C) 2002-2020 ProcessOne, SARL. All Rights Reserved.
 %%%
 %%% Licensed under the Apache License, Version 2.0 (the "License");
 %%% you may not use this file except in compliance with the License.
@@ -53,6 +53,9 @@
 %%     of 'error | #jid{}' for some functions which is not very good
 -export([from_string/1, to_string/1]).
 -deprecated([{from_string, 1}, {to_string, 1}]).
+
+%% For tests only
+-export([string_to_usr/1]).
 
 -include("jid.hrl").
 
@@ -131,8 +134,13 @@ from_string(S) when is_binary(S) ->
 -spec decode(binary()) -> jid().
 decode(S) when is_binary(S) ->
     case string_to_usr(S) of
-       error -> erlang:error({bad_jid, S});
-       Val -> make(Val)
+	error ->
+	    erlang:error({bad_jid, S});
+	Val ->
+	    case make(Val) of
+		error -> erlang:error({bad_jid, S});
+		Prepped -> Prepped
+	    end
     end.
 
 -spec encode(jid() | ljid()) -> binary().
@@ -198,8 +206,8 @@ resourceprep(S) when byte_size(S) < 1024 ->
     end;
 resourceprep(_) -> error.
 
--spec tolower(jid() | ljid()) -> error | ljid().
-
+-spec tolower(jid()) -> ljid();
+	     (ljid()) -> error | ljid().
 tolower(#jid{luser = U, lserver = S,
 	     lresource = R}) ->
     {U, S, R};
