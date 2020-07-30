@@ -1,13 +1,12 @@
 %%%-------------------------------------------------------------------
 %%% @author Evgeny Khramtsov <ekhramtsov@process-one.net>
-%%% @copyright (C) 2015-2017, Evgeny Khramtsov
 %%% @doc
 %%%
 %%% @end
 %%% Created :  9 Dec 2015 by Evgeny Khramtsov <ekhramtsov@process-one.net>
 %%%
 %%%
-%%% Copyright (C) 2002-2017 ProcessOne, SARL. All Rights Reserved.
+%%% Copyright (C) 2002-2020 ProcessOne, SARL. All Rights Reserved.
 %%%
 %%% Licensed under the Apache License, Version 2.0 (the "License");
 %%% you may not use this file except in compliance with the License.
@@ -25,6 +24,7 @@
 
 -module(xmpp).
 -behaviour(application).
+-dialyzer({nowarn_function, get_els/1}).
 
 %% API
 %% Application callbacks
@@ -37,19 +37,22 @@
 	 get_meta/3, set_type/2, set_to/2, set_from/2, set_id/2,
 	 set_lang/2, set_error/2, set_els/2, set_from_to/3,
 	 set_meta/2, put_meta/3, update_meta/3, del_meta/2,
-	 format_error/1, io_format_error/1, is_stanza/1,
+	 format_error/1, io_format_error/1, is_stanza/1, try_subtag/2,
 	 set_subtag/2, get_subtag/2, remove_subtag/2, has_subtag/2,
 	 decode_els/1, decode_els/3, pp/1, get_name/1, get_text/1,
 	 get_text/2, mk_text/1, mk_text/2, is_known_tag/1, is_known_tag/2,
 	 append_subtags/2, prep_lang/1, register_codec/1, unregister_codec/1,
-	 set_tr_callback/1]).
+	 set_tr_callback/1, format_stanza_error/1, format_stanza_error/2,
+	 format_stream_error/1, format_stream_error/2, format_sasl_error/1,
+	 format_sasl_error/2, set_config/1, get_config/0, get_subtags/2,
+	 try_subtags/2]).
 
 %% XMPP errors
 -export([err_bad_request/0, err_bad_request/2,
          err_conflict/0, err_conflict/2,
          err_feature_not_implemented/0, err_feature_not_implemented/2,
          err_forbidden/0, err_forbidden/2,
-         err_gone/0, err_gone/2,
+         err_gone/1, err_gone/3,
          err_internal_server_error/0, err_internal_server_error/2,
          err_item_not_found/0, err_item_not_found/2,
          err_jid_malformed/0, err_jid_malformed/2,
@@ -59,7 +62,7 @@
 	 err_payment_required/0, err_payment_required/2,
          err_policy_violation/0, err_policy_violation/2,
          err_recipient_unavailable/0, err_recipient_unavailable/2,
-         err_redirect/0, err_redirect/2,
+         err_redirect/1, err_redirect/3,
          err_registration_required/0, err_registration_required/2,
          err_remote_server_not_found/0, err_remote_server_not_found/2,
          err_remote_server_timeout/0, err_remote_server_timeout/2,
@@ -89,7 +92,7 @@
          serr_reset/0, serr_reset/2,
          serr_resource_constraint/0, serr_resource_constraint/2,
          serr_restricted_xml/0, serr_restricted_xml/2,
-         serr_see_other_host/0, serr_see_other_host/2,
+         serr_see_other_host/1, serr_see_other_host/3,
          serr_system_shutdown/0, serr_system_shutdown/2,
          serr_undefined_condition/0, serr_undefined_condition/2,
          serr_unsupported_encoding/0, serr_unsupported_encoding/2,
@@ -101,6 +104,9 @@
 -type reason_text() :: binary() | {io:format(), list()}.
 -type lang() :: binary().
 -type decode_option() :: ignore_els.
+-type config_option() :: {debug, boolean()} | {fqdn, [binary()]}.
+
+-export_type([decode_option/0, config_option/0]).
 
 %%%===================================================================
 %%% Application callbacks
@@ -109,8 +115,15 @@ start(_StartType, _StartArgs) ->
     try
 	{ok, _} = application:ensure_all_started(fast_xml),
 	{ok, _} = application:ensure_all_started(stringprep),
+	{ok, _} = application:ensure_all_started(fast_tls),
+	{ok, _} = application:ensure_all_started(ezlib),
 	ok = jid:start(),
-	{ok, self()}
+	ok = xmpp_uri:start(),
+	ok = xmpp_lang:start(),
+	p1_options:start_link(xmpp_config),
+	p1_options:insert(xmpp_config, debug, global, false),
+	p1_options:insert(xmpp_config, fqdn, global, []),
+	xmpp_sup:start_link()
     catch _:{badmatch, Err} ->
 	    Err
     end.
@@ -195,19 +208,19 @@ get_to(#iq{to = J}) -> J;
 get_to(#message{to = J}) -> J;
 get_to(#presence{to = J}) -> J.
 
--spec get_error(stanza()) -> undefined | stanza_error().
-get_error(Stanza) ->
-    case get_subtag(Stanza, #stanza_error{type = cancel}) of
+-spec get_error(xmpp_element()) -> undefined | stanza_error().
+get_error(Pkt) ->
+    case get_subtag(Pkt, #stanza_error{type = cancel}) of
 	false -> undefined;
 	Error -> Error
     end.
 
--spec get_els(stanza()) -> [xmpp_element() | xmlel()];
+-spec get_els(xmpp_element()) -> [xmpp_element() | xmlel()];
 	     (xmlel()) -> [xmlel()].
-get_els(#iq{sub_els = Els}) -> Els;
-get_els(#message{sub_els = Els}) -> Els;
-get_els(#presence{sub_els = Els}) -> Els;
-get_els(#xmlel{children = Els}) -> [El || El = #xmlel{} <- Els].
+get_els(#xmlel{children = Els}) ->
+    [El || El = #xmlel{} <- Els];
+get_els(Pkt) ->
+    xmpp_codec:get_els(Pkt).
 
 -spec set_id(iq(), binary()) -> iq();
 	    (message(), binary()) -> message();
@@ -256,12 +269,9 @@ set_from_to(#presence{} = Pres, F, T) -> Pres#presence{from = F, to = T}.
 	       (presence(), stanza_error()) -> presence().
 set_error(Stanza, E) -> set_subtag(Stanza, E).
 
--spec set_els(iq(), [xmpp_element() | xmlel()]) -> iq();
-	     (message(), [xmpp_element() | xmlel()]) -> message();
-	     (presence(), [xmpp_element() | xmlel()]) -> presence().
-set_els(#iq{} = IQ, Els) -> IQ#iq{sub_els = Els};
-set_els(#message{} = Msg, Els) -> Msg#message{sub_els = Els};
-set_els(#presence{} = Pres, Els) -> Pres#presence{sub_els = Els}.
+-spec set_els(xmpp_element(), [xmpp_element() | xmlel()]) -> xmpp_element().
+set_els(Pkt, Els) ->
+    xmpp_codec:set_els(Pkt, Els).
 
 -spec get_ns(xmpp_element() | xmlel()) -> binary().
 get_ns(#xmlel{attrs = Attrs}) ->
@@ -338,27 +348,23 @@ decode(#xmlel{} = El, TopXMLNS, Opts) ->
 decode(Pkt, _, _) ->
     Pkt.
 
--spec decode_els(iq()) -> iq();
-		(message()) -> message();
-		(presence()) -> presence().
-decode_els(Stanza) ->
-    decode_els(Stanza, ?NS_CLIENT, fun is_known_tag/1).
+-spec decode_els(xmpp_element()) -> xmpp_element().
+decode_els(Pkt) ->
+    decode_els(Pkt, ?NS_CLIENT, fun is_known_tag/1).
 
 -type match_fun() :: fun((xmlel()) -> boolean()).
--spec decode_els(iq(), binary(), match_fun()) -> iq();
-		(message(), binary(), match_fun()) -> message();
-		(presence(), binary(), match_fun()) -> presence().
-decode_els(Stanza, TopXMLNS, MatchFun) ->
+-spec decode_els(xmpp_element(), binary(), match_fun()) -> xmpp_element().
+decode_els(Pkt, TopXMLNS, MatchFun) ->
     Els = lists:map(
 	    fun(#xmlel{} = El) ->
 		    case MatchFun(El) of
 			true ->	decode(El, TopXMLNS, []);
 			false -> El
 		    end;
-	       (Pkt) ->
-		    Pkt
-	    end, get_els(Stanza)),
-    set_els(Stanza, Els).
+	       (El) ->
+		    El
+	    end, get_els(Pkt)),
+    set_els(Pkt, Els).
 
 -spec encode(xmpp_element() | xmlel()) -> xmlel().
 encode(Pkt) ->
@@ -384,6 +390,30 @@ format_error(Reason) ->
 io_format_error(Reason) ->
     xmpp_codec:io_format_error(Reason).
 
+-spec format_stanza_error(stanza_error()) -> binary().
+format_stanza_error(Err) ->
+    format_stanza_error(Err, <<"en">>).
+
+-spec format_stanza_error(stanza_error(), binary()) -> binary().
+format_stanza_error(#stanza_error{reason = Reason, text = Text}, Lang) ->
+    format_s_error(Reason, Text, Lang).
+
+-spec format_stream_error(stream_error()) -> binary().
+format_stream_error(Err) ->
+    format_stream_error(Err, <<"en">>).
+
+-spec format_stream_error(stream_error(), binary()) -> binary().
+format_stream_error(#stream_error{reason = Reason, text = Text}, Lang) ->
+    format_s_error(Reason, Text, Lang).
+
+-spec format_sasl_error(sasl_failure()) -> binary().
+format_sasl_error(Err) ->
+    format_sasl_error(Err, <<"en">>).
+
+-spec format_sasl_error(sasl_failure(), binary()) -> binary().
+format_sasl_error(#sasl_failure{reason = Reason, text = Text}, Lang) ->
+    format_s_error(Reason, Text, Lang).
+
 -spec is_stanza(any()) -> boolean().
 is_stanza(#message{}) -> true;
 is_stanza(#iq{}) -> true;
@@ -392,16 +422,14 @@ is_stanza(#xmlel{name = Name}) ->
     (Name == <<"iq">>) or (Name == <<"message">>) or (Name == <<"presence">>);
 is_stanza(_) -> false.
 
--spec set_subtag(iq(), xmpp_element()) -> iq();
-		(message(), xmpp_element()) -> message();
-		(presence(), xmpp_element()) -> presence().
-set_subtag(Stanza, Tag) ->
+-spec set_subtag(xmpp_element(), xmpp_element()) -> xmpp_element().
+set_subtag(Pkt, Tag) ->
     TagName = xmpp_codec:get_name(Tag),
-    TopXMLNS = xmpp_codec:get_ns(Stanza),
+    TopXMLNS = xmpp_codec:get_ns(Pkt),
     XMLNS = xmpp_codec:get_ns(Tag),
-    Els = get_els(Stanza),
+    Els = get_els(Pkt),
     NewEls = set_subtag(Els, Tag, TagName, XMLNS, TopXMLNS),
-    set_els(Stanza, NewEls).
+    set_els(Pkt, NewEls).
 
 set_subtag([El|Els], Tag, TagName, XMLNS, TopXMLNS) ->
     case match_tag(El, TagName, XMLNS, TopXMLNS) of
@@ -413,10 +441,10 @@ set_subtag([El|Els], Tag, TagName, XMLNS, TopXMLNS) ->
 set_subtag([], Tag, _, _, _) ->
     [Tag].
 
--spec get_subtag(stanza(), xmpp_element()) -> xmpp_element() | false.
-get_subtag(Stanza, Tag) ->
-    Els = get_els(Stanza),
-    TopXMLNS = xmpp_codec:get_ns(Stanza),
+-spec get_subtag(xmpp_element(), xmpp_element()) -> xmpp_element() | false.
+get_subtag(Pkt, Tag) ->
+    Els = get_els(Pkt),
+    TopXMLNS = xmpp_codec:get_ns(Pkt),
     TagName = xmpp_codec:get_name(Tag),
     XMLNS = xmpp_codec:get_ns(Tag),
     get_subtag(Els, TagName, XMLNS, TopXMLNS).
@@ -435,16 +463,72 @@ get_subtag([El|Els], TagName, XMLNS, TopXMLNS) ->
 get_subtag([], _, _, _) ->
     false.
 
--spec remove_subtag(iq(), xmpp_element()) -> iq();
-		   (message(), xmpp_element()) -> message();
-		   (presence(), xmpp_element()) -> presence().
-remove_subtag(Stanza, Tag) ->
-    Els = get_els(Stanza),
+-spec get_subtags(xmpp_element(), xmpp_element()) -> [xmpp_element()].
+get_subtags(Pkt, Tag) ->
+    Els = get_els(Pkt),
+    TopXMLNS = xmpp_codec:get_ns(Pkt),
     TagName = xmpp_codec:get_name(Tag),
-    TopXMLNS = xmpp_codec:get_ns(Stanza),
+    XMLNS = xmpp_codec:get_ns(Tag),
+    get_subtags(Els, TagName, XMLNS, TopXMLNS, []).
+
+get_subtags([El|Els], TagName, XMLNS, TopXMLNS, Acc) ->
+    case match_tag(El, TagName, XMLNS, TopXMLNS) of
+	true ->
+	    try
+		get_subtags(Els, TagName, XMLNS, TopXMLNS, [decode(El) | Acc])
+	    catch _:{xmpp_codec, _Why} ->
+		get_subtags(Els, TagName, XMLNS, TopXMLNS, Acc)
+	    end;
+	false ->
+	    get_subtags(Els, TagName, XMLNS, TopXMLNS, Acc)
+    end;
+get_subtags([], _, _, _, Acc) ->
+    lists:reverse(Acc).
+
+-spec try_subtag(xmpp_element(), xmpp_element()) -> xmpp_element() | false.
+try_subtag(Pkt, Tag) ->
+    Els = get_els(Pkt),
+    TopXMLNS = xmpp_codec:get_ns(Pkt),
+    TagName = xmpp_codec:get_name(Tag),
+    XMLNS = xmpp_codec:get_ns(Tag),
+    try_subtag(Els, TagName, XMLNS, TopXMLNS).
+
+try_subtag([El|Els], TagName, XMLNS, TopXMLNS) ->
+    case match_tag(El, TagName, XMLNS, TopXMLNS) of
+	true ->
+	    decode(El);
+	false ->
+	    try_subtag(Els, TagName, XMLNS, TopXMLNS)
+    end;
+try_subtag([], _, _, _) ->
+    false.
+
+-spec try_subtags(xmpp_element(), xmpp_element()) -> [xmpp_element()].
+try_subtags(Pkt, Tag) ->
+    Els = get_els(Pkt),
+    TopXMLNS = xmpp_codec:get_ns(Pkt),
+    TagName = xmpp_codec:get_name(Tag),
+    XMLNS = xmpp_codec:get_ns(Tag),
+    try_subtags(Els, TagName, XMLNS, TopXMLNS, []).
+
+try_subtags([El|Els], TagName, XMLNS, TopXMLNS, Acc) ->
+    case match_tag(El, TagName, XMLNS, TopXMLNS) of
+	true ->
+	    try_subtags(Els, TagName, XMLNS, TopXMLNS, [decode(El) | Acc]);
+	false ->
+	    try_subtags(Els, TagName, XMLNS, TopXMLNS, Acc)
+    end;
+try_subtags([], _, _, _, Acc) ->
+    lists:reverse(Acc).
+
+-spec remove_subtag(xmpp_element(), xmpp_element()) -> xmpp_element().
+remove_subtag(Pkt, Tag) ->
+    Els = get_els(Pkt),
+    TagName = xmpp_codec:get_name(Tag),
+    TopXMLNS = xmpp_codec:get_ns(Pkt),
     XMLNS = xmpp_codec:get_ns(Tag),
     NewEls = remove_subtag(Els, TagName, XMLNS, TopXMLNS),
-    set_els(Stanza, NewEls).
+    set_els(Pkt, NewEls).
 
 remove_subtag([El|Els], TagName, XMLNS, TopXMLNS) ->
     case match_tag(El, TagName, XMLNS, TopXMLNS) of
@@ -456,11 +540,11 @@ remove_subtag([El|Els], TagName, XMLNS, TopXMLNS) ->
 remove_subtag([], _, _, _) ->
     [].
 
--spec has_subtag(stanza(), xmpp_element()) -> boolean().
-has_subtag(Stanza, Tag) ->
-    Els = get_els(Stanza),
+-spec has_subtag(xmpp_element(), xmpp_element()) -> boolean().
+has_subtag(Pkt, Tag) ->
+    Els = get_els(Pkt),
     TagName = xmpp_codec:get_name(Tag),
-    TopXMLNS = xmpp_codec:get_ns(Stanza),
+    TopXMLNS = xmpp_codec:get_ns(Pkt),
     XMLNS = xmpp_codec:get_ns(Tag),
     has_subtag(Els, TagName, XMLNS, TopXMLNS).
 
@@ -474,12 +558,10 @@ has_subtag([El|Els], TagName, XMLNS, TopXMLNS) ->
 has_subtag([], _, _, _) ->
     false.
 
--spec append_subtags(iq(), [xmpp_element() | xmlel()]) -> iq();
-		    (message(), [xmpp_element() | xmlel()]) -> message();
-		    (presence(), [xmpp_element() | xmlel()]) -> presence().
-append_subtags(Stanza, Tags) ->
-    Els = get_els(Stanza),
-    set_els(Stanza, Els ++ Tags).
+-spec append_subtags(xmpp_element(), [xmpp_element() | xmlel()]) -> xmpp_element().
+append_subtags(Pkt, Tags) ->
+    Els = get_els(Pkt),
+    set_els(Pkt, Els ++ Tags).
 
 -spec get_text([text()]) -> binary().
 get_text(Text) ->
@@ -491,18 +573,34 @@ get_text(Text, Lang) ->
 
 -spec mk_text(reason_text()) -> [text()].
 mk_text(Text) ->
-    mk_text(Text, <<"en">>).
+    mk_text(Text, <<"">>).
 
 -spec mk_text(reason_text(), lang()) -> [text()].
-mk_text(<<"">>, _) ->
+mk_text(<<"">>, _Lang) ->
     [];
-mk_text(Text, Lang) ->
-    [#text{lang = Lang,
-	   data = translate(Lang, Text)}].
+mk_text({Format, Args}, Lang) ->
+    InFormat = iolist_to_binary(Format),
+    OutFormat = xmpp_tr:tr(Lang, InFormat),
+    InTxt = iolist_to_binary(io_lib:format(InFormat, Args)),
+    if InFormat == OutFormat ->
+	    [#text{data = InTxt, lang = <<"en">>}];
+       true ->
+	    OutTxt = iolist_to_binary(io_lib:format(OutFormat, Args)),
+	    [#text{data = OutTxt, lang = Lang},
+	     #text{data = InTxt, lang = <<"en">>}]
+    end;
+mk_text(InTxt, Lang) ->
+    OutTxt = xmpp_tr:tr(Lang, InTxt),
+    if OutTxt == InTxt ->
+	    [#text{data = InTxt, lang = <<"en">>}];
+       true ->
+	    [#text{data = OutTxt, lang = Lang},
+	     #text{data = InTxt, lang = <<"en">>}]
+    end.
 
 -spec pp(any()) -> iodata().
 pp(Term) ->
-    xmpp_codec:pp(Term).
+    io_lib_pretty:print(Term, fun pp/2).
 
 -spec register_codec(module()) -> ok.
 register_codec(Mod) ->
@@ -522,6 +620,29 @@ set_tr_callback(Callback) ->
 		 end,
     {module, xmpp_tr} = code:load_binary(xmpp_tr, "nofile", Code),
     ok.
+
+-spec set_config([config_option()]) -> ok.
+set_config(Options) ->
+    lists:foreach(
+      fun({debug, Bool}) when is_boolean(Bool) ->
+	      p1_options:insert(xmpp_config, debug, global, Bool);
+	 ({fqdn, Domains}) ->
+	      case lists:all(fun erlang:is_binary/1, Domains) of
+		  true ->
+		      p1_options:insert(xmpp_config, fqdn, global, Domains);
+		  false ->
+		      erlang:error(badarg)
+	      end;
+	 (_) ->
+	      erlang:error(badarg)
+      end, Options),
+    p1_options:compile(xmpp_config).
+
+-spec get_config() -> [config_option()].
+get_config() ->
+    {ok, Debug} = xmpp_config:debug(global),
+    {ok, Domains} = xmpp_config:fqdn(global),
+    [{debug, Debug}, {fqdn, Domains}].
 
 %%%===================================================================
 %%% Functions to construct general XMPP errors
@@ -560,15 +681,15 @@ err_forbidden(Text, Lang) ->
 
 %% RFC 6120 says error type SHOULD be "cancel".
 %% RFC 3920 and XEP-0082 says it SHOULD be "modify".
--spec err_gone() -> stanza_error().
-err_gone() ->
-    err(modify, 'gone', 302).
+-spec err_gone(binary()) -> stanza_error().
+err_gone(URI) ->
+    err(modify, #gone{uri = URI}, 302).
 
--spec err_gone(reason_text(), lang()) -> stanza_error().
-err_gone(Text, Lang) ->
-    err(modify, 'gone', 302, Text, Lang).
+-spec err_gone(binary(), reason_text(), lang()) -> stanza_error().
+err_gone(URI, Text, Lang) ->
+    err(modify, #gone{uri = URI}, 302, Text, Lang).
 
-%% RFC 6120 sasy error type SHOULD be "cancel".
+%% RFC 6120 says error type SHOULD be "cancel".
 %% RFC 3920 and XEP-0082 says it SHOULD be "wait".
 -spec err_internal_server_error() -> stanza_error().
 err_internal_server_error() ->
@@ -644,13 +765,13 @@ err_recipient_unavailable() ->
 err_recipient_unavailable(Text, Lang) ->
     err(wait, 'recipient-unavailable', 404, Text, Lang).
 
--spec err_redirect() -> stanza_error().
-err_redirect() ->
-    err(modify, 'redirect', 302).
+-spec err_redirect(binary()) -> stanza_error().
+err_redirect(URI) ->
+    err(modify, #redirect{uri = URI}, 302).
 
--spec err_redirect(reason_text(), lang()) -> stanza_error().
-err_redirect(Text, Lang) ->
-    err(modify, 'redirect', 302, Text, Lang).
+-spec err_redirect(binary(), reason_text(), lang()) -> stanza_error().
+err_redirect(URI, Text, Lang) ->
+    err(modify, #redirect{uri = URI}, 302, Text, Lang).
 
 -spec err_registration_required() -> stanza_error().
 err_registration_required() ->
@@ -877,13 +998,13 @@ serr_restricted_xml() ->
 serr_restricted_xml(Text, Lang) ->
     serr('restricted-xml', Text, Lang).
 
--spec serr_see_other_host() -> stream_error().
-serr_see_other_host() ->
-    serr('see-other-host').
+-spec serr_see_other_host(xmpp_host()) -> stream_error().
+serr_see_other_host(HostPort) ->
+    serr(#'see-other-host'{host = HostPort}).
 
--spec serr_see_other_host(reason_text(), lang()) -> stream_error().
-serr_see_other_host(Text, Lang) ->
-    serr('see-other-host', Text, Lang).
+-spec serr_see_other_host(xmpp_host(), reason_text(), lang()) -> stream_error().
+serr_see_other_host(HostPort, Text, Lang) ->
+    serr(#'see-other-host'{host = HostPort}, Text, Lang).
 
 -spec serr_system_shutdown() -> stream_error().
 serr_system_shutdown() ->
@@ -946,8 +1067,7 @@ err(Type, Reason, Code) ->
 	  reason_text(), lang()) -> stanza_error().
 err(Type, Reason, Code, Text, Lang) ->
     #stanza_error{type = Type, reason = Reason, code = Code,
-		  text = #text{lang = Lang,
-			       data = translate(Lang, Text)}}.
+		  text = mk_text(Text, Lang)}.
 
 -spec serr(atom() | 'see-other-host'()) -> stream_error().
 serr(Reason) ->
@@ -956,9 +1076,7 @@ serr(Reason) ->
 -spec serr(atom() | 'see-other-host'(), reason_text(),
 	   binary()) -> stream_error().
 serr(Reason, Text, Lang) ->
-    #stream_error{reason = Reason,
-		  text = #text{lang = Lang,
-			       data = translate(Lang, Text)}}.
+    #stream_error{reason = Reason, text = mk_text(Text, Lang)}.
 
 -spec match_tag(xmlel() | xmpp_element(),
 		binary(), binary(), binary()) -> boolean().
@@ -973,13 +1091,6 @@ match_tag(El, TagName, XMLNS, TopXMLNS) ->
 	_ ->
 	    false
     end.
-
--spec translate(lang(), reason_text()) -> binary().
-translate(Lang, {Format, Args}) ->
-    TranslatedFormat = xmpp_tr:tr(Lang, iolist_to_binary(Format)),
-    iolist_to_binary(io_lib:format(TranslatedFormat, Args));
-translate(Lang, Text) ->
-    xmpp_tr:tr(Lang, Text).
 
 -spec prep_lang(binary()) -> binary().
 prep_lang(L) ->
@@ -1021,3 +1132,25 @@ get_tr_forms(Callback) ->
 	      {ok, Form} = erl_parse:parse_form(Tokens),
 	      Form
       end, [Module, Export, Tr]).
+
+-spec format_s_error(atom() | gone() | redirect() | 'see-other-host'(),
+		     [text()], binary()) -> binary().
+format_s_error(Reason, Text, Lang) ->
+    Slogan = if Reason == undefined ->
+		     <<"no reason">>;
+		is_atom(Reason) ->
+		     atom_to_binary(Reason, latin1);
+		is_tuple(Reason) ->
+		     atom_to_binary(element(1, Reason), latin1)
+	     end,
+    case xmpp:get_text(Text, Lang) of
+	<<"">> ->
+	    Slogan;
+	Data ->
+	    <<Data/binary, " (", Slogan/binary, ")">>
+    end.
+
+pp(jid, 6) ->
+    record_info(fields, jid);
+pp(Name, Arity) ->
+    xmpp_codec:pp(Name, Arity).
