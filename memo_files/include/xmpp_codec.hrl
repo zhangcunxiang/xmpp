@@ -1460,7 +1460,6 @@
                         muc_subscribe() |
                         privacy_item() |
                         search_group_item() |
-                        search() |
                         disco_items() |
                         memo_group() |
                         memo_jingle() |
@@ -1535,6 +1534,7 @@
                         message() |
                         mod_topic() |
                         thumbnail() |
+                        text() |
                         redirect() |
                         upload_retry() |
                         position() |
@@ -1545,6 +1545,7 @@
                         time() |
                         block_list() |
                         ps_affiliation() |
+                        search() |
                         presence() |
                         carbons_enable() |
                         mix_join() |
@@ -1677,7 +1678,6 @@
                         version() |
                         request_info() |
                         muc_admin() |
-                        text() |
                         mix_destroy() |
                         search_user_item() |
                         oob_x() |
