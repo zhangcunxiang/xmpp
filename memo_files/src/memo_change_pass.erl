@@ -16,66 +16,91 @@ do_decode(Name, XMLNS, _, _) ->
 
 tags() -> [{<<"query">>, <<"memo:change:pass">>}].
 
-do_encode({memo_change_pass, _, _, _} = Query,
+do_encode({memo_change_pass, _, _, _, _, _} = Query,
 	  TopXMLNS) ->
     encode_memo_change_pass(Query, TopXMLNS).
 
-do_get_name({memo_change_pass, _, _, _}) -> <<"query">>.
+do_get_name({memo_change_pass, _, _, _, _, _}) ->
+    <<"query">>.
 
-do_get_ns({memo_change_pass, _, _, _}) ->
+do_get_ns({memo_change_pass, _, _, _, _, _}) ->
     <<"memo:change:pass">>.
 
-pp(memo_change_pass, 3) -> [account, newpass, vcode];
+pp(memo_change_pass, 5) ->
+    [account, newpass, vcode, phone_number, country_code];
 pp(_, _) -> no.
 
-records() -> [{memo_change_pass, 3}].
+records() -> [{memo_change_pass, 5}].
 
 decode_memo_change_pass(__TopXMLNS, __Opts,
 			{xmlel, <<"query">>, _attrs, _els}) ->
-    {Account, Newpass, Vcode} =
+    {Account, Newpass, Vcode, Phone_number, Country_code} =
 	decode_memo_change_pass_attrs(__TopXMLNS, _attrs,
-				      undefined, undefined, undefined),
-    {memo_change_pass, Account, Newpass, Vcode}.
+				      undefined, undefined, undefined,
+				      undefined, undefined),
+    {memo_change_pass, Account, Newpass, Vcode,
+     Phone_number, Country_code}.
 
 decode_memo_change_pass_attrs(__TopXMLNS,
 			      [{<<"account">>, _val} | _attrs], _Account,
-			      Newpass, Vcode) ->
+			      Newpass, Vcode, Phone_number, Country_code) ->
     decode_memo_change_pass_attrs(__TopXMLNS, _attrs, _val,
-				  Newpass, Vcode);
+				  Newpass, Vcode, Phone_number, Country_code);
 decode_memo_change_pass_attrs(__TopXMLNS,
 			      [{<<"newpass">>, _val} | _attrs], Account,
-			      _Newpass, Vcode) ->
+			      _Newpass, Vcode, Phone_number, Country_code) ->
     decode_memo_change_pass_attrs(__TopXMLNS, _attrs,
-				  Account, _val, Vcode);
+				  Account, _val, Vcode, Phone_number,
+				  Country_code);
 decode_memo_change_pass_attrs(__TopXMLNS,
 			      [{<<"vcode">>, _val} | _attrs], Account, Newpass,
-			      _Vcode) ->
+			      _Vcode, Phone_number, Country_code) ->
     decode_memo_change_pass_attrs(__TopXMLNS, _attrs,
-				  Account, Newpass, _val);
+				  Account, Newpass, _val, Phone_number,
+				  Country_code);
+decode_memo_change_pass_attrs(__TopXMLNS,
+			      [{<<"phone_number">>, _val} | _attrs], Account,
+			      Newpass, Vcode, _Phone_number, Country_code) ->
+    decode_memo_change_pass_attrs(__TopXMLNS, _attrs,
+				  Account, Newpass, Vcode, _val, Country_code);
+decode_memo_change_pass_attrs(__TopXMLNS,
+			      [{<<"country_code">>, _val} | _attrs], Account,
+			      Newpass, Vcode, Phone_number, _Country_code) ->
+    decode_memo_change_pass_attrs(__TopXMLNS, _attrs,
+				  Account, Newpass, Vcode, Phone_number, _val);
 decode_memo_change_pass_attrs(__TopXMLNS, [_ | _attrs],
-			      Account, Newpass, Vcode) ->
+			      Account, Newpass, Vcode, Phone_number,
+			      Country_code) ->
     decode_memo_change_pass_attrs(__TopXMLNS, _attrs,
-				  Account, Newpass, Vcode);
+				  Account, Newpass, Vcode, Phone_number,
+				  Country_code);
 decode_memo_change_pass_attrs(__TopXMLNS, [], Account,
-			      Newpass, Vcode) ->
+			      Newpass, Vcode, Phone_number, Country_code) ->
     {decode_memo_change_pass_attr_account(__TopXMLNS,
 					  Account),
      decode_memo_change_pass_attr_newpass(__TopXMLNS,
 					  Newpass),
-     decode_memo_change_pass_attr_vcode(__TopXMLNS, Vcode)}.
+     decode_memo_change_pass_attr_vcode(__TopXMLNS, Vcode),
+     decode_memo_change_pass_attr_phone_number(__TopXMLNS,
+					       Phone_number),
+     decode_memo_change_pass_attr_country_code(__TopXMLNS,
+					       Country_code)}.
 
 encode_memo_change_pass({memo_change_pass, Account,
-			 Newpass, Vcode},
+			 Newpass, Vcode, Phone_number, Country_code},
 			__TopXMLNS) ->
     __NewTopXMLNS =
 	xmpp_codec:choose_top_xmlns(<<"memo:change:pass">>, [],
 				    __TopXMLNS),
     _els = [],
-    _attrs = encode_memo_change_pass_attr_vcode(Vcode,
-						encode_memo_change_pass_attr_newpass(Newpass,
-										     encode_memo_change_pass_attr_account(Account,
-															  xmpp_codec:enc_xmlns_attrs(__NewTopXMLNS,
-																		     __TopXMLNS)))),
+    _attrs =
+	encode_memo_change_pass_attr_country_code(Country_code,
+						  encode_memo_change_pass_attr_phone_number(Phone_number,
+											    encode_memo_change_pass_attr_vcode(Vcode,
+															       encode_memo_change_pass_attr_newpass(Newpass,
+																				    encode_memo_change_pass_attr_account(Account,
+																									 xmpp_codec:enc_xmlns_attrs(__NewTopXMLNS,
+																												    __TopXMLNS)))))),
     {xmlel, <<"query">>, _attrs, _els}.
 
 decode_memo_change_pass_attr_account(__TopXMLNS,
@@ -111,3 +136,27 @@ decode_memo_change_pass_attr_vcode(__TopXMLNS, _val) ->
 encode_memo_change_pass_attr_vcode(<<>>, _acc) -> _acc;
 encode_memo_change_pass_attr_vcode(_val, _acc) ->
     [{<<"vcode">>, _val} | _acc].
+
+decode_memo_change_pass_attr_phone_number(__TopXMLNS,
+					  undefined) ->
+    <<>>;
+decode_memo_change_pass_attr_phone_number(__TopXMLNS,
+					  _val) ->
+    _val.
+
+encode_memo_change_pass_attr_phone_number(<<>>, _acc) ->
+    _acc;
+encode_memo_change_pass_attr_phone_number(_val, _acc) ->
+    [{<<"phone_number">>, _val} | _acc].
+
+decode_memo_change_pass_attr_country_code(__TopXMLNS,
+					  undefined) ->
+    <<>>;
+decode_memo_change_pass_attr_country_code(__TopXMLNS,
+					  _val) ->
+    _val.
+
+encode_memo_change_pass_attr_country_code(<<>>, _acc) ->
+    _acc;
+encode_memo_change_pass_attr_country_code(_val, _acc) ->
+    [{<<"country_code">>, _val} | _acc].

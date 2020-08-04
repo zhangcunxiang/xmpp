@@ -1685,8 +1685,6 @@ get_mod({memo_delay_msg, _, _, _, _, _, _}) ->
     memo_delay_msg;
 get_mod({disco_items, _, _, _}) -> xep0030;
 get_mod({vcard_xupdate, _}) -> xep0153;
-get_mod({memo_change_pass, _, _, _}) ->
-    memo_change_pass;
 get_mod({memo_send_sms, _, _, _}) -> memo_xep_send_sms;
 get_mod({block_item, _, _}) -> xep0191;
 get_mod({message, _, _, _, _, _, _, _, _, _, _}) ->
@@ -1839,6 +1837,8 @@ get_mod({delegation, _, _}) -> xep0355;
 get_mod({x509_challenge, _, _, _}) -> xep0417;
 get_mod({mod_topic, _, _, _, _, _}) -> memo_xep_topic;
 get_mod({sub_device, _, _, _}) -> memo_xep_message;
+get_mod({memo_change_pass, _, _, _, _, _}) ->
+    memo_change_pass;
 get_mod({sm_enabled, _, _, _, _, _}) -> xep0198;
 get_mod({topic_user_item, _, _, _, _}) ->
     memo_xep_topic;

@@ -508,7 +508,9 @@
 
 -record(memo_change_pass, {account = <<>> :: binary(),
                            newpass = <<>> :: binary(),
-                           vcode = <<>> :: binary()}).
+                           vcode = <<>> :: binary(),
+                           phone_number = <<>> :: binary(),
+                           country_code = <<>> :: binary()}).
 -type memo_change_pass() :: #memo_change_pass{}.
 
 -record(memo_owncloud, {rtype = <<>> :: binary(),
@@ -1449,20 +1451,19 @@
                         query_group_info() |
                         iq() |
                         stream_features() |
-                        memo_device_info() |
                         muc_invite() |
                         addresses() |
                         chatstate() |
                         sasl_success() |
                         muc_subscriptions() |
                         vcard_photo() |
+                        memo_scene_list() |
                         group_vcard_photo() |
                         muc_subscribe() |
                         privacy_item() |
                         search_group_item() |
                         disco_items() |
                         memo_group() |
-                        memo_jingle() |
                         feature_sm() |
                         db_verify() |
                         origin_id() |
@@ -1512,6 +1513,7 @@
                         sasl_failure() |
                         receipt_request() |
                         ps_items() |
+                        memo_send_sms() |
                         roster_query() |
                         caps() |
                         x509_revoke() |
@@ -1534,18 +1536,17 @@
                         message() |
                         mod_topic() |
                         thumbnail() |
-                        text() |
                         redirect() |
                         upload_retry() |
                         position() |
                         x509_challenge_failed() |
                         x509_challenge() |
+                        memo_invite_info() |
                         sm_a() |
                         x_conference() |
                         time() |
                         block_list() |
                         ps_affiliation() |
-                        search() |
                         presence() |
                         carbons_enable() |
                         mix_join() |
@@ -1555,7 +1556,6 @@
                         search_item() |
                         carbons_received() |
                         feature_csi() |
-                        memo_send_sms() |
                         delay() |
                         upload_file_too_large() |
                         sic() |
@@ -1566,12 +1566,10 @@
                         jingle_ft_file() |
                         vcard_logo() |
                         jingle_ft_received() |
-                        trans_form() |
                         legacy_auth() |
                         stream_start() |
                         handshake() |
                         ibb_close() |
-                        memo_scene_list() |
                         mix_setnick() |
                         muc_history() |
                         ps_error() |
@@ -1595,8 +1593,8 @@
                         expire() |
                         topic_user_item() |
                         muc_unsubscribe() |
+                        trans_form() |
                         ping() |
-                        memo_invite_info() |
                         xevent() |
                         privilege() |
                         rsm_set() |
@@ -1613,6 +1611,7 @@
                         stanza_id() |
                         ps_retract() |
                         mix_create() |
+                        memo_jingle() |
                         stats() |
                         vcard_label() |
                         x509_ca_list() |
@@ -1637,6 +1636,7 @@
                         vcard_tel() |
                         block() |
                         mam_prefs() |
+                        text() |
                         services() |
                         xdata_option() |
                         sm_resume() |
@@ -1647,6 +1647,7 @@
                         gone() |
                         privacy_query() |
                         muc_actor() |
+                        memo_device_info() |
                         feature_register() |
                         block_item() |
                         carbons_private() |
@@ -1671,6 +1672,7 @@
                         delegation_query() |
                         memo_check_sms_login_code() |
                         jingle_reason() |
+                        search() |
                         rsm_first() |
                         muc_user() |
                         jingle_s5b_candidate() |
