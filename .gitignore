@@ -1,5 +1,4 @@
 c_src/*.o
 deps/
 ebin/
-c_src/
 priv/
